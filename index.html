@@ -3,428 +3,603 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>中部北陸極簡之旅</title>
+    <title>名古屋・高山 追楓之旅</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Vue.js -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        maple: {
+                            100: '#FDF7F5', // 極淺底色
+                            200: '#F7E7E3',
+                            500: '#C75D4E', // 楓葉紅主色
+                            700: '#8A3B31', // 深楓葉紅
+                        },
+                        ui: {
+                            bg: '#FDF7F5', // 對應第4點：背景顏色依照楓葉底色延伸
+                            card: '#FFFFFF',
+                        }
+                    },
+                    borderRadius: {
+                        '4xl': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            /* 日式極簡色彩 (大地色、低飽和) */
-            --bg-color: #F9F8F6;
-            --text-main: #2C2C2C;
-            --text-muted: #7A7A7A;
-            --primary: #8C7A6B;
-            --card-bg: #FFFFFF;
-            --border: #E8E5DF;
-            
-            /* 標籤色彩 */
-            --tag-eat: #D96C6C;     /* 必吃美食：紅色系 */
-            --tag-order: #D98E6C;   /* 必點菜單：橘色系 */
-            --tag-buy: #6C8D74;     /* 必買伴手禮：綠色系 */
-            --tag-code: #896CD9;    /* 重要預約：紫色系 */
-            
-            /* 分類色彩 */
-            --cat-attraction: #E8F0EA;
-            --cat-food: #FCEAE8;
-            --cat-transport: #E8EEFC;
+        /* 隱藏滾動條但保留功能 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        body { background-color: #FDF7F5; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        
+        /* 頁首Banner (要求3) */
+        .hero-banner {
+            height: 250px; /* 手機比例調整，原始要求 1920x400 的等比縮放感 */
+            background-image: linear-gradient(rgba(199, 93, 78, 0.4), rgba(138, 59, 49, 0.7)), url('https://images.unsplash.com/photo-1490806840057-33630f40fb17?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            position: relative;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Helvetica Neue", sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: #EAEaea; display: flex; justify-content: center; color: var(--text-main); }
-        
-        #app-container {
-            width: 100%; max-width: 480px; min-height: 100vh; background: var(--bg-color);
-            position: relative; padding-bottom: 80px; box-shadow: 0 0 20px rgba(0,0,0,0.05);
-            overflow-x: hidden;
+        /* 圓弧銜接與負邊距 (要求5) */
+        .content-overlay {
+            background-color: #FDF7F5;
+            border-top-left-radius: 2rem;
+            border-top-right-radius: 2rem;
+            margin-top: -30px;
+            position: relative;
+            min-height: calc(100vh - 220px);
+            padding-bottom: 90px; /* 留給 Bottom Nav */
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
         }
 
-        /* Top Header */
-        header { background: var(--card-bg); padding: 20px 16px 15px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; }
-        h1 { font-size: 1.2rem; font-weight: 600; text-align: center; color: var(--primary); letter-spacing: 1px; }
-
-        /* Main Views */
-        .view { display: none; padding: 16px; animation: fadeIn 0.3s ease; }
-        .view.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Day Navigation */
-        .day-nav { display: flex; overflow-x: auto; gap: 10px; padding: 5px 0 15px; scrollbar-width: none; border-bottom: 1px solid var(--border); margin-bottom: 15px; }
-        .day-nav::-webkit-scrollbar { display: none; }
-        .day-tab { padding: 8px 16px; background: transparent; border: 1px solid var(--border); border-radius: 20px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer; white-space: nowrap; transition: 0.2s; }
-        .day-tab.active { background: var(--primary); color: #FFF; border-color: var(--primary); font-weight: 500; box-shadow: 0 2px 6px rgba(140,122,107,0.3); }
-
-        /* Weather Banner */
-        .weather-banner { display: block; text-decoration: none; background: #F0F4F8; border-radius: 12px; padding: 12px; text-align: center; color: #4A6572; font-size: 0.9rem; margin-bottom: 16px; font-weight: 500; border: 1px solid #DCE6ED; }
-        .weather-banner span { margin-right: 5px; }
-
-        /* Cards */
-        .day-content { display: none; }
-        .day-content.active { display: block; }
-        .card { background: var(--card-bg); border-radius: 16px; padding: 16px; margin-bottom: 16px; border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        /* 拖曳動畫過渡 */
+        .list-enter-active, .list-leave-active { transition: all 0.3s ease; }
+        .list-enter-from, .list-leave-to { opacity: 0; transform: translateX(30px); }
         
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .category { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px; }
-        .cat-attraction { background: var(--cat-attraction); color: #2E5C3A; }
-        .cat-food { background: var(--cat-food); color: #B33A3A; }
-        .cat-transport { background: var(--cat-transport); color: #3A5CB3; }
-        .time { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+        /* 浮動的自訂圖標 Tabs (要求：右下方浮在圖片上) */
+        .floating-tabs {
+            position: absolute;
+            bottom: 40px; /* 位於負邊距之上 */
+            right: 20px;
+            display: flex;
+            gap: 12px;
+            z-index: 10;
+        }
+        .tab-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.4);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: white;
+            color: #C75D4E;
+            transform: scale(1.1);
+        }
 
-        .card h3 { font-size: 1.1rem; margin-bottom: 8px; color: var(--text-main); font-weight: 600; }
-        .card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px; }
-        .guide-tip { background: #F6F5F2; padding: 10px 12px; border-radius: 8px; border-left: 3px solid var(--primary); font-size: 0.85rem; color: #5C544D; margin-bottom: 12px; line-height: 1.5;}
-
-        /* Highlight Badges */
-        .badges { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
-        .badge { display: inline-flex; align-items: center; padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; color: #FFF; width: fit-content; }
-        .badge-eat { background: var(--tag-eat); }
-        .badge-order { background: var(--tag-order); }
-        .badge-buy { background: var(--tag-buy); }
-        .badge-code { background: var(--tag-code); }
-
-        /* Navigation Button */
-        .nav-btn { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 12px; background: #FAFAFA; border: 1px solid var(--border); border-radius: 10px; color: var(--text-main); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: background 0.2s; }
-        .nav-btn:active { background: #F0F0F0; }
-
-        /* Currency & Info Styles */
-        .section-title { font-size: 1.05rem; font-weight: 600; margin: 20px 0 12px; color: var(--text-main); padding-left: 8px; border-left: 4px solid var(--primary); }
-        .info-box { background: var(--card-bg); border-radius: 12px; padding: 15px; border: 1px solid var(--border); margin-bottom: 16px; }
-        .info-row { display: flex; flex-direction: column; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #F0F0F0; }
-        .info-row:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
-        .info-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
-        .info-value { font-size: 0.95rem; font-weight: 500; }
-
-        /* Calculator */
-        .calc-box { display: flex; flex-direction: column; gap: 15px; }
-        .input-group { display: flex; align-items: center; background: #F9F9F9; border: 1px solid var(--border); border-radius: 10px; padding: 10px 15px; }
-        .input-group span { font-weight: 600; color: var(--text-muted); width: 40px; }
-        .input-group input { flex: 1; border: none; background: transparent; font-size: 1.2rem; outline: none; font-weight: 500; color: var(--text-main); }
-        .result-box { text-align: center; padding: 20px; background: var(--primary); color: #FFF; border-radius: 12px; }
-        .result-box .label { font-size: 0.85rem; opacity: 0.8; margin-bottom: 5px; }
-        .result-box .amount { font-size: 1.8rem; font-weight: bold; }
-        .rate-hint { text-align: right; font-size: 0.75rem; color: var(--text-muted); margin-top: -5px; }
-
-        /* Bottom Nav Bar */
-        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; height: 70px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 100; padding-bottom: env(safe-area-inset-bottom, 0px); }
-        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 60px; height: 100%; color: var(--text-muted); text-decoration: none; font-size: 0.7rem; font-weight: 500; gap: 4px; cursor: pointer; }
-        .nav-item.active { color: var(--primary); }
-        .nav-icon { font-size: 1.4rem; }
+        /* 底部新增按鈕 */
+        .fab-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: #C75D4E;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(199, 93, 78, 0.4);
+            z-index: 50;
+        }
     </style>
 </head>
 <body>
 
-<div id="app-container">
-    <header>
-        <h1>10/29 - 11/3 中部北陸之旅</h1>
-    </header>
-
-    <!-- 視圖 1: 每日行程 -->
-    <div id="view-itinerary" class="view active">
-        <!-- 天數切換 -->
-        <div class="day-nav">
-            <button class="day-tab active" onclick="switchDay(1)">10/29 (Day 1)</button>
-            <button class="day-tab" onclick="switchDay(2)">10/30 (Day 2)</button>
-            <button class="day-tab" onclick="switchDay(3)">10/31 (Day 3)</button>
-            <button class="day-tab" onclick="switchDay(4)">11/1 (Day 4)</button>
-            <button class="day-tab" onclick="switchDay(5)">11/2 (Day 5)</button>
-            <button class="day-tab" onclick="switchDay(6)">11/3 (Day 6)</button>
+<div id="app" class="relative max-w-md mx-auto min-h-screen bg-ui-bg shadow-lg overflow-hidden">
+    
+    <!-- Hero Banner (要求3) -->
+    <div class="hero-banner flex items-start pt-12 px-6">
+        <div>
+            <h1 class="text-3xl font-bold text-white tracking-wider drop-shadow-md">中部北陸</h1>
+            <p class="text-white/90 text-sm mt-1 tracking-widest">AUTUMN IN JAPAN 2026</p>
         </div>
-
-        <!-- Day 1 -->
-        <div id="day-1" class="day-content active">
-            <a href="https://tenki.jp/forecast/4/21/5110/23100/" target="_blank" class="weather-banner">
-                <span>🌤️</span> 名古屋・高山 即時天氣 (點擊查看)
-            </a>
-            
-            <div class="card">
-                <div class="card-header"><span class="category cat-transport">交通</span><span class="time">02:55 - 06:25</span></div>
-                <h3>搭機抵達名古屋</h3>
-                <p>桃園機場出發至名古屋機場。出關後可買早餐或至名古屋車站購買。</p>
-                <a href="https://www.google.com/maps/search/?api=1&query=Chubu+Centrair+International+Airport" class="nav-btn" target="_blank">📍 導航至 中部國際機場</a>
-            </div>
-
-            <div class="card">
-                <div class="card-header"><span class="category cat-transport">交通</span><span class="time">07:26 - 10:58</span></div>
-                <h3>前往高山市</h3>
-                <p>搭乘 µ-SKY 至名古屋車站 (最晚搭07:26班次)，轉乘至高山 (Klook車票)。</p>
-                <a href="https://www.google.com/maps/search/?api=1&query=Takayama+Station" class="nav-btn" target="_blank">📍 導航至 高山車站</a>
-            </div>
-
-            <div class="card">
-                <div class="card-header"><span class="category cat-food">餐廳</span><span class="time">10:58 - 12:00</span></div>
-                <h3>中橋 WAKACHIYA</h3>
-                <p>抵達高山後，步行約 10-15 分鐘前往享用午餐。</p>
-                <div class="guide-tip">💡 導遊專屬攻略：這間店以高品質飛驒牛聞名，入口即化的油花搭配壽喜燒醬汁是絕配。</div>
-                <div class="badges">
-                    <span class="badge badge-eat">🥩 必吃美食：飛驒牛 SUKIYAKI</span>
-                </div>
-                <a href="https://www.google.com/maps/search/?api=1&query=中橋+WAKACHIYA" class="nav-btn" target="_blank">📍 導航至 餐廳</a>
-            </div>
-
-            <div class="card">
-                <div class="card-header"><span class="category cat-attraction">景點</span><span class="time">14:00 - 18:00</span></div>
-                <h3>飛驒高山老街 + 高山陣屋</h3>
-                <p>飯店放完行李後，漫步於充滿江戶風情的老街與歷史陣屋。</p>
-                <div class="guide-tip">💡 導遊專屬攻略：古色古香的街道極具氛圍，這時利用 Sony a6700 搭配 18-50mm 焦段直出 JPG 的色彩，能完美捕捉木造建築的溫潤感與街頭人像，不需要頻繁換鏡頭。</div>
-                <a href="https://www.google.com/maps/search/?api=1&query=高山陣屋" class="nav-btn" target="_blank">📍 導航至 高山老街</a>
-            </div>
-
-            <div class="card">
-                <div class="card-header"><span class="category cat-food">餐廳</span><span class="time">18:00 - 19:00</span></div>
-                <h3>中華拉麺 つづみ</h3>
-                <p>晚餐享用在地經典的高山拉麵。</p>
-                <a href="https://www.google.com/maps/search/?api=1&query=中華拉麺+つづみ" class="nav-btn" target="_blank">📍 導航至 拉麵店</a>
-            </div>
-        </div>
-
-        <!-- Day 2 -->
-        <div id="day-2" class="day-content">
-            <a href="https://tenki.jp/forecast/4/21/5110/23100/" target="_blank" class="weather-banner">
-                <span>🌲</span> 上高地 即時天氣 (點擊查看)
-            </a>
-            
-            <div class="card">
-                <div class="card-header"><span class="category cat-transport">交通</span><span class="time">07:00 - 09:00</span></div>
-                <h3>出發前往上高地</h3>
-                <p>06:00 起床。於濃飛巴士總站 5號售票處買來回票。先搭至平湯溫泉，再轉乘 2號月台至大正池。</p>
-                <a href="https://www.google.com/maps/search/?api=1&query=大正池" class="nav-btn" target="_blank">📍 導航至 大正池</a>
-            </div>
-
-            <div class="card">
-                <div class="card-header"><span class="category cat-attraction">景點</span><span class="time">09:00 - 15:00</span></div>
-                <h3>上高地絕景健行</h3>
-                <p>路線：大正池 → 河童橋 (午餐/點心) → 梓川左岸 → 明神池 → 梓川右岸返回。</p>
-                <div class="guide-tip">💡 導遊專屬攻略：走在阿爾卑斯山脈間的自然步道，光影變化極快，f/2.8 的大光圈即使在林間也能保持畫質純淨，拍出通透的湖面反光。</div>
-                <div class="badges">
-                    <span class="badge badge-eat">🥧 必吃美食：河童橋蘋果派、河童燒</span>
-                    <span class="badge badge-order">🍮 必點菜單：五千尺飯店卡士達布丁</span>
-                </div>
-                <a href="https://www.google.com/maps/search/?api=1&query=河童橋" class="nav-btn" target="_blank">📍 導航至 河童橋</a>
-            </div>
-
-            <div class="card">
-                <div class="card-header"><span class="category cat-food">餐廳</span><span class="time">18:30</span></div>
-                <h3>味の与平</h3>
-                <p>15:00 返回高山休息後，晚餐享用精緻料理。</p>
-                <div class="badges">
-                    <span class="badge badge-code">🔑 重要預約代號：JZ44GD5SC5</span>
-                </div>
-                <a href="https://www.google.com/maps/search/?api=1&query=味の与平" class="nav-btn" target="_blank">📍 導航至 味の与平</a>
-            </div>
-        </div>
-
-        <!-- Day 3 -->
-        <div id="day-3" class="day-content">
-             <a href="https://tenki.jp/forecast/4/21/5110/23100/" target="_blank" class="weather-banner">
-                <span>🍂</span> 白川鄉・名古屋 即時天氣 (點擊查看)
-            </a>
-            
-            <div class="card">
-                <div class="card-header"><span class="category cat-food">餐廳</span><span class="time">06:00 - 07:00</span></div>
-                <h3>かじ橋食堂 早餐</h3>
-                <p>05:30 起床，享用在地朝食後出發至車站。</p>
-                <a href="https://www.google.com/maps/search/?api=1&query=かじ橋食堂" class="nav-btn" target="_blank">📍 導航至 餐廳</a>
-            </div>
-
-            <div class="card">
-                <div class="card-header"><span class="category cat-attraction">景點</span><span class="time">08:20 - 14:00</span></div>
-                <h3>白川鄉合掌村</h3>
-                <p>07:20 搭乘巴士前往白川鄉。走訪世界遺產「城山展望台」，俯瞰被秋意包圍的茅草屋聚落。</p>
-                <div class="guide-tip">💡 導遊專屬攻略：展望台的廣闊視野是絕佳拍攝點，標準變焦鏡的廣角端能將群山與童話般的聚落完整收納入鏡。</div>
-                <a href="https://www.google.com/maps/search/?api=1&query=白川鄉城山展望台" class="nav-btn" target="_blank">📍 導航至 展望台</a>
-            </div>
-
-            <div class="card">
-                <div class="card-header"><span class="category cat-food">餐廳</span><span class="time">17:30 報到</span></div>
-                <h3>炭燒鰻魚藤榮 HAERA店</h3>
-                <p>14:30 搭乘高速巴士前往名古屋市區。晚上享用知名炭烤鰻魚飯。</p>
-                <div class="badges">
-                    <span class="badge badge-order">🍱 必點菜單：炭烤鰻魚飯 (鰻魚三吃)</span>
-                    <span class="badge badge-code">🔑 重要預訂編號：99bc9420</span>
-                </div>
-                <a href="https://www.google.com/maps/search/?api=1&query=炭焼きうな富士" class="nav-btn" target="_blank">📍 導航至 鰻魚飯</a>
-            </div>
-        </div>
-
-        <!-- Day 4 -->
-        <div id="day-4" class="day-content">
-             <a href="https://tenki.jp/forecast/4/21/5110/23100/" target="_blank" class="weather-banner">
-                <span>🎡</span> 長久手市 即時天氣 (點擊查看)
-            </a>
-            
-            <div class="card">
-                <div class="card-header"><span class="category cat-attraction">景點</span><span class="time">全日</span></div>
-                <h3>吉卜力公園 Ghibli Park</h3>
-                <p>享用飯店早餐後，出發前往沉浸式體驗宮崎駿動畫世界。</p>
-                <div class="guide-tip">💡 導遊專屬攻略：園區內有眾多隱藏的動畫彩蛋與互動場景，記得預留充足的停留時間。</div>
-                <div class="badges">
-                    <span class="badge badge-code">⚠️ 搶票提醒：2026/9/10 台灣時間 13:00 準時開賣</span>
-                </div>
-                <a href="https://www.google.com/maps/search/?api=1&query=Ghibli+Park" class="nav-btn" target="_blank">📍 導航至 吉卜力公園</a>
-            </div>
-        </div>
-
-        <!-- Day 5 -->
-        <div id="day-5" class="day-content">
-             <a href="https://tenki.jp/forecast/4/21/5110/23100/" target="_blank" class="weather-banner">
-                <span>🏯</span> 犬山 即時天氣 (點擊查看)
-            </a>
-            
-            <div class="card">
-                <div class="card-header"><span class="category cat-attraction">景點</span><span class="time">白天</span></div>
-                <h3>犬山城下町與三光稻荷神社</h3>
-                <p>路線：犬山站出發 → 城下町上山 → 犬山城天守閣 → 三光稻荷神社 → 城下町吃小吃 → 傍晚返回名古屋。</p>
-                <div class="guide-tip">💡 導遊專屬攻略：三光稻荷神社以「粉紅色愛心繪馬」爆紅！別忘了將硬幣或錢包在石上以水沖洗體驗「洗錢」，據說能招財提升財運。</div>
-                <a href="https://www.google.com/maps/search/?api=1&query=犬山城" class="nav-btn" target="_blank">📍 導航至 犬山城</a>
-            </div>
-
-            <div class="card">
-                <div class="card-header"><span class="category cat-food">餐廳</span><span class="time">城下町美食清單</span></div>
-                <h3>犬山城下町 散策美食</h3>
-                <p>集結各家老街特色小吃與得獎甜點。</p>
-                <div class="badges">
-                    <span class="badge badge-eat">🥩 必吃美食：犬山牛太郎 A5飛驒牛握壽司</span>
-                    <span class="badge badge-order">🍡 必點菜單：本町茶寮 (彩り田楽御膳、五色餅與抹茶)</span>
-                    <span class="badge badge-order">🍢 必點菜單：壽俵屋 (醤油おこげ串)、Tonamaru串炸</span>
-                    <span class="badge badge-eat">🍓 必吃美食：戀小町團子、芳川屋草莓冰淇淋</span>
-                    <span class="badge badge-buy">🎁 必買伴手禮：COCOTOMO FARM 玄米年輪蛋糕 (口感偏硬扎實越嚼越香，常溫保存三週)</span>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header"><span class="category cat-food">餐廳</span><span class="time">晚餐</span></div>
-                <h3>名古屋名物：手羽先</h3>
-                <p>選擇「世界的山將」或「風來坊」，享受道地的名古屋夜晚。</p>
-                <div class="badges">
-                    <span class="badge badge-eat">🍗 必吃美食：手羽先 (炸雞翅) 搭配啤酒</span>
-                </div>
-                <a href="https://www.google.com/maps/search/?api=1&query=世界的山將+名古屋" class="nav-btn" target="_blank">📍 導航至 世界的山將</a>
-            </div>
-        </div>
-
-        <!-- Day 6 -->
-        <div id="day-6" class="day-content">
-             <a href="https://tenki.jp/forecast/4/21/5110/23100/" target="_blank" class="weather-banner">
-                <span>🏙️</span> 名古屋 即時天氣 (點擊查看)
-            </a>
-            
-            <div class="card">
-                <div class="card-header"><span class="category cat-attraction">景點</span><span class="time">10:00 - 14:00</span></div>
-                <h3>名古屋榮商圈 採買與甜點</h3>
-                <p>造訪 HAERA FUEGUIA 1833 與 LOUANGE TOKYO Le Château 體驗頂級甜點與香氛。</p>
-                <div class="guide-tip">💡 導遊專屬攻略：榮商圈周邊也是極佳的採購聖地，推薦可順道尋覓福壽園或一保堂的頂級抹茶粉，或是添購一些能精確控溫、適合批次製作精緻甜點的烘焙模具，為未來的瑪德蓮與費南雪研發帶來新靈感。</div>
-                <a href="https://www.google.com/maps/search/?api=1&query=LOUANGE+TOKYO+Le+Chateau+Nagoya" class="nav-btn" target="_blank">📍 導航至 LOUANGE TOKYO</a>
-            </div>
-
-            <div class="card">
-                <div class="card-header"><span class="category cat-transport">交通</span><span class="time">14:30</span></div>
-                <h3>前往名古屋機場</h3>
-                <p>帶著滿滿的戰利品與回憶，準備搭機返程。</p>
-                <a href="https://www.google.com/maps/search/?api=1&query=Chubu+Centrair+International+Airport" class="nav-btn" target="_blank">📍 導航至 名古屋機場</a>
-            </div>
+        
+        <!-- 浮動 Tabs (功能一) -->
+        <div class="floating-tabs">
+            <button @click="currentTab = 'itinerary'" class="tab-btn" :class="{ 'active': currentTab === 'itinerary' }">
+                <i class="fa-solid fa-map-location-dot"></i>
+            </button>
+            <button @click="currentTab = 'info'" class="tab-btn" :class="{ 'active': currentTab === 'info' }">
+                <i class="fa-solid fa-circle-info"></i>
+            </button>
+            <button @click="currentTab = 'shopping'" class="tab-btn" :class="{ 'active': currentTab === 'shopping' }">
+                <i class="fa-solid fa-basket-shopping"></i>
+            </button>
+            <button @click="currentTab = 'budget'" class="tab-btn" :class="{ 'active': currentTab === 'budget' }">
+                <i class="fa-solid fa-yen-sign"></i>
+            </button>
         </div>
     </div>
 
-    <!-- 視圖 2: 航班與住宿資訊 -->
-    <div id="view-info" class="view">
-        <h2 class="section-title">✈️ 航班資訊</h2>
-        <div class="info-box">
-            <div class="info-row">
-                <div class="info-label">去程航班 (10/29)</div>
-                <div class="info-value">桃園機場 02:55 🛫 名古屋機場 06:25</div>
+    <!-- 內容區塊 (要求5: 圓弧銜接與負邊距) -->
+    <div class="content-overlay px-4 pt-6">
+        
+        <!-- =========================
+             Tab 1: 每日行程 (Itinerary) 
+             ========================= -->
+        <div v-show="currentTab === 'itinerary'" class="animate-[fadeIn_0.3s_ease-out]">
+            
+            <!-- 日期橫向滑動選單 (功能1-1) -->
+            <div class="flex overflow-x-auto gap-4 pb-4 no-scrollbar border-b border-maple-200">
+                <div v-for="(day, index) in days" :key="index" 
+                     @click="selectedDay = index"
+                     class="flex flex-col items-center justify-center min-w-[65px] p-2 rounded-2xl cursor-pointer transition-colors"
+                     :class="selectedDay === index ? 'bg-maple-500 text-white shadow-md' : 'bg-white text-gray-400'">
+                    <span class="text-xs uppercase font-bold">{{ day.weekday }}</span>
+                    <span class="text-xl font-bold mt-1">{{ day.date }}</span>
+                </div>
             </div>
-            <div class="info-row">
-                <div class="info-label">回程航班 (11/3)</div>
-                <div class="info-value">待提供</div>
+
+            <!-- 天氣資訊 (功能1-10) -->
+            <div class="mt-4 flex items-center justify-between bg-white/60 backdrop-blur rounded-xl p-3 border border-maple-200">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-cloud-sun text-2xl text-orange-400"></i>
+                    <div>
+                        <div class="text-sm font-bold text-gray-700">{{ days[selectedDay].location }}即時天氣</div>
+                        <div class="text-xs text-gray-500">晴時多雲</div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-lg font-bold text-gray-800">18°C</div>
+                    <div class="text-[10px] text-gray-500">體感 16°C</div>
+                </div>
             </div>
+
+            <!-- 行程列表 (功能1-3, 1-4, 1-6) -->
+            <div class="mt-5 space-y-4">
+                <div v-for="(item, idx) in days[selectedDay].itinerary" :key="item.id">
+                    
+                    <!-- 交通時間提示 (功能1-6) -->
+                    <div v-if="idx > 0" class="flex items-center justify-center gap-2 py-2 text-xs text-gray-400 font-medium">
+                        <div class="w-px h-6 bg-gray-300"></div>
+                        <div class="bg-gray-100 px-3 py-1 rounded-full flex items-center gap-1">
+                            <i :class="getTransportIcon(item.transportType)"></i>
+                            <span>{{ item.transportTime }} 分鐘</span>
+                        </div>
+                    </div>
+                    <div v-else class="flex items-center justify-center gap-2 py-2 text-xs text-gray-400 font-medium">
+                        <div class="bg-gray-100 px-3 py-1 rounded-full flex items-center gap-1">
+                            <i class="fa-solid fa-hotel"></i>
+                            <span>由前晚住宿出發</span>
+                        </div>
+                    </div>
+
+                    <!-- 航班卡片 (功能1-8: 第一天第一個行程特殊呈現) -->
+                    <div v-if="selectedDay === 0 && idx === 0" class="bg-blue-50 rounded-2xl p-4 border border-blue-100 shadow-sm relative">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-xs font-bold bg-blue-500 text-white px-2 py-1 rounded-md">✈️ 航班資訊</span>
+                            <span class="text-sm font-bold text-blue-800">{{ item.time }}</span>
+                        </div>
+                        <div class="flex justify-between items-center px-2">
+                            <div class="text-center">
+                                <div class="text-xl font-bold text-gray-800">TPE</div>
+                                <div class="text-xs text-gray-500">桃園</div>
+                            </div>
+                            <div class="flex flex-col items-center text-blue-400 px-4">
+                                <i class="fa-solid fa-plane text-lg mb-1"></i>
+                                <span class="text-[10px] border-b border-blue-300 pb-1">航班 {{ item.flightNo }}</span>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-xl font-bold text-gray-800">NGO</div>
+                                <div class="text-xs text-gray-500">名古屋</div>
+                            </div>
+                        </div>
+                        <div class="mt-3 text-xs text-gray-600 bg-white p-2 rounded-lg">{{ item.note }}</div>
+                    </div>
+
+                    <!-- 一般行程卡片 -->
+                    <div v-else class="bg-white rounded-2xl p-4 border border-maple-100 shadow-sm relative group" @click="editItem(item)">
+                        <!-- 類別標籤 -->
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[10px] font-bold px-2 py-1 rounded-md" :class="getCategoryClass(item.category)">
+                                {{ item.category }}
+                            </span>
+                            <span class="text-sm font-bold text-gray-700">{{ item.time }}</span>
+                        </div>
+                        
+                        <!-- 標題與導航 (功能1-9) -->
+                        <h3 class="text-base font-bold text-gray-800 mb-1 flex items-center justify-between">
+                            {{ item.title }}
+                            <a :href="`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.title)}`" target="_blank" @click.stop class="w-8 h-8 rounded-full bg-maple-50 flex items-center justify-center text-maple-500 hover:bg-maple-100">
+                                <i class="fa-solid fa-location-arrow text-sm"></i>
+                            </a>
+                        </h3>
+                        
+                        <!-- 詳細資訊 -->
+                        <div class="text-xs text-gray-500 space-y-1 mb-2">
+                            <div v-if="item.openTime"><i class="fa-regular fa-clock w-4 text-center"></i> 營業: {{ item.openTime }}</div>
+                            <div v-if="item.ticket"><i class="fa-solid fa-ticket w-4 text-center"></i> 門票: {{ item.ticket }}</div>
+                        </div>
+                        
+                        <!-- 備註 -->
+                        <div v-if="item.note" class="text-xs text-gray-700 bg-maple-100/50 p-2 rounded-lg leading-relaxed border-l-2 border-maple-500">
+                            {{ item.note }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 新增行程按鈕 (功能1-5) -->
+            <button @click="showAddModal = true" class="fab-btn">
+                <i class="fa-solid fa-plus"></i>
+            </button>
         </div>
 
-        <h2 class="section-title">🏨 住宿資訊</h2>
-        <div class="info-box">
-            <div class="info-row">
-                <div class="info-label">10/29 - 10/30 (兩晚)</div>
-                <div class="info-value">FAV LUX HIDATAKAYAMA (高山)</div>
-                <a href="https://www.google.com/maps/search/?api=1&query=FAV+LUX+HIDATAKAYAMA" style="color:var(--primary); font-size:0.8rem; margin-top:5px; text-decoration:none;">打開地圖</a>
+        <!-- =========================
+             Tab 2: 資訊 (Info) 
+             ========================= -->
+        <div v-show="currentTab === 'info'" class="animate-[fadeIn_0.3s_ease-out] space-y-6">
+            
+            <!-- 匯率換算 (功能2-3) -->
+            <section>
+                <h2 class="text-sm font-bold text-maple-700 mb-3 flex items-center gap-2"><i class="fa-solid fa-money-bill-transfer"></i> 匯率換算 (JPY to TWD)</h2>
+                <div class="bg-white rounded-2xl p-5 border border-maple-200 shadow-sm">
+                    <div class="flex items-center gap-4">
+                        <div class="flex-1">
+                            <label class="text-[10px] text-gray-400 font-bold">日幣 (¥)</label>
+                            <input type="number" v-model="calcJpy" class="w-full text-xl font-bold border-b border-gray-200 focus:border-maple-500 outline-none py-1 bg-transparent" placeholder="輸入金額">
+                        </div>
+                        <div class="text-maple-500 mt-4"><i class="fa-solid fa-arrow-right-arrow-left"></i></div>
+                        <div class="flex-1 text-right">
+                            <label class="text-[10px] text-gray-400 font-bold">台幣 (NT$)</label>
+                            <div class="text-xl font-bold text-gray-800 py-1 border-b border-transparent">
+                                {{ Math.round(calcJpy * exchangeRate).toLocaleString() }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-[10px] text-gray-400 mt-2 text-right">今日參考匯率: {{ exchangeRate }}</div>
+                </div>
+            </section>
+
+            <!-- 航班資訊 (功能2-1) -->
+            <section>
+                <h2 class="text-sm font-bold text-maple-700 mb-3 flex items-center gap-2"><i class="fa-solid fa-plane-departure"></i> 航班資訊</h2>
+                <div class="bg-white rounded-2xl p-4 border border-maple-200 shadow-sm space-y-4">
+                    <!-- 去程 -->
+                    <div class="relative">
+                        <div class="absolute -left-2 top-2 bottom-2 w-1 bg-maple-500 rounded-full"></div>
+                        <div class="pl-2">
+                            <div class="text-xs font-bold text-gray-500 mb-1">去程 10/29 (航班 MM724)</div>
+                            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl">
+                                <div class="text-center"><div class="text-lg font-bold">TPE</div><div class="text-xs text-gray-500">02:55</div></div>
+                                <div class="text-[10px] text-gray-400 flex flex-col items-center">
+                                    <span>2h 30m</span>
+                                    <div class="w-16 border-t border-dashed border-gray-300 my-1 relative">
+                                        <i class="fa-solid fa-plane absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-maple-300"></i>
+                                    </div>
+                                </div>
+                                <div class="text-center"><div class="text-lg font-bold">NGO</div><div class="text-xs text-gray-500">06:25</div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 回程 -->
+                    <div class="relative">
+                        <div class="absolute -left-2 top-2 bottom-2 w-1 bg-gray-300 rounded-full"></div>
+                        <div class="pl-2">
+                            <div class="text-xs font-bold text-gray-500 mb-1">回程 11/03 (航班 CX531)</div>
+                            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl">
+                                <div class="text-center"><div class="text-lg font-bold">NGO</div><div class="text-xs text-gray-500">16:40</div></div>
+                                <div class="text-[10px] text-gray-400 flex flex-col items-center">
+                                    <span>3h 30m</span>
+                                    <div class="w-16 border-t border-dashed border-gray-300 my-1 relative">
+                                        <i class="fa-solid fa-plane absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-300 transform -scale-x-100"></i>
+                                    </div>
+                                </div>
+                                <div class="text-center"><div class="text-lg font-bold">TPE</div><div class="text-xs text-gray-500">19:10</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 住宿資訊 (功能2-2) -->
+            <section>
+                <h2 class="text-sm font-bold text-maple-700 mb-3 flex items-center gap-2"><i class="fa-solid fa-bed"></i> 住宿資訊</h2>
+                <div class="space-y-3">
+                    <div class="bg-white rounded-2xl p-4 border border-maple-200 shadow-sm flex justify-between items-center">
+                        <div>
+                            <div class="text-xs text-gray-500 font-bold">10/29 - 10/31 (2晚)</div>
+                            <div class="font-bold text-gray-800 mt-1">FAV LUX HIDATAKAYAMA</div>
+                        </div>
+                        <a href="https://www.google.com/maps/search/?api=1&query=FAV+LUX+HIDATAKAYAMA" target="_blank" class="w-10 h-10 rounded-full bg-maple-50 text-maple-500 flex items-center justify-center">
+                            <i class="fa-solid fa-location-arrow"></i>
+                        </a>
+                    </div>
+                    <div class="bg-white rounded-2xl p-4 border border-maple-200 shadow-sm flex justify-between items-center">
+                        <div>
+                            <div class="text-xs text-gray-500 font-bold">10/31 - 11/03 (3晚)</div>
+                            <div class="font-bold text-gray-800 mt-1">Henn na Hotel (名古屋)</div>
+                        </div>
+                        <a href="https://www.google.com/maps/search/?api=1&query=Henn+na+Hotel+Nagoya" target="_blank" class="w-10 h-10 rounded-full bg-maple-50 text-maple-500 flex items-center justify-center">
+                            <i class="fa-solid fa-location-arrow"></i>
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- =========================
+             Tab 3: 購物清單 (Shopping) 
+             ========================= -->
+        <div v-show="currentTab === 'shopping'" class="animate-[fadeIn_0.3s_ease-out]">
+            <div class="grid grid-cols-2 gap-3">
+                <div v-for="item in shoppingList" :key="item.id" class="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm relative group cursor-pointer" @click="item.checked = !item.checked">
+                    <div class="h-24 bg-gray-100 relative">
+                        <img v-if="item.img" :src="item.img" class="w-full h-full object-cover">
+                        <div v-else class="w-full h-full flex items-center justify-center text-gray-300"><i class="fa-solid fa-image text-2xl"></i></div>
+                        <div class="absolute top-2 left-2 w-5 h-5 rounded-full border-2 bg-white flex items-center justify-center" :class="item.checked ? 'border-maple-500 text-maple-500' : 'border-gray-300 text-transparent'">
+                            <i class="fa-solid fa-check text-[10px]"></i>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <div class="text-sm font-bold text-gray-800 line-clamp-2" :class="{'line-through text-gray-400': item.checked}">{{ item.name }}</div>
+                    </div>
+                </div>
             </div>
-            <div class="info-row">
-                <div class="info-label">10/31 - 11/2 (三晚)</div>
-                <div class="info-value">henn na hotel (名古屋變現飯店)</div>
-                <a href="https://www.google.com/maps/search/?api=1&query=henn+na+hotel+nagoya" style="color:var(--primary); font-size:0.8rem; margin-top:5px; text-decoration:none;">打開地圖</a>
+            
+            <!-- 購物預設空狀態 -->
+            <div v-if="shoppingList.length === 0" class="text-center py-10 text-gray-400">
+                <i class="fa-solid fa-bag-shopping text-4xl mb-3 opacity-30"></i>
+                <div class="text-sm">尚未新增購物清單</div>
+            </div>
+
+            <button @click="alert('新增購物功能開發中')" class="fab-btn">
+                <i class="fa-solid fa-plus"></i>
+            </button>
+        </div>
+
+        <!-- =========================
+             Tab 4: 花費 (Budget) 
+             ========================= -->
+        <div v-show="currentTab === 'budget'" class="animate-[fadeIn_0.3s_ease-out]">
+            <!-- 總花費 -->
+            <div class="bg-maple-500 rounded-3xl p-6 text-white text-center shadow-lg mb-6 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+                <div class="text-xs font-medium opacity-80 mb-1">旅行總花費</div>
+                <div class="text-3xl font-bold flex justify-center items-end gap-1">
+                    <span class="text-lg mb-1">¥</span>{{ totalExpense.toLocaleString() }}
+                </div>
+                <div class="text-xs opacity-70 mt-1">約 NT$ {{ Math.round(totalExpense * exchangeRate).toLocaleString() }}</div>
+            </div>
+
+            <!-- 花費清單 -->
+            <div class="space-y-3">
+                <div v-for="exp in expenses" :key="exp.id" class="bg-white p-4 rounded-2xl border border-gray-100 flex items-center gap-4 shadow-sm">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm" :class="getExpenseIconBg(exp.category)">
+                        <i :class="getExpenseIcon(exp.category)"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-sm font-bold text-gray-800">{{ exp.name }}</div>
+                        <div class="text-[10px] text-gray-400 flex gap-2 mt-0.5">
+                            <span>{{ exp.date }}</span>
+                            <span v-if="exp.method === '信用卡'" class="text-blue-500 font-bold">💳 刷卡</span>
+                            <span v-else class="text-green-500 font-bold">💵 現金</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-base font-bold text-gray-800">¥{{ exp.amount.toLocaleString() }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <button @click="showExpenseModal = true" class="fab-btn">
+                <i class="fa-solid fa-plus"></i>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Modal: 新增/編輯行程 (包含刪除確認機制) -->
+    <div v-if="showAddModal" class="fixed inset-0 bg-black/50 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 animate-[fadeIn_0.2s_ease]">
+        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-lg font-bold text-gray-800">{{ editMode ? '編輯行程' : '新增行程' }}</h3>
+                <button @click="closeModal" class="w-8 h-8 bg-gray-100 rounded-full text-gray-500"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">分類</label>
+                    <select class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-maple-500">
+                        <option>景點</option><option>美食</option><option>交通</option><option>住宿</option><option>購物</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">名稱</label>
+                    <input type="text" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-maple-500" placeholder="例如: 高山陣屋">
+                </div>
+                <div class="flex gap-3">
+                    <div class="flex-1">
+                        <label class="block text-xs font-bold text-gray-500 mb-1">時間</label>
+                        <input type="text" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-maple-500" placeholder="09:00 - 10:00">
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-xs font-bold text-gray-500 mb-1">至下個地點交通</label>
+                        <select class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-maple-500">
+                            <option>走路 (10分)</option><option>開車 (30分)</option><option>大眾運輸 (20分)</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">備註 / 特色</label>
+                    <textarea class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-maple-500 h-20" placeholder="輸入預約代碼或必吃美食..."></textarea>
+                </div>
+            </div>
+
+            <div class="mt-6 flex gap-3">
+                <button v-if="editMode" @click="confirmDelete" class="flex-1 py-3 rounded-xl font-bold text-red-500 bg-red-50 border border-red-100">刪除</button>
+                <button @click="closeModal" class="flex-1 py-3 rounded-xl font-bold text-white bg-maple-500 shadow-md">儲存</button>
             </div>
         </div>
     </div>
-
-    <!-- 視圖 3: 匯率轉換 -->
-    <div id="view-currency" class="view">
-        <h2 class="section-title">💱 匯率轉換 (日幣轉台幣)</h2>
-        <div class="info-box calc-box">
-            <div class="rate-hint">
-                目前預設匯率: <input type="number" id="exchange-rate" value="0.215" step="0.001" style="width:60px; border:1px solid #ccc; border-radius:4px; padding:2px; text-align:center;">
-            </div>
-            
-            <div class="input-group">
-                <span>¥</span>
-                <input type="number" id="jpy-input" placeholder="輸入日幣金額" oninput="calculateTWD()">
-            </div>
-            
-            <div class="result-box">
-                <div class="label">約合台幣 (TWD)</div>
-                <div class="amount" id="twd-output">0</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 底部導航列 -->
-    <nav class="bottom-nav">
-        <a class="nav-item active" onclick="switchMainView('itinerary', this)">
-            <span class="nav-icon">📅</span>行程
-        </a>
-        <a class="nav-item" onclick="switchMainView('info', this)">
-            <span class="nav-icon">🏨</span>航班住宿
-        </a>
-        <a class="nav-item" onclick="switchMainView('currency', this)">
-            <span class="nav-icon">💱</span>匯率轉換
-        </a>
-    </nav>
 </div>
 
 <script>
-    // 切換底部主分頁
-    function switchMainView(viewId, element) {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.getElementById('view-' + viewId).classList.add('active');
-        
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        element.classList.add('active');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    const { createApp, ref, computed } = Vue
 
-    // 切換行程天數
-    function switchDay(day) {
-        document.querySelectorAll('.day-content').forEach(d => d.classList.remove('active'));
-        document.getElementById('day-' + day).classList.add('active');
-        
-        const tabs = document.querySelectorAll('.day-tab');
-        tabs.forEach(t => t.classList.remove('active'));
-        tabs[day - 1].classList.add('active');
-        
-        // 置中點擊的標籤
-        tabs[day - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-    }
+    createApp({
+        setup() {
+            const currentTab = ref('itinerary')
+            const selectedDay = ref(0)
+            const calcJpy = ref(10000)
+            const exchangeRate = ref(0.215)
+            const showAddModal = ref(false)
+            const editMode = ref(false)
+            const showExpenseModal = ref(false)
 
-    // 匯率轉換邏輯
-    function calculateTWD() {
-        const jpy = document.getElementById('jpy-input').value;
-        const rate = document.getElementById('exchange-rate').value;
-        const twdOutput = document.getElementById('twd-output');
-        
-        if (jpy && rate) {
-            const twd = Math.round(jpy * rate);
-            twdOutput.innerText = twd.toLocaleString();
-        } else {
-            twdOutput.innerText = "0";
+            // 行程資料 (依據 PDF 生成 10/29 - 11/3)
+            const days = ref([
+                {
+                    date: '29', weekday: 'Thu', location: '高山',
+                    itinerary: [
+                        { id: 1, category: '航班', time: '02:55-06:25', title: '桃園 - 名古屋機場', flightNo: 'MM724', note: '出關後可買早餐或至名古屋車站購買', transportType: 'train', transportTime: 60 },
+                        { id: 2, category: '交通', time: '07:26-10:58', title: '名古屋車站前往高山', note: '預估最晚搭07:26買票+USKY。08:43轉乘至高山 (Klook票)', transportType: 'walk', transportTime: 10 },
+                        { id: 3, category: '住宿', time: '10:58', title: 'FAV LUX HIDATAKAYAMA', note: '先放行李', transportType: 'walk', transportTime: 15 },
+                        { id: 4, category: '美食', time: '12:30-14:00', title: '中橋 WAKACHIYA', note: '必吃：飛驒牛 SUKIYAKI', transportType: 'walk', transportTime: 5 },
+                        { id: 5, category: '景點', time: '14:00-18:00', title: '飛驒高山老街 + 高山陣屋', openTime: '08:45-17:00', ticket: '440日圓', note: '漫步古色古香街道', transportType: 'walk', transportTime: 10 },
+                        { id: 6, category: '美食', time: '18:00-19:00', title: '中華拉麺 つづみ', note: '高山拉麵', transportType: 'walk', transportTime: 15 }
+                    ]
+                },
+                {
+                    date: '30', weekday: 'Fri', location: '上高地',
+                    itinerary: [
+                        { id: 7, category: '交通', time: '07:00-09:00', title: '高山前往平湯溫泉轉乘至大正池', note: '06:00起床，於濃飛巴士5號售票處買來回票', transportType: 'bus', transportTime: 60 },
+                        { id: 8, category: '景點', time: '09:00-15:00', title: '上高地絕景健行', note: '大正池 → 河童橋 (午餐: 蘋果派/五千尺布丁) → 明神池 → 返回', transportType: 'bus', transportTime: 60 },
+                        { id: 9, category: '美食', time: '18:30', title: '味の与平', note: '預約號碼: JZ44GD5SC5', transportType: 'walk', transportTime: 10 }
+                    ]
+                },
+                {
+                    date: '31', weekday: 'Sat', location: '白川鄉',
+                    itinerary: [
+                        { id: 10, category: '美食', time: '06:00-07:00', title: 'かじ橋食堂', note: '05:30起床，早餐後07:00出發', transportType: 'bus', transportTime: 60 },
+                        { id: 11, category: '景點', time: '08:20-14:30', title: '白川鄉合掌村', note: '城山展望台俯瞰茅草屋聚落', transportType: 'bus', transportTime: 150 },
+                        { id: 12, category: '美食', time: '17:30', title: '炭燒鰻魚藤榮 HAERA店', note: '預訂編號: 99bc9420 (20:00 抵達 henn na hotel)', transportType: 'walk', transportTime: 15 }
+                    ]
+                },
+                {
+                    date: '1', weekday: 'Sun', location: '名古屋',
+                    itinerary: [
+                        { id: 13, category: '美食', time: '11:00-11:30', title: 'HARBS 栄本店', note: '飯店早餐後前往', transportType: 'train', transportTime: 60 },
+                        { id: 14, category: '景點', time: '12:00-15:00', title: '吉卜力公園', note: '東山線至藤が丘轉 Linimo。', transportType: 'train', transportTime: 60 },
+                        { id: 15, category: '美食', time: '20:00', title: '炭火燒鳥 しげ栄本店', note: '預約號碼: 99bc9420', transportType: 'walk', transportTime: 10 }
+                    ]
+                },
+                {
+                    date: '2', weekday: 'Mon', location: '犬山',
+                    itinerary: [
+                        { id: 16, category: '交通', time: '08:30-09:30', title: '前往犬山站', note: '名鐵名古屋站(名鐵犬山線)出發', transportType: 'walk', transportTime: 15 },
+                        { id: 17, category: '景點', time: '09:30-15:00', title: '犬山城下町與三光稻荷神社', note: '洗錢體驗、天守閣。必吃:犬山牛太郎、本町茶寮、戀小町團子。必買:COCOTOMO FARM年輪蛋糕', transportType: 'train', transportTime: 40 },
+                        { id: 18, category: '美食', time: '晚上', title: '獅子丸拉麵', note: '傍晚返回名古屋市區晚餐', transportType: 'walk', transportTime: 10 }
+                    ]
+                },
+                {
+                    date: '3', weekday: 'Tue', location: '名古屋',
+                    itinerary: [
+                        { id: 19, category: '購物', time: '10:00-14:30', title: '名古屋榮商圈', note: 'HAERA FUEGUIA 1833, LOUANGE TOKYO Le Chateau', transportType: 'train', transportTime: 40 },
+                        { id: 20, category: '交通', time: '14:30', title: '前往名古屋機場', note: '準備回程', transportType: 'flight', transportTime: 0 },
+                        { id: 21, category: '航班', time: '16:40-19:10', title: '名古屋 - 桃園機場', flightNo: 'CX531', note: '歸途', transportType: 'none', transportTime: 0 }
+                    ]
+                }
+            ])
+
+            // 購物清單範例
+            const shoppingList = ref([
+                { id:1, name: 'COCOTOMO FARM 玄米年輪蛋糕', checked: false, img: '' },
+                { id:2, name: '福壽園 抹茶粉', checked: false, img: '' },
+                { id:3, name: '五千尺飯店 布丁', checked: false, img: '' },
+            ])
+
+            // 花費紀錄範例
+            const expenses = ref([
+                { id:1, category: '交通', name: 'Klook 高山車票', date: '10/29', amount: 4780, method: '信用卡' },
+                { id:2, category: '飲食', name: '飛驒牛 SUKIYAKI', date: '10/29', amount: 6500, method: '現金' },
+                { id:3, category: '門票', name: '高山陣屋門票', date: '10/29', amount: 440, method: '現金' },
+            ])
+
+            const totalExpense = computed(() => expenses.value.reduce((sum, item) => sum + item.amount, 0))
+
+            // 工具函數：取得分類顏色
+            const getCategoryClass = (cat) => {
+                if(cat === '景點') return 'bg-[#E8F0EA] text-[#2E5C3A]'
+                if(cat === '美食') return 'bg-[#FCEAE8] text-[#B33A3A]'
+                if(cat === '交通' || cat === '航班') return 'bg-[#E8EEFC] text-[#3A5CB3]'
+                if(cat === '住宿') return 'bg-[#FDF2E3] text-[#D98E6C]'
+                return 'bg-gray-100 text-gray-600'
+            }
+
+            // 工具函數：取得交通圖標
+            const getTransportIcon = (type) => {
+                if(type === 'walk') return 'fa-solid fa-person-walking'
+                if(type === 'car') return 'fa-solid fa-car'
+                if(type === 'bus') return 'fa-solid fa-bus'
+                if(type === 'train') return 'fa-solid fa-train-subway'
+                return 'fa-solid fa-arrow-right'
+            }
+
+            const getExpenseIcon = (cat) => {
+                const map = {'交通': 'fa-train', '飲食': 'fa-utensils', '住宿': 'fa-bed', '門票': 'fa-ticket', '購物': 'fa-bag-shopping'}
+                return `fa-solid ${map[cat] || 'fa-receipt'}`
+            }
+            const getExpenseIconBg = (cat) => {
+                const map = {'交通': 'bg-blue-500', '飲食': 'bg-red-500', '住宿': 'bg-orange-500', '門票': 'bg-green-500', '購物': 'bg-pink-500'}
+                return map[cat] || 'bg-gray-500'
+            }
+
+            // 編輯與刪除邏輯
+            const editItem = (item) => {
+                editMode.value = true;
+                showAddModal.value = true;
+            }
+            const closeModal = () => {
+                showAddModal.value = false;
+                setTimeout(() => { editMode.value = false }, 300);
+            }
+            const confirmDelete = () => {
+                if(confirm('確定要刪除這個行程嗎？此動作無法復原。')) {
+                    alert('已刪除 (前端展示用)');
+                    closeModal();
+                }
+            }
+
+            return {
+                currentTab, days, selectedDay, calcJpy, exchangeRate,
+                shoppingList, expenses, totalExpense,
+                showAddModal, editMode, showExpenseModal,
+                getCategoryClass, getTransportIcon, getExpenseIcon, getExpenseIconBg,
+                editItem, closeModal, confirmDelete
+            }
         }
-    }
-    
-    // 監聽匯率改變時自動重算
-    document.getElementById('exchange-rate').addEventListener('input', calculateTWD);
+    }).mount('#app')
 </script>
-
 </body>
 </html>

@@ -8,8 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Vue.js -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <!-- FontAwesome for Icons (使用最穩定的版本) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- FontAwesome for Icons (更新至 6.5.1，並使用更穩定的 CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Sortable.js for Drag and Drop -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <!-- vuedraggable -->
@@ -170,7 +170,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 放大並突出的浮動新增按鈕 */
         .fab-btn {
             position: fixed;
             bottom: 30px; 
@@ -226,16 +225,16 @@
         
         <div class="side-tab-bar">
             <button @click="currentTab = 'itinerary'" title="行程" :class="{'active': currentTab === 'itinerary'}" class="tab-button">
-                <i class="fas fa-map-location-dot"></i>
+                <i class="fa fa-map-marker-alt"></i>
             </button>
             <button @click="currentTab = 'info'" title="資訊" :class="{'active': currentTab === 'info'}" class="tab-button">
-                <i class="fas fa-circle-info"></i>
+                <i class="fa fa-info-circle"></i>
             </button>
             <button @click="currentTab = 'shopping'" title="購物" :class="{'active': currentTab === 'shopping'}" class="tab-button">
-                <i class="fas fa-shopping-basket"></i>
+                <i class="fa fa-shopping-basket"></i>
             </button>
             <button @click="currentTab = 'expenses'" title="花費" :class="{'active': currentTab === 'expenses'}" class="tab-button">
-                <i class="fas fa-coins"></i>
+                <i class="fa fa-coins"></i>
             </button>
         </div>
     </div>
@@ -253,13 +252,13 @@
                      class="snap-center flex-shrink-0 w-[60px] h-[70px] rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all duration-300 border shadow-sm relative overflow-hidden"
                      :class="selectedDateIndex === index ? 'bg-maple-500 text-white border-maple-500 shadow-md scale-105' : 'bg-white text-gray-400 border-maple-100 hover:bg-maple-50'">
                     
-                    <i v-if="selectedDateIndex === index" class="fas fa-leaf absolute -top-1 -right-1 text-maple-200 opacity-30 rotate-45 text-xs"></i>
+                    <i v-if="selectedDateIndex === index" class="fa fa-leaf absolute -top-1 -right-1 text-maple-200 opacity-30 rotate-45 text-xs"></i>
                     <span class="text-sm font-bold uppercase tracking-wider">{{ day.weekday }}</span> 
                     <span class="text-lg font-black">{{ day.date }}</span> 
                 </div>
             </div>
 
-            <!-- 天氣資訊 (優化圖示) -->
+            <!-- 天氣資訊 -->
             <div v-if="weatherData[selectedDateIndex]" class="mt-4 mb-5 bg-white border border-maple-100 rounded-2xl p-4 flex justify-between items-center card-shadow">
                 <div class="flex items-center text-maple-700 space-x-4">
                     <div class="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
@@ -276,9 +275,9 @@
                 <div class="text-right text-xs text-gray-500 pr-2">
                     <span class="font-bold block text-gray-800 text-sm mb-1">{{ getWeatherDescription(weatherData[selectedDateIndex].condition) }}</span>
                     <span v-if="dates[selectedDateIndex].hasCar" class="text-maple-500 font-bold bg-maple-50 px-2 py-1 rounded-md flex items-center justify-end gap-1">
-                        <i class="fas fa-car-side"></i> 租車日
+                        <i class="fa fa-car"></i> 租車日
                     </span>
-                    <span v-else class="text-gray-400 flex items-center justify-end gap-1"><i class="fas fa-subway"></i> 大眾運輸</span>
+                    <span v-else class="text-gray-400 flex items-center justify-end gap-1"><i class="fa fa-subway"></i> 大眾運輸</span>
                 </div>
             </div>
 
@@ -294,7 +293,7 @@
                     <template #item="{element: item, index: idx}">
                         <div class="relative group">
                             
-                            <!-- 交通時間提示 (優化圖示) -->
+                            <!-- 交通時間提示 -->
                             <div v-if="idx > 0" class="flex items-center justify-center gap-2 py-1 text-xs text-gray-400 font-medium mb-3">
                                 <div class="w-px h-6 bg-maple-200"></div>
                                 <div class="bg-white border border-maple-100 px-3 py-1 rounded-full flex items-center gap-2 shadow-sm">
@@ -304,20 +303,20 @@
                             </div>
                             <div v-else-if="selectedDateIndex !== 0 || (selectedDateIndex === 0 && idx !== 0)" class="flex items-center justify-center gap-2 py-1 text-xs text-gray-400 font-medium mb-3">
                                 <div class="bg-white border border-maple-100 px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
-                                    <i class="fas fa-hotel text-maple-500"></i>
+                                    <i class="fa fa-hotel text-maple-500"></i>
                                     <span>由前晚住宿出發</span>
                                 </div>
                             </div>
 
                             <!-- 航班卡片 -->
                             <div v-if="item.category === 'flight'" class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-3xl p-5 border border-blue-200 shadow-sm relative group overflow-hidden">
-                                <i class="fas fa-plane-departure absolute -right-4 -bottom-4 text-8xl text-blue-500 opacity-5 pointer-events-none"></i>
+                                <i class="fa fa-plane absolute -right-4 -bottom-4 text-8xl text-blue-500 opacity-5 pointer-events-none"></i>
                                 
                                 <div class="flex justify-between items-center mb-4 relative z-10">
-                                    <span class="text-[10px] font-bold bg-blue-500 text-white px-2 py-1 rounded shadow-sm flex items-center gap-1"><i class="fas fa-plane"></i> 航班資訊</span>
+                                    <span class="text-[10px] font-bold bg-blue-500 text-white px-2 py-1 rounded shadow-sm flex items-center gap-1"><i class="fa fa-plane"></i> 航班資訊</span>
                                     <div class="flex items-center gap-3">
                                         <span class="text-sm font-bold text-blue-800 bg-white/60 px-2 py-0.5 rounded">{{ item.startTime }}</span>
-                                        <i class="fas fa-grip-lines drag-handle text-blue-300 hover:text-blue-500 p-1"></i>
+                                        <i class="fa fa-bars drag-handle text-blue-300 hover:text-blue-500 p-1"></i>
                                     </div>
                                 </div>
                                 
@@ -328,7 +327,7 @@
                                     <div class="flex flex-col items-center text-blue-500 px-4 w-full">
                                         <span class="bg-white px-2 py-0.5 rounded-full shadow-sm border border-blue-100 mb-1 text-[10px] font-bold z-10">{{ item.travelTime || '2h30m' }}</span>
                                         <div class="w-full border-t-2 border-dashed border-blue-300 relative -mt-3">
-                                            <i class="fas fa-plane absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-50 px-1 text-sm"></i>
+                                            <i class="fa fa-plane absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-50 px-1 text-sm"></i>
                                         </div>
                                     </div>
                                     <div class="text-center">
@@ -336,7 +335,7 @@
                                     </div>
                                 </div>
                                 <div class="mt-4 text-xs font-bold text-blue-800 bg-white/70 backdrop-blur p-2.5 rounded-xl border border-blue-200/50 relative z-10 shadow-inner flex items-start gap-2">
-                                    <i class="fas fa-info-circle mt-0.5"></i>
+                                    <i class="fa fa-info-circle mt-0.5"></i>
                                     <span class="leading-relaxed">{{ item.note }}</span>
                                 </div>
                                 <button @click="editItem(item)" class="absolute inset-0 w-[85%] h-full opacity-0 cursor-pointer z-0"></button>
@@ -357,7 +356,7 @@
                                         </div>
                                     </div>
                                     <div class="flex flex-col items-end gap-2">
-                                        <i class="fas fa-grip-lines drag-handle p-1 hover:text-maple-500 transition-colors bg-gray-50 rounded"></i>
+                                        <i class="fa fa-bars drag-handle p-1 hover:text-maple-500 transition-colors bg-gray-50 rounded"></i>
                                     </div>
                                 </div>
                                 
@@ -365,9 +364,9 @@
                                     <h3 class="text-lg font-bold text-gray-800 mb-2 leading-tight">{{ item.name }}</h3>
                                     
                                     <div class="text-xs text-gray-500 space-y-1.5 mb-3 bg-gray-50 p-2.5 rounded-xl border border-gray-100">
-                                        <p v-if="item.hours" class="flex items-center font-medium"><i class="far fa-clock w-5 text-center text-maple-500"></i> 營業: {{ item.hours }}</p>
-                                        <p v-if="item.price" class="flex items-center font-medium"><i class="fas fa-ticket-alt w-5 text-center text-maple-500"></i> 門票: {{ item.price }}</p>
-                                        <p v-if="item.address" class="flex items-start font-medium"><i class="fas fa-map-marker-alt w-5 text-center mt-0.5 text-maple-500"></i> {{ item.address }}</p>
+                                        <p v-if="item.hours" class="flex items-center font-medium"><i class="fa fa-clock w-5 text-center text-maple-500"></i> 營業: {{ item.hours }}</p>
+                                        <p v-if="item.price" class="flex items-center font-medium"><i class="fa fa-ticket-alt w-5 text-center text-maple-500"></i> 門票: {{ item.price }}</p>
+                                        <p v-if="item.address" class="flex items-start font-medium"><i class="fa fa-map-marker-alt w-5 text-center mt-0.5 text-maple-500"></i> {{ item.address }}</p>
                                     </div>
                                     
                                     <div v-if="item.note" class="text-xs text-gray-700 bg-maple-50 p-3 rounded-xl border-l-4 border-maple-500 shadow-inner">
@@ -380,9 +379,8 @@
                                     </div>
                                 </div>
 
-                                <!-- 獨立導航按鈕 (優化圖示) -->
                                 <a :href="`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.address || item.name)}`" target="_blank" @click.stop class="absolute right-4 top-20 w-10 h-10 rounded-full bg-maple-100 text-maple-600 flex items-center justify-center hover:bg-maple-500 hover:text-white transition-all shadow-sm z-20">
-                                    <i class="fas fa-location-arrow"></i>
+                                    <i class="fa fa-location-arrow"></i>
                                 </a>
 
                                 <div @click="editItem(item)" class="absolute inset-0 w-[80%] h-full cursor-pointer z-0"></div>
@@ -393,7 +391,7 @@
 
                 <div v-if="currentItinerary.length === 0" class="text-center py-16 bg-white rounded-3xl border border-dashed border-maple-200 card-shadow">
                     <div class="w-16 h-16 bg-maple-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <i class="fas fa-map-marked-alt text-2xl text-maple-300"></i>
+                        <i class="fa fa-map-marker-alt text-2xl text-maple-300"></i>
                     </div>
                     <p class="text-sm font-bold text-gray-600">本日尚無行程</p>
                     <p class="text-xs text-gray-400 mt-1">請點擊右下角新增</p>
@@ -407,14 +405,14 @@
         <div v-if="currentTab === 'info'" class="space-y-5 animate-fade-in">
             
             <div class="bg-gradient-to-r from-maple-500 to-maple-700 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
-                <i class="fas fa-yen-sign absolute -right-4 -bottom-4 text-8xl opacity-10"></i>
-                <h3 class="font-bold text-lg mb-4 flex items-center relative z-10"><i class="fas fa-calculator mr-2"></i> 匯率換算</h3>
+                <i class="fa fa-yen-sign absolute -right-4 -bottom-4 text-8xl opacity-10"></i>
+                <h3 class="font-bold text-lg mb-4 flex items-center relative z-10"><i class="fa fa-calculator mr-2"></i> 匯率換算</h3>
                 <div class="flex items-center justify-between space-x-3 relative z-10">
                     <div class="flex-1 bg-white/10 p-3 rounded-2xl border border-white/20 backdrop-blur-sm">
                         <label class="text-[10px] text-maple-100 block mb-1 uppercase tracking-wider font-bold">JPY (日幣)</label>
                         <input type="number" v-model="currencyInput" @input="calculateCurrency" class="w-full bg-transparent border-b border-white/30 px-1 py-1 text-white placeholder-white/50 focus:outline-none focus:border-white text-2xl font-bold font-mono" placeholder="¥">
                     </div>
-                    <i class="fas fa-exchange-alt text-maple-200 text-xl"></i>
+                    <i class="fa fa-exchange-alt text-maple-200 text-xl"></i>
                     <div class="flex-1 bg-white p-3 rounded-2xl shadow-inner text-right">
                         <label class="text-[10px] text-maple-700/60 block mb-1 uppercase tracking-wider font-bold">TWD (台幣)</label>
                         <div class="w-full px-1 py-1 text-maple-700 text-2xl font-bold border-b border-transparent font-mono tracking-tight">
@@ -427,8 +425,8 @@
             </div>
             
             <div class="bg-white rounded-3xl p-6 card-shadow relative overflow-hidden">
-                <i class="fas fa-plane-departure absolute -right-6 -top-6 text-8xl text-blue-50 opacity-50"></i>
-                <h3 class="font-bold text-gray-800 mb-4 flex items-center"><i class="fas fa-plane text-blue-500 mr-2 bg-blue-50 p-2 rounded-lg"></i> 航班資訊</h3>
+                <i class="fa fa-plane absolute -right-6 -top-6 text-8xl text-blue-50 opacity-50"></i>
+                <h3 class="font-bold text-gray-800 mb-4 flex items-center"><i class="fa fa-plane text-blue-500 mr-2 bg-blue-50 p-2 rounded-lg"></i> 航班資訊</h3>
                 <div class="space-y-4 relative z-10">
                     <div class="bg-blue-50 rounded-2xl p-4 border border-blue-100 shadow-sm">
                         <div class="flex justify-between text-xs font-bold mb-2">
@@ -440,7 +438,7 @@
                             <div class="flex flex-col items-center">
                                 <span class="text-[10px] text-gray-400 font-bold bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100 mb-1 z-10">3h 30m</span>
                                 <div class="w-16 border-t-2 border-dashed border-blue-200 relative -mt-2">
-                                    <i class="fas fa-plane absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-blue-400 bg-white px-1"></i>
+                                    <i class="fa fa-plane absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-blue-400 bg-white px-1"></i>
                                 </div>
                             </div>
                             <div class="text-center"><div class="text-2xl font-black text-gray-800">NGO</div><div class="text-xs font-bold text-gray-500 mt-1">06:25</div></div>
@@ -456,7 +454,7 @@
                             <div class="flex flex-col items-center">
                                 <span class="text-[10px] text-gray-400 font-bold bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100 mb-1 z-10">2h 30m</span>
                                 <div class="w-16 border-t-2 border-dashed border-maple-200 relative -mt-2">
-                                    <i class="fas fa-plane absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-maple-400 transform -scale-x-100 bg-white px-1"></i>
+                                    <i class="fa fa-plane absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-maple-400 transform -scale-x-100 bg-white px-1"></i>
                                 </div>
                             </div>
                             <div class="text-center"><div class="text-2xl font-black text-gray-800">TPE</div><div class="text-xs font-bold text-gray-500 mt-1">19:10</div></div>
@@ -466,17 +464,17 @@
             </div>
 
             <div class="bg-white rounded-3xl p-6 card-shadow">
-                <h3 class="font-bold text-gray-800 mb-4 flex items-center"><i class="fas fa-bed text-indigo-500 mr-2 bg-indigo-50 p-2 rounded-lg"></i> 住宿資訊</h3>
+                <h3 class="font-bold text-gray-800 mb-4 flex items-center"><i class="fa fa-bed text-indigo-500 mr-2 bg-indigo-50 p-2 rounded-lg"></i> 住宿資訊</h3>
                 <div class="space-y-4">
                     <div v-for="hotel in hotels" :key="hotel.name" class="border border-gray-100 rounded-2xl p-4 hover:border-indigo-200 transition-colors group bg-gray-50/50">
                         <div class="flex justify-between items-start mb-2">
                             <span class="text-[10px] font-bold text-white bg-indigo-400 px-2 py-0.5 rounded">{{ hotel.date }}</span>
-                            <button @click="openMap(hotel.name)" class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-all shadow-sm"><i class="fas fa-location-arrow text-xs"></i></button>
+                            <button @click="openMap(hotel.name)" class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-all shadow-sm"><i class="fa fa-location-arrow text-xs"></i></button>
                         </div>
                         <h4 class="font-black text-gray-800 text-lg leading-tight mb-2">{{ hotel.name }}</h4>
                         <div class="text-xs text-gray-500 space-y-1 bg-white p-2.5 rounded-xl border border-gray-100">
-                            <p class="flex items-center font-medium"><i class="fas fa-phone w-4 text-center mr-1.5 text-indigo-300"></i> <a :href="'tel:' + hotel.phone" class="hover:text-indigo-600">{{ hotel.phone }}</a></p>
-                            <p class="flex items-start font-medium"><i class="fas fa-map-marker-alt w-4 text-center mr-1.5 mt-0.5 text-indigo-300"></i> {{ hotel.address }}</p>
+                            <p class="flex items-center font-medium"><i class="fa fa-phone w-4 text-center mr-1.5 text-indigo-300"></i> <a :href="'tel:' + hotel.phone" class="hover:text-indigo-600">{{ hotel.phone }}</a></p>
+                            <p class="flex items-start font-medium"><i class="fa fa-map-marker-alt w-4 text-center mr-1.5 mt-0.5 text-indigo-300"></i> {{ hotel.address }}</p>
                         </div>
                     </div>
                 </div>
@@ -492,15 +490,15 @@
                     <div class="aspect-square bg-gray-50 rounded-xl mb-3 overflow-hidden relative flex items-center justify-center">
                         <img v-if="item.image" :src="item.image" class="w-full h-full object-cover">
                         <div v-else class="text-gray-300 flex flex-col items-center">
-                            <i class="fas fa-image text-3xl mb-1 opacity-50"></i>
+                            <i class="fa fa-image text-3xl mb-1 opacity-50"></i>
                         </div>
                         <div class="absolute top-2 left-2 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all shadow-sm" :class="item.checked ? 'border-maple-500 bg-maple-500 text-white' : 'border-gray-300 bg-white/90 backdrop-blur text-transparent'">
-                            <i class="fas fa-check text-xs"></i>
+                            <i class="fa fa-check text-xs"></i>
                         </div>
                         <div v-if="item.checked" class="absolute inset-0 bg-white/50 backdrop-blur-[1px]"></div>
                         
                         <button @click.stop="removeShoppingItem(idx)" class="absolute bottom-2 right-2 bg-red-500/80 backdrop-blur text-white rounded-full w-8 h-8 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity z-20 hover:bg-red-600 shadow-sm">
-                            <i class="fas fa-trash"></i>
+                            <i class="fa fa-trash"></i>
                         </button>
                     </div>
                     <p class="font-bold text-sm text-gray-800 line-clamp-2 px-1 leading-snug" :class="{'line-through text-gray-400': item.checked}">{{ item.name }}</p>
@@ -510,7 +508,7 @@
                 
                 <div v-if="shoppingList.length === 0" class="col-span-2 text-center py-16 bg-white rounded-3xl border border-dashed border-gray-300 card-shadow">
                     <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <i class="fas fa-shopping-basket text-2xl text-gray-300"></i>
+                        <i class="fa fa-shopping-basket text-2xl text-gray-300"></i>
                     </div>
                     <p class="text-sm font-bold text-gray-600">購物清單空白</p>
                     <p class="text-xs text-gray-400 mt-1">請點擊右下角新增想買的物品</p>
@@ -523,8 +521,8 @@
              ========================= -->
         <div v-if="currentTab === 'expenses'" class="animate-fade-in">
             <div class="expenses-banner text-white rounded-3xl p-6 mb-6 relative overflow-hidden shadow-lg">
-                <i class="fas fa-wallet absolute -right-6 -top-6 text-9xl opacity-10"></i>
-                <p class="text-xs font-bold text-maple-200 mb-1 uppercase tracking-wider relative z-10 flex items-center gap-1"><i class="fas fa-chart-pie"></i> 目前旅行總花費 (JPY)</p>
+                <i class="fa fa-wallet absolute -right-6 -top-6 text-9xl opacity-10"></i>
+                <p class="text-xs font-bold text-maple-200 mb-1 uppercase tracking-wider relative z-10 flex items-center gap-1"><i class="fa fa-chart-pie"></i> 目前旅行總花費 (JPY)</p>
                 <h2 class="text-4xl font-black relative z-10 tracking-tight flex items-start gap-1">
                     <span class="text-xl mt-1.5 font-bold">¥</span>{{ formatNumber(totalExpensesJPY) }}
                 </h2>
@@ -535,7 +533,7 @@
 
             <div class="bg-white rounded-3xl p-5 card-shadow mb-4">
                 <h3 class="font-bold text-gray-800 mb-4 flex items-center border-b border-gray-100 pb-3">
-                    <i class="fas fa-receipt text-maple-500 mr-2 bg-maple-50 p-2 rounded-lg"></i> 支出紀錄
+                    <i class="fa fa-receipt text-maple-500 mr-2 bg-maple-50 p-2 rounded-lg"></i> 支出紀錄
                 </h3>
                 <div class="space-y-4">
                     <div v-for="(exp, idx) in expenses" :key="idx" class="flex items-center justify-between border border-gray-100 rounded-2xl p-3 shadow-sm relative overflow-hidden group">
@@ -548,8 +546,8 @@
                                 <p class="font-bold text-gray-800 text-sm mb-0.5 leading-tight">{{ exp.name }}</p>
                                 <div class="flex gap-2 items-center">
                                     <span class="text-[9px] font-bold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">{{ exp.date }}</span>
-                                    <span v-if="exp.payment === 'card'" class="text-[9px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded flex items-center gap-0.5"><i class="far fa-credit-card"></i> 刷卡</span>
-                                    <span v-else class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded flex items-center gap-0.5"><i class="fas fa-coins"></i> 現金</span>
+                                    <span v-if="exp.payment === 'card'" class="text-[9px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded flex items-center gap-0.5"><i class="fa fa-credit-card"></i> 刷卡</span>
+                                    <span v-else class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded flex items-center gap-0.5"><i class="fa fa-coins"></i> 現金</span>
                                 </div>
                             </div>
                         </div>
@@ -558,13 +556,13 @@
                                 <p class="font-black text-gray-800 tracking-tight text-base">¥{{ formatNumber(exp.amount) }}</p>
                             </div>
                             <button @click="removeExpense(idx)" class="w-8 h-8 bg-red-50 text-red-400 rounded-full hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center shadow-sm">
-                                <i class="fas fa-trash text-[10px]"></i>
+                                <i class="fa fa-trash text-[10px]"></i>
                             </button>
                         </div>
                     </div>
                     
                     <div v-if="expenses.length === 0" class="text-center py-10 text-gray-400">
-                        <i class="fas fa-file-invoice-dollar text-3xl mb-2 opacity-30"></i>
+                        <i class="fa fa-file-invoice-dollar text-3xl mb-2 opacity-30"></i>
                         <p class="text-xs font-bold">尚無支出紀錄</p>
                     </div>
                 </div>
@@ -572,9 +570,9 @@
         </div>
     </main>
  
-    <!-- 浮動新增按鈕 (加大版) -->
+    <!-- 浮動新增按鈕 (加大突出版) -->
     <button v-if="currentTab !== 'info'" @click="handleAddClick" class="fab-btn">
-        <i class="fas fa-plus"></i>
+        <i class="fa fa-plus"></i>
     </button>
 
     <!-- Modal: 新增/編輯行程 -->
@@ -586,15 +584,15 @@
                 <div v-if="showItineraryModal" class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-3xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto relative z-10 border-t border-white/20">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-black text-gray-800 flex items-center gap-2">
-                            <i class="fas fa-pen text-maple-500"></i>
+                            <i class="fa fa-pen text-maple-500"></i>
                             {{ isEditMode ? '編輯行程' : '新增行程' }}
                         </h3>
-                        <button @click="showItineraryModal = false" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-500 transition-colors flex items-center justify-center"><i class="fas fa-times"></i></button>
+                        <button @click="showItineraryModal = false" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-500 transition-colors flex items-center justify-center"><i class="fa fa-times"></i></button>
                     </div>
                     
                     <div class="space-y-4">
                         <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                            <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider"><i class="fas fa-tag mr-1"></i> 分類</label>
+                            <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider"><i class="fa fa-tag mr-1"></i> 分類</label>
                             <select v-model="newItinerary.category" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-bold text-gray-700 outline-none focus:border-maple-500 focus:ring-2 focus:ring-maple-100 transition-all appearance-none">
                                 <option value="sightseeing">景點</option>
                                 <option value="food">美食</option>
@@ -611,17 +609,17 @@
                         </div>
                         
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1 uppercase tracking-wider"><i class="fas fa-map-marker-alt mr-1"></i> 地址/導航用關鍵字</label>
+                            <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1 uppercase tracking-wider"><i class="fa fa-map-marker-alt mr-1"></i> 地址/導航用關鍵字</label>
                             <input type="text" v-model="newItinerary.address" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-800 outline-none focus:border-maple-500 transition-all shadow-sm" placeholder="用於 Google Maps">
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1 uppercase tracking-wider"><i class="far fa-clock mr-1"></i> 時間</label>
+                                <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1 uppercase tracking-wider"><i class="fa fa-clock mr-1"></i> 時間</label>
                                 <input type="text" v-model="newItinerary.startTime" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold text-gray-800 outline-none focus:border-maple-500 transition-all shadow-sm" placeholder="09:00">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1 uppercase tracking-wider"><i class="fas fa-route mr-1"></i> 至下個地點交通</label>
+                                <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1 uppercase tracking-wider"><i class="fa fa-route mr-1"></i> 至下個地點交通</label>
                                 <select v-model="newItinerary.transportType" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold text-gray-700 outline-none focus:border-maple-500 transition-all shadow-sm appearance-none">
                                     <option value="walk">步行</option>
                                     <option value="car">開車</option>
@@ -642,17 +640,17 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1 uppercase tracking-wider"><i class="fas fa-sticky-note mr-1"></i> 備註 / 特色</label>
+                            <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1 uppercase tracking-wider"><i class="fa fa-sticky-note mr-1"></i> 備註 / 特色</label>
                             <textarea v-model="newItinerary.note" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 outline-none focus:border-maple-500 transition-all shadow-sm h-20 resize-none" placeholder="輸入預約代碼或必吃美食..."></textarea>
                         </div>
                     </div>
 
                     <div class="mt-8 flex gap-3 pb-safe">
                         <button v-if="isEditMode" @click="removeItineraryItem" class="flex-1 py-3.5 rounded-xl font-bold text-red-500 bg-red-50 hover:bg-red-100 border border-red-100 transition-colors flex items-center justify-center gap-2 shadow-sm">
-                            <i class="fas fa-trash"></i> 刪除
+                            <i class="fa fa-trash"></i> 刪除
                         </button>
                         <button @click="saveItineraryItem" class="flex-1 py-3.5 rounded-xl font-bold text-white bg-maple-500 hover:bg-maple-700 shadow-md shadow-maple-500/30 transition-all flex items-center justify-center gap-2">
-                            <i class="fas fa-save"></i> 儲存
+                            <i class="fa fa-save"></i> 儲存
                         </button>
                     </div>
                 </div>
@@ -668,9 +666,9 @@
                 <div v-if="showShoppingModal" class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-3xl p-6 shadow-2xl relative z-10">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-black text-gray-800 flex items-center gap-2">
-                            <i class="fas fa-shopping-basket text-maple-500"></i> 新增購物清單
+                            <i class="fa fa-shopping-basket text-maple-500"></i> 新增購物清單
                         </h3>
-                        <button @click="showShoppingModal = false" class="w-8 h-8 bg-gray-100 rounded-full text-gray-500"><i class="fas fa-times"></i></button>
+                        <button @click="showShoppingModal = false" class="w-8 h-8 bg-gray-100 rounded-full text-gray-500"><i class="fa fa-times"></i></button>
                     </div>
                     
                     <div class="space-y-4">
@@ -684,11 +682,11 @@
                             <input type="file" @change="handleImageUpload" class="hidden" id="fileInput">
                             <label for="fileInput" class="w-full h-32 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center cursor-pointer text-gray-400 hover:bg-gray-100 transition-all overflow-hidden relative group">
                                 <span v-if="!newShoppingItem.image" class="flex flex-col items-center font-bold text-xs">
-                                    <i class="fas fa-camera text-2xl mb-2 text-gray-300 group-hover:text-maple-400 transition-colors"></i> 點擊選取圖片
+                                    <i class="fa fa-camera text-2xl mb-2 text-gray-300 group-hover:text-maple-400 transition-colors"></i> 點擊選取圖片
                                 </span>
                                 <img v-else :src="newShoppingItem.image" class="h-full w-full object-cover">
                                 <div v-if="newShoppingItem.image" class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <span class="text-white text-xs font-bold bg-black/50 px-3 py-1 rounded-full"><i class="fas fa-pen mr-1"></i>更換</span>
+                                    <span class="text-white text-xs font-bold bg-black/50 px-3 py-1 rounded-full"><i class="fa fa-pen mr-1"></i>更換</span>
                                 </div>
                             </label>
                         </div>
@@ -710,9 +708,9 @@
                 <div v-if="showExpenseModal" class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-3xl p-6 shadow-2xl relative z-10">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-xl font-black text-gray-800 flex items-center gap-2">
-                            <i class="fas fa-pen text-maple-500"></i> 記一筆花費
+                            <i class="fa fa-pen text-maple-500"></i> 記一筆花費
                         </h3>
-                        <button @click="showExpenseModal = false" class="w-8 h-8 bg-gray-100 rounded-full text-gray-500"><i class="fas fa-times"></i></button>
+                        <button @click="showExpenseModal = false" class="w-8 h-8 bg-gray-100 rounded-full text-gray-500"><i class="fa fa-times"></i></button>
                     </div>
                     
                     <div class="space-y-4">
@@ -748,8 +746,8 @@
                         <div>
                             <label class="block text-xs font-bold text-gray-500 mb-2 ml-1">付款方式</label>
                             <div class="flex space-x-3 bg-gray-50 p-1.5 rounded-xl border border-gray-100">
-                                <button @click="newExpense.payment='cash'" :class="newExpense.payment==='cash' ? 'bg-white text-emerald-600 shadow border-emerald-100' : 'text-gray-400 border-transparent'" class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all border flex items-center justify-center gap-1"><i class="fas fa-coins"></i> 現金</button>
-                                <button @click="newExpense.payment='card'" :class="newExpense.payment==='card' ? 'bg-white text-blue-600 shadow border-blue-100' : 'text-gray-400 border-transparent'" class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all border flex items-center justify-center gap-1"><i class="far fa-credit-card"></i> 信用卡</button>
+                                <button @click="newExpense.payment='cash'" :class="newExpense.payment==='cash' ? 'bg-white text-emerald-600 shadow border-emerald-100' : 'text-gray-400 border-transparent'" class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all border flex items-center justify-center gap-1"><i class="fa fa-coins"></i> 現金</button>
+                                <button @click="newExpense.payment='card'" :class="newExpense.payment==='card' ? 'bg-white text-blue-600 shadow border-blue-100' : 'text-gray-400 border-transparent'" class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all border flex items-center justify-center gap-1"><i class="fa fa-credit-card"></i> 信用卡</button>
                             </div>
                         </div>
                     </div>
@@ -893,30 +891,30 @@
             const calculateCurrency = () => { currencyResult.value = Math.round(currencyInput.value * EXCHANGE_RATE); };
             const formatNumber = (num) => num ? num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : '0';
 
-            // Icons & Colors (確保使用 fas 通用字型)
+            // Icons & Colors (改回使用舊版相容性最好的 fa 類名，確保不破圖)
             const getCategoryColor = (cat) => {
                 const map = { sightseeing: 'bg-[#2E5C3A]', food: 'bg-[#B33A3A]', shopping: 'bg-[#6C8D74]', accommodation: 'bg-[#D98E6C]', flight: 'bg-[#3A5CB3]', transport: 'bg-[#8A3B31]' };
                 return map[cat] || 'bg-gray-500';
             };
             const getCategoryIcon = (cat) => {
                 const map = { sightseeing: 'fa-camera', food: 'fa-utensils', shopping: 'fa-shopping-basket', accommodation: 'fa-bed', flight: 'fa-plane', transport: 'fa-subway' };
-                return `fas ${map[cat] || 'fa-tag'}`;
+                return `fa ${map[cat] || 'fa-tag'}`;
             };
             const getCategoryBgIcon = (cat) => {
                 const map = { sightseeing: 'fa-camera', food: 'fa-coffee', shopping: 'fa-shopping-basket', accommodation: 'fa-bed', flight: 'fa-plane', transport: 'fa-train' };
-                return `fas ${map[cat] || 'fa-star'}`;
+                return `fa ${map[cat] || 'fa-star'}`;
             };
             const getCategoryLabel = (cat) => {
                 const map = { sightseeing: '景點', food: '飲食', shopping: '購物', accommodation: '住宿', flight: '航班', transport: '交通' };
                 return map[cat] || '其他';
             };
             
-            const getWeatherIcon = (cond) => ({ sunny: 'fa-sun', cloudy: 'fa-cloud', rain: 'fa-cloud-rain' }[cond] || 'fa-cloud');
+            const getWeatherIcon = (cond) => ({ sunny: 'fa-sun', cloudy: 'fa-cloud', rain: 'fa-tint' }[cond] || 'fa-cloud');
             const getWeatherDescription = (cond) => ({ sunny: '晴朗', cloudy: '多雲', rain: '降雨' }[cond] || '未知');
             
             const getTransportIcon = (type) => ({ walk: 'fa-walking', car: 'fa-car', bus: 'fa-bus', public: 'fa-subway', flight: 'fa-plane' }[type] || 'fa-arrow-right');
 
-            const getExpenseIcon = (cat) => `fas ${{ transport: 'fa-train', food: 'fa-utensils', stay: 'fa-bed', ticket: 'fa-ticket-alt', shopping: 'fa-shopping-basket' }[cat] || 'fa-receipt'}`;
+            const getExpenseIcon = (cat) => `fa ${{ transport: 'fa-train', food: 'fa-utensils', stay: 'fa-bed', ticket: 'fa-ticket', shopping: 'fa-shopping-basket' }[cat] || 'fa-receipt'}`;
             const getExpenseIconBg = (cat) => ({ transport: 'bg-blue-500', food: 'bg-red-500', stay: 'bg-orange-500', ticket: 'bg-emerald-500', shopping: 'bg-pink-500' }[cat] || 'bg-gray-500');
             const getExpenseBorder = (cat) => ({ transport: 'bg-blue-500', food: 'bg-red-500', stay: 'bg-orange-500', ticket: 'bg-emerald-500', shopping: 'bg-pink-500' }[cat] || 'bg-gray-500');
 

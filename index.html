@@ -1,4 +1,4 @@
-html_content = """<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
@@ -868,7 +868,7 @@ html_content = """<!DOCTYPE html>
             onMounted(() => {
                 fetchRealTimeRate();
                 
-                db.collection('tripData').doc('main').onSnapshot((doc) => {
+                db.collection('tripData').doc('v2026_final').onSnapshot((doc) => {
                     syncStatus.value = 'syncing';
                     if (doc.exists) {
                         const data = doc.data();
@@ -917,7 +917,7 @@ html_content = """<!DOCTYPE html>
             const pushToFirebase = () => {
                 if (!initialLoadDone) return;
                 syncStatus.value = 'syncing';
-                db.collection('tripData').doc('main').set({
+                db.collection('tripData').doc('v2026_final').set({
                     itinerary: JSON.stringify(itineraryData.value),
                     shopping: JSON.stringify(shoppingList.value),
                     expenses: JSON.stringify(expenses.value),
@@ -1113,8 +1113,3 @@ html_content = """<!DOCTYPE html>
 </script>
 </body>
 </html>
-"""
-
-with open('index_v18.html', 'w', encoding='utf-8') as f:
-    f.write(html_content)
-print("V18 HTML generated.")

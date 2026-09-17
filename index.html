@@ -45,31 +45,29 @@
             position: relative; z-index: 10; padding-bottom: 25px; 
         }
 
-        /* 修復 Banner 被裁切的問題：移除 padding、使用 height 控制、並設定 object-fit: contain */
+        /* 修改：使用 100% 100% 保證圖片絕對不裁切 */
         .banner-container {
             width: 100%;
-            height: 220px; /* 固定高度，避免手機自動拉長 */
-            background-color: #87B3D6; /* 底色 */
-            border-bottom-left-radius: 30px;
+            height: 180px; 
+            background-image: url('31263.png'); 
+            background-size: 100% 100%; 
+            background-position: center; 
+            background-repeat: no-repeat;
+            background-color: #79A3D3;
+            border-bottom-left-radius: 30px; 
             border-bottom-right-radius: 30px;
-            overflow: hidden;
+            position: relative;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            display: flex;
-            align-items: center; /* 讓圖片在容器內置中 */
-            justify-content: center;
+            overflow: hidden;
         }
 
-        .banner-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* 改用 cover 或 contain，如果圖變形請改為 cover 並調整 height */
-            /* 因為圖片是長條形，使用 cover 加上 object-position left 可以保留人物與城堡 */
-            object-position: left center; 
+        .side-tab-bar {
+            position: absolute; bottom: 38px; right: 12px; z-index: 30; display: flex; flex-direction: row; gap: 6px;
         }
-
+        
         .tab-button {
-            width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 1.15rem; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); transition: all 0.2s ease;
+            width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); transition: all 0.2s ease;
         }
         .tab-button.active { background-color: #DE7B54; color: #ffffff; box-shadow: 0 6px 15px rgba(222, 123, 84, 0.4); transform: scale(1.05); }
         .tab-button:not(.active) { background-color: rgba(255,255,255,0.95); backdrop-filter: blur(4px); color: #DE7B54; }
@@ -79,7 +77,7 @@
             z-index: 20; 
             background-color: #FFF9F5; 
             min-height: calc(100vh - 160px); 
-            margin-top: -30px; /* 拉上來重疊 */
+            margin-top: -30px;
             border-top-left-radius: 30px; 
             border-top-right-radius: 30px;
             padding-top: 25px; 
@@ -118,7 +116,6 @@
     
     <div class="header-wrapper">
         <div class="banner-container">
-            <img src="31263.png" alt="Japan Trip 2026">
         </div>
         
         <div class="absolute bottom-0 right-4 z-30 flex flex-row gap-1.5">
@@ -147,6 +144,7 @@
         <i class="fa-solid fa-cloud-check"></i> 已連線雲端
     </div>
 
+    <!-- 主內容區 -->
     <main class="px-4 app-main">
         <!-- Tab 1: Itinerary -->
         <div v-show="currentTab === 'itinerary'" class="animate-fade-in">
@@ -215,7 +213,7 @@
                                     <i class="fa-solid fa-circle-info text-base mt-0.5"></i><span class="leading-relaxed whitespace-pre-line">{{ item.note }}</span>
                                 </div>
                                 
-                                <button @click.stop="editItineraryItem(item)" class="absolute bottom-3 right-3 w-9 h-9 bg-white text-blue-500 rounded-full flex items-center justify-center hover:bg-blue-500 hover:text-white shadow-sm transition-colors border border-blue-100 z-20">
+                                <button @click.stop="editItineraryItem(item)" class="absolute bottom-3 right-3 w-9 h-9 bg-white text-blue-600 rounded-full flex items-center justify-center hover:bg-blue-600 hover:text-white shadow-md transition-colors border border-blue-200 z-20">
                                     <i class="fa-solid fa-pen text-sm"></i>
                                 </button>
                             </div>
@@ -231,7 +229,7 @@
                                     </div>
                                     <div class="flex flex-col items-end gap-2"><i class="fa-solid fa-grip-lines drag-handle p-1 hover:text-maple-500 transition-colors bg-gray-50 rounded text-xl cursor-grab"></i></div>
                                 </div>
-                                <div class="relative z-10 pr-12">
+                                <div class="relative z-10 pr-4">
                                     <h3 class="text-lg font-bold text-gray-800 mb-2 leading-tight">{{ item.name }}</h3>
                                     <div class="text-xs text-gray-500 space-y-2 mb-3 bg-gray-50 p-3 rounded-xl border border-gray-100" v-if="item.hours || item.price || item.address">
                                         <p v-if="item.hours" class="flex items-center font-medium"><i class="fa-regular fa-clock w-5 text-center text-maple-500 text-sm"></i> 營業: {{ item.hours }}</p>
@@ -249,7 +247,7 @@
                                     <i class="fa-solid fa-location-arrow text-sm"></i>
                                 </a>
                                 
-                                <button @click.stop="editItineraryItem(item)" class="absolute bottom-4 right-4 w-9 h-9 bg-maple-50 text-maple-500 rounded-full flex items-center justify-center hover:bg-maple-500 hover:text-white shadow-sm transition-colors border border-maple-100 z-20">
+                                <button @click.stop="editItineraryItem(item)" class="absolute bottom-4 right-4 w-10 h-10 bg-white text-blue-600 rounded-full flex items-center justify-center hover:bg-blue-600 hover:text-white shadow-md transition-colors border border-blue-200 z-20">
                                     <i class="fa-solid fa-pen text-sm"></i>
                                 </button>
                             </div>
@@ -788,15 +786,16 @@
             const defaultItineraryData = [
                 // Day 1: 10/29
                 [
-                    { id: 101, name: '機場報到', category: 'flight', startTime: '24:00', address: '桃園國際機場 (TPE)', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
-                    { id: 102, name: '桃園機場-名古屋機場', category: 'flight', startTime: '02:55-06:25', address: 'TPE - NGO', note: '出關(可買早餐或到名古屋後再買)。航班MM724', transportType: 'flight', travelTime: '3h30m', isNoteExpanded: false },
-                    { id: 103, name: '名古屋機場-名古屋車站', category: 'transport', startTime: '07:26-08:08', address: '名古屋車站', note: '預估最晚搭這班(買票+USKY) / 現場買票', transportType: 'public', travelTime: '42m', isNoteExpanded: false },
-                    { id: 104, name: '名古屋車站~高山', category: 'transport', startTime: '08:43-10:58', address: '高山車站', note: '9/2買klook(共4780)', transportType: 'public', travelTime: '2h15m', isNoteExpanded: false },
-                    { id: 105, name: '至飯店放行李', category: 'accommodation', startTime: '10:58-12:00', address: 'FAV LUX HIDATAKAYAMA', note: '放行李', transportType: 'walk', travelTime: '10m', isNoteExpanded: false },
-                    { id: 106, name: '飛騨牛SUKIYAKI 中橋 WAKACHIYA', category: 'food', startTime: '12:30-14:00', address: '中橋 WAKACHIYA', note: '飛騨牛SUKIYAKI', hours: '11:00-14:00', transportType: 'walk', travelTime: '15m', isNoteExpanded: false },
-                    { id: 107, name: '飛騨高山老街 + 高山陣屋', category: 'sightseeing', startTime: '14:00-18:00', address: '高山老街', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
-                    { id: 108, name: '中華拉麺 つづみ', category: 'food', startTime: '18:00-19:00', address: '中華拉麺 つづみ', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
-                    { id: 109, name: 'FAV LUX HIDATAKAYAMA', category: 'accommodation', startTime: '19:00', address: 'FAV LUX HIDATAKAYAMA', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
+                    { id: 101, name: '機場報到', category: 'flight', startTime: '24:00', address: '桃園國際機場', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
+                    { id: 102, name: '桃園機場-名古屋機場', category: 'flight', startTime: '02:55-06:25', address: 'TPE - NGO', note: '可買早餐或到名古屋後再買。航班MM724', transportType: 'flight', travelTime: '3h30m', isNoteExpanded: false },
+                    { id: 103, name: '出關 / 往名古屋車站', category: 'transport', startTime: '06:25-07:26', address: '名古屋機場', note: '預估最晚搭這班+USKY / 現場買票', transportType: 'public', travelTime: '1h', isNoteExpanded: false },
+                    { id: 104, name: '轉車等待', category: 'other', startTime: '08:08-08:43', address: '名古屋車站', note: '', transportType: 'walk', travelTime: '35m', isNoteExpanded: false },
+                    { id: 105, name: '名古屋車站-高山', category: 'transport', startTime: '08:43-10:58', address: '高山車站', note: '9/2買klook(共4780)', transportType: 'public', travelTime: '2h15m', isNoteExpanded: false },
+                    { id: 106, name: '至飯店放行李', category: 'accommodation', startTime: '10:58-12:00', address: 'FAV LUX HIDATAKAYAMA', note: '放行李', transportType: 'walk', travelTime: '1h', isNoteExpanded: false },
+                    { id: 107, name: '飛騨牛SUKIYAKI 中橋 WAKACHIYA', category: 'food', startTime: '12:30-14:00', address: '中橋 WAKACHIYA', note: '走路10-15分', transportType: 'walk', travelTime: '15m', isNoteExpanded: false },
+                    { id: 108, name: '飛騨高山老街+高山陣屋', category: 'sightseeing', startTime: '14:00-18:00', address: '高山老街', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
+                    { id: 109, name: '中華拉麵 つづみ', category: 'food', startTime: '18:00-19:00', address: '中華拉麵 つづみ', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
+                    { id: 110, name: '住 FAV LUX HIDATAKAYAMA', category: 'accommodation', startTime: '', address: 'FAV LUX HIDATAKAYAMA', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false }
                 ],
                 // Day 2: 10/30
                 [
@@ -806,7 +805,7 @@
                     { id: 204, name: '大正池→河童橋→(梓川左岸)明神池', category: 'sightseeing', startTime: '09:00-15:00', address: '上高地', note: '健行。河童橋午餐;蘋果派;河童燒;五千尺飯店卡士達布丁', transportType: 'walk', travelTime: '', isNoteExpanded: false },
                     { id: 205, name: '明神池返回(梓川右岸)', category: 'sightseeing', startTime: '15:00', address: '上高地巴士站', note: '河童橋休息後至上高地巴士站回程', transportType: 'walk', travelTime: '', isNoteExpanded: false },
                     { id: 206, name: '味の与平', category: 'food', startTime: '18:30', address: '味の与平', note: '預約號碼:JZ44GD5SC5', transportType: 'walk', travelTime: '', isNoteExpanded: false },
-                    { id: 207, name: '往 FAV LUX HIDATAKAYAMA', category: 'accommodation', startTime: '', address: 'FAV LUX HIDATAKAYAMA', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
+                    { id: 207, name: '住 FAV LUX HIDATAKAYAMA', category: 'accommodation', startTime: '', address: 'FAV LUX HIDATAKAYAMA', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false }
                 ],
                 // Day 3: 10/31
                 [
@@ -814,37 +813,36 @@
                     { id: 302, name: '早餐: かじ橋食堂', category: 'food', startTime: '06:00-07:00', address: 'かじ橋食堂', note: '06:00開', transportType: 'walk', travelTime: '', isNoteExpanded: false },
                     { id: 303, name: '出發至車站', category: 'transport', startTime: '07:00-07:20', address: '高山車站', note: '', transportType: 'walk', travelTime: '20m', isNoteExpanded: false },
                     { id: 304, name: '巴士前往白川鄉合掌村', category: 'transport', startTime: '07:20-08:20', address: '白川鄉', note: '9月底預約巴士', transportType: 'bus', travelTime: '1h', isNoteExpanded: false },
-                    { id: 305, name: '白川鄉合掌村 / 城山展望台', category: 'sightseeing', startTime: '08:20-14:30', address: '白川鄉', note: '「城山展望台」俯瞰被秋意包圍的茅草聚落。', transportType: 'walk', travelTime: '', isNoteExpanded: false },
-                    { id: 306, name: '高速巴士前往名古屋市區', category: 'transport', startTime: '14:30-17:16', address: '名古屋', note: '從白川鄉搭乘高速巴士', transportType: 'bus', travelTime: '2.5-3h', isNoteExpanded: false },
+                    { id: 305, name: '白川鄉合掌村 / 城山展望台', category: 'sightseeing', startTime: '08:20-14:30', address: '白川鄉', note: '「城山展望台」俯瞰被秋意包圍的茅草屋聚落。', transportType: 'walk', travelTime: '', isNoteExpanded: false },
+                    { id: 306, name: '高速巴士前往名古屋市區', category: 'transport', startTime: '14:30-17:16', address: '名古屋', note: '從白川鄉搭乘高速巴士(車程約2.5至3小時)', transportType: 'bus', travelTime: '2.5-3h', isNoteExpanded: false },
                     { id: 307, name: '炭燒鰻魚藤榮 HAERA店', category: 'food', startTime: '17:30-18:30', address: '炭燒鰻魚藤榮', note: '預訂編號:99bc9420。必點炭烤鰻魚飯。', transportType: 'walk', travelTime: '', isNoteExpanded: false },
-                    { id: 308, name: 'Henn na Hotel Nagoya', category: 'accommodation', startTime: '20:00', address: 'Henn na Hotel Nagoya', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
+                    { id: 308, name: '住 henn na hotel', category: 'accommodation', startTime: '20:00', address: 'henn na hotel', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false }
                 ],
                 // Day 4: 11/01
                 [
                     { id: 401, name: '飯店早餐/早午餐', category: 'food', startTime: '08:00', address: '飯店', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
-                    { id: 402, name: '地下鐵東山線到藤が丘轉Linimo', category: 'transport', startTime: '08:30-09:30', address: '愛・地球博記念公園', note: '搭乘地下鐵「東山線」到藤が丘站。轉乘 Linimo 從藤が丘站到「愛・地球博記念公園」站下車。', transportType: 'public', travelTime: '1h', isNoteExpanded: false },
+                    { id: 402, name: '地下鐵東山線到藤が丘轉Linimo', category: 'transport', startTime: '08:30-09:30', address: '愛・地球博記念公園', note: '搭乘地下鐵「東山線」到藤が丘站。轉乘 Linimo (只有一條路線) 從藤が丘站到「愛・地球博記念公園」站下車。', transportType: 'public', travelTime: '1h', isNoteExpanded: false },
                     { id: 403, name: '吉卜力公園', category: 'sightseeing', startTime: '09:30-15:00', address: 'Ghibli Park', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
                     { id: 404, name: '返回名古屋', category: 'transport', startTime: '15:00-16:00', address: '名古屋市區', note: '', transportType: 'public', travelTime: '1h', isNoteExpanded: false },
-                    { id: 405, name: '名古屋市區逛街 (PARCO HAERA)', category: 'shopping', startTime: '16:00-20:00', address: '名古屋 PARCO', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
-                    { id: 406, name: '炭火燒鳥 しげ榮本店', category: 'food', startTime: '20:00', address: 'しげ榮本店', note: '預約號碼:99bc9420', transportType: 'walk', travelTime: '', isNoteExpanded: false },
-                    { id: 407, name: '往 Henn na Hotel Nagoya', category: 'accommodation', startTime: '', address: 'Henn na Hotel Nagoya', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
+                    { id: 405, name: '名古屋市區逛街', category: 'shopping', startTime: '16:00-20:00', address: '名古屋市區', note: 'PARCO HAERA', transportType: 'walk', travelTime: '', isNoteExpanded: false },
+                    { id: 406, name: '燒鳥:炭火燒鳥 しげ榮本店', category: 'food', startTime: '20:00', address: 'しげ榮本店', note: '預約號碼:99bc9420', transportType: 'walk', travelTime: '', isNoteExpanded: false },
+                    { id: 407, name: '住 henn na hotel', category: 'accommodation', startTime: '', address: 'henn na hotel', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false }
                 ],
                 // Day 5: 11/02
                 [
-                    { id: 501, name: '飯店早餐', category: 'food', startTime: '08:30-09:00', address: '飯店', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
-                    { id: 502, name: '飯店-名古屋車站', category: 'transport', startTime: '09:00-09:30', address: '名古屋車站', note: '', transportType: 'public', travelTime: '30m', isNoteExpanded: false },
-                    { id: 503, name: '名鐵名古屋站(名鐵犬山線)→犬山站', category: 'transport', startTime: '09:30-10:00', address: '犬山站', note: '', transportType: 'public', travelTime: '30m', isNoteExpanded: false },
-                    { id: 504, name: '犬山城下町散策', category: 'sightseeing', startTime: '10:00-15:00', address: '犬山城', note: '1.犬山牛太郎(飛騨牛握壽司) 2.本町茶寮 3.壽俵屋 4.Tonamaru串炸 5.戀小町團子 6.COCOTOMO FARM年輪蛋糕 7.芳川屋草莓冰。', transportType: 'walk', travelTime: '', isNoteExpanded: false },
-                    { id: 505, name: '犬山城天守閣與三光稲荷神社', category: 'sightseeing', startTime: '', address: '三光稲荷神社', note: '粉紅色愛心繪馬、洗錢體驗。傍晚返回名古屋。', transportType: 'walk', travelTime: '', isNoteExpanded: false },
-                    { id: 506, name: '晚餐: 獅子丸拉麵', category: 'food', startTime: '18:00-20:00', address: '獅子丸拉麵', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
-                    { id: 507, name: 'Henn na Hotel Nagoya', category: 'accommodation', startTime: '', address: 'Henn na Hotel Nagoya', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
+                    { id: 501, name: '飯店早餐', category: 'food', startTime: '', address: '飯店', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
+                    { id: 502, name: '飯店-名古屋車站', category: 'transport', startTime: '08:30-09:00', address: '名古屋車站', note: '', transportType: 'public', travelTime: '30m', isNoteExpanded: false },
+                    { id: 503, name: '名鐵名古屋站(名鐵犬山線)→犬山站', category: 'transport', startTime: '09:00-09:30', address: '犬山站', note: '車程約30分', transportType: 'public', travelTime: '30m', isNoteExpanded: false },
+                    { id: 504, name: '犬山城下町與天守閣', category: 'sightseeing', startTime: '09:30-15:00', address: '犬山城', note: '犬山站出發走城下町上山→犬山城天守閣→三光稲荷神社→下山在城下町吃小吃→傍晚前回名古屋。\n\n1.犬山牛太郎:A5飛驒牛握壽司\n2.本町茶寮:彩り田楽御膳\n3.壽俵屋犬山井上邸:醬油おこげ串\n4.Tonamaru串炸\n5.戀小町團子\n6.COCOTOMO FARM年輪蛋糕\n7.芳川屋草莓冰\n8.三光稲荷神社與「洗錢」體驗', transportType: 'walk', travelTime: '', isNoteExpanded: false },
+                    { id: 505, name: '晚餐: 獅子丸拉麵', category: 'food', startTime: '', address: '獅子丸拉麵', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
+                    { id: 506, name: '住 henn na hotel', category: 'accommodation', startTime: '', address: 'henn na hotel', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false }
                 ],
                 // Day 6: 11/03
                 [
-                    { id: 601, name: '飯店早餐', category: 'food', startTime: '08:30', address: '飯店', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
-                    { id: 602, name: '名古屋榮商圈', category: 'shopping', startTime: '10:00', address: '榮', note: 'HAERA FUEGUIA 1833, LOUANGE TOKYO Le Chateau。', transportType: 'walk', travelTime: '', isNoteExpanded: false },
+                    { id: 601, name: '飯店早餐', category: 'food', startTime: '', address: '飯店', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
+                    { id: 602, name: '名古屋榮商圈', category: 'shopping', startTime: '10:00', address: '榮', note: 'HAERA FUEGUIA 1833\nLOUANGE TOKYO Le Chateau', transportType: 'walk', travelTime: '', isNoteExpanded: false },
                     { id: 603, name: '到機場', category: 'transport', startTime: '14:30', address: '名古屋機場 (NGO)', note: '', transportType: 'public', travelTime: '', isNoteExpanded: false },
-                    { id: 604, name: '回台 (NGO - TPE)', category: 'flight', startTime: '16:40-19:10', address: 'NGO - TPE', note: '航班CX531，19:10抵達桃園。', transportType: 'flight', travelTime: '2h30m', isNoteExpanded: false },
+                    { id: 604, name: '回台', category: 'flight', startTime: '16:40-19:10', address: 'NGO - TPE', note: '航班CX531', transportType: 'flight', travelTime: '2h30m', isNoteExpanded: false }
                 ]
             ];
 
@@ -881,7 +879,7 @@
             onMounted(() => {
                 fetchRealTimeRate();
                 
-                db.collection('tripData').doc('v2026_final_v2').onSnapshot((doc) => {
+                db.collection('tripData').doc('v2026_final_v5').onSnapshot((doc) => {
                     syncStatus.value = 'syncing';
                     if (doc.exists) {
                         const data = doc.data();
@@ -930,7 +928,7 @@
             const pushToFirebase = () => {
                 if (!initialLoadDone) return;
                 syncStatus.value = 'syncing';
-                db.collection('tripData').doc('v2026_final_v2').set({
+                db.collection('tripData').doc('v2026_final_v5').set({
                     itinerary: JSON.stringify(itineraryData.value),
                     shopping: JSON.stringify(shoppingList.value),
                     expenses: JSON.stringify(expenses.value),

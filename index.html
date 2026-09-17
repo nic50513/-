@@ -42,17 +42,29 @@
         }
 
         .header-wrapper {
-            position: relative; z-index: 10; padding-bottom: 25px; /* 留給選單的空間 */
+            position: relative; z-index: 10; padding-bottom: 25px; 
         }
 
-        /* 改用 <img> 標籤放入圓角容器，保證 100% 比例不裁切 */
+        /* 修復 Banner 被裁切的問題：移除 padding、使用 height 控制、並設定 object-fit: contain */
         .banner-container {
             width: 100%;
-            background-color: #87B3D6; /* 天空藍底色，若圖片載入稍慢可墊底 */
+            height: 220px; /* 固定高度，避免手機自動拉長 */
+            background-color: #87B3D6; /* 底色 */
             border-bottom-left-radius: 30px;
             border-bottom-right-radius: 30px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center; /* 讓圖片在容器內置中 */
+            justify-content: center;
+        }
+
+        .banner-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 改用 cover 或 contain，如果圖變形請改為 cover 並調整 height */
+            /* 因為圖片是長條形，使用 cover 加上 object-position left 可以保留人物與城堡 */
+            object-position: left center; 
         }
 
         .tab-button {
@@ -67,6 +79,10 @@
             z-index: 20; 
             background-color: #FFF9F5; 
             min-height: calc(100vh - 160px); 
+            margin-top: -30px; /* 拉上來重疊 */
+            border-top-left-radius: 30px; 
+            border-top-right-radius: 30px;
+            padding-top: 25px; 
         }
 
         .date-selector-sticky { background-color: #FFF9F5; border-bottom: 1px solid #FCE4D6; z-index: 20; top: 0; padding-top: 5px; padding-bottom: 10px; }
@@ -100,10 +116,9 @@
 
 <div id="app" class="app-container">
     
-    <!-- 重新設計的 Header 確保圖片 100% 完整顯示不裁切 -->
     <div class="header-wrapper">
         <div class="banner-container">
-            <img src="31263.png" alt="Japan Trip 2026" class="w-full h-auto block object-contain">
+            <img src="31263.png" alt="Japan Trip 2026">
         </div>
         
         <div class="absolute bottom-0 right-4 z-30 flex flex-row gap-1.5">
@@ -132,7 +147,6 @@
         <i class="fa-solid fa-cloud-check"></i> 已連線雲端
     </div>
 
-    <!-- 主內容區 -->
     <main class="px-4 app-main">
         <!-- Tab 1: Itinerary -->
         <div v-show="currentTab === 'itinerary'" class="animate-fade-in">
@@ -186,7 +200,7 @@
                                     <span class="text-[10px] font-bold bg-blue-500 text-white px-2 py-1 rounded shadow-sm flex items-center gap-1"><i class="fa-solid fa-plane text-xs"></i> 航班資訊</span>
                                     <div class="flex items-center gap-3">
                                         <span class="text-sm font-bold text-blue-800 bg-white/60 px-2 py-0.5 rounded">{{ item.startTime }}</span>
-                                        <i class="fa-solid fa-grip-lines drag-handle text-blue-300 hover:text-blue-500 p-1 text-xl"></i>
+                                        <i class="fa-solid fa-grip-lines drag-handle text-blue-300 hover:text-blue-500 p-1 text-xl cursor-grab"></i>
                                     </div>
                                 </div>
                                 <div class="flex justify-between items-center px-2 relative z-10">
@@ -201,7 +215,6 @@
                                     <i class="fa-solid fa-circle-info text-base mt-0.5"></i><span class="leading-relaxed whitespace-pre-line">{{ item.note }}</span>
                                 </div>
                                 
-                                <!-- 獨立且清晰的編輯按鈕 -->
                                 <button @click.stop="editItineraryItem(item)" class="absolute bottom-3 right-3 w-9 h-9 bg-white text-blue-500 rounded-full flex items-center justify-center hover:bg-blue-500 hover:text-white shadow-sm transition-colors border border-blue-100 z-20">
                                     <i class="fa-solid fa-pen text-sm"></i>
                                 </button>
@@ -216,7 +229,7 @@
                                             <div v-if="item.startTime" class="text-sm font-bold text-maple-700 bg-maple-50 px-1.5 py-0.5 rounded mt-0.5 flex items-center gap-1"><i class="fa-regular fa-clock text-[12px]"></i>{{ item.startTime }}</div>
                                         </div>
                                     </div>
-                                    <div class="flex flex-col items-end gap-2"><i class="fa-solid fa-grip-lines drag-handle p-1 hover:text-maple-500 transition-colors bg-gray-50 rounded text-xl"></i></div>
+                                    <div class="flex flex-col items-end gap-2"><i class="fa-solid fa-grip-lines drag-handle p-1 hover:text-maple-500 transition-colors bg-gray-50 rounded text-xl cursor-grab"></i></div>
                                 </div>
                                 <div class="relative z-10 pr-12">
                                     <h3 class="text-lg font-bold text-gray-800 mb-2 leading-tight">{{ item.name }}</h3>
@@ -236,7 +249,6 @@
                                     <i class="fa-solid fa-location-arrow text-sm"></i>
                                 </a>
                                 
-                                <!-- 獨立且清晰的編輯按鈕 -->
                                 <button @click.stop="editItineraryItem(item)" class="absolute bottom-4 right-4 w-9 h-9 bg-maple-50 text-maple-500 rounded-full flex items-center justify-center hover:bg-maple-500 hover:text-white shadow-sm transition-colors border border-maple-100 z-20">
                                     <i class="fa-solid fa-pen text-sm"></i>
                                 </button>
@@ -513,6 +525,7 @@
                                 <option value="accommodation">住宿</option>
                                 <option value="flight">航班</option>
                                 <option value="transport">交通</option>
+                                <option value="other">其他</option>
                             </select>
                         </div>
                         
@@ -775,7 +788,7 @@
             const defaultItineraryData = [
                 // Day 1: 10/29
                 [
-                    { id: 101, name: '機場報到', category: 'flight', startTime: '00:00', address: '桃園國際機場 (TPE)', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
+                    { id: 101, name: '機場報到', category: 'flight', startTime: '24:00', address: '桃園國際機場 (TPE)', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
                     { id: 102, name: '桃園機場-名古屋機場', category: 'flight', startTime: '02:55-06:25', address: 'TPE - NGO', note: '出關(可買早餐或到名古屋後再買)。航班MM724', transportType: 'flight', travelTime: '3h30m', isNoteExpanded: false },
                     { id: 103, name: '名古屋機場-名古屋車站', category: 'transport', startTime: '07:26-08:08', address: '名古屋車站', note: '預估最晚搭這班(買票+USKY) / 現場買票', transportType: 'public', travelTime: '42m', isNoteExpanded: false },
                     { id: 104, name: '名古屋車站~高山', category: 'transport', startTime: '08:43-10:58', address: '高山車站', note: '9/2買klook(共4780)', transportType: 'public', travelTime: '2h15m', isNoteExpanded: false },
@@ -791,7 +804,7 @@
                     { id: 202, name: '高山 - 平湯溫泉', category: 'transport', startTime: '07:00-08:00', address: '平湯溫泉', note: '高山(濃飛巴士總站)售票處(5號)->平湯溫泉站2號月台搭乘前往大正池站巴士', transportType: 'bus', travelTime: '1h', isNoteExpanded: false },
                     { id: 203, name: '平湯溫泉 - 大正池', category: 'transport', startTime: '08:30-09:00', address: '大正池', note: '現場買來回票', transportType: 'bus', travelTime: '30m', isNoteExpanded: false },
                     { id: 204, name: '大正池→河童橋→(梓川左岸)明神池', category: 'sightseeing', startTime: '09:00-15:00', address: '上高地', note: '健行。河童橋午餐;蘋果派;河童燒;五千尺飯店卡士達布丁', transportType: 'walk', travelTime: '', isNoteExpanded: false },
-                    { id: 205, name: '明神池返回(梓川右岸)', category: 'sightseeing', startTime: '15:00', address: '上高地巴士站', note: '河童橋休息接至上高地巴士站回程', transportType: 'walk', travelTime: '', isNoteExpanded: false },
+                    { id: 205, name: '明神池返回(梓川右岸)', category: 'sightseeing', startTime: '15:00', address: '上高地巴士站', note: '河童橋休息後至上高地巴士站回程', transportType: 'walk', travelTime: '', isNoteExpanded: false },
                     { id: 206, name: '味の与平', category: 'food', startTime: '18:30', address: '味の与平', note: '預約號碼:JZ44GD5SC5', transportType: 'walk', travelTime: '', isNoteExpanded: false },
                     { id: 207, name: '往 FAV LUX HIDATAKAYAMA', category: 'accommodation', startTime: '', address: 'FAV LUX HIDATAKAYAMA', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
                 ],
@@ -868,7 +881,7 @@
             onMounted(() => {
                 fetchRealTimeRate();
                 
-                db.collection('tripData').doc('v2026_final').onSnapshot((doc) => {
+                db.collection('tripData').doc('v2026_final_v2').onSnapshot((doc) => {
                     syncStatus.value = 'syncing';
                     if (doc.exists) {
                         const data = doc.data();
@@ -917,7 +930,7 @@
             const pushToFirebase = () => {
                 if (!initialLoadDone) return;
                 syncStatus.value = 'syncing';
-                db.collection('tripData').doc('v2026_final').set({
+                db.collection('tripData').doc('v2026_final_v2').set({
                     itinerary: JSON.stringify(itineraryData.value),
                     shopping: JSON.stringify(shoppingList.value),
                     expenses: JSON.stringify(expenses.value),

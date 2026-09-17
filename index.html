@@ -41,38 +41,46 @@
             box-shadow: 0 0 30px rgba(0, 0, 0, 0.05); position: relative; padding-bottom: 90px; overflow-x: hidden; 
         }
 
-        .header-wrapper {
-            position: relative; z-index: 10; padding-bottom: 25px; 
-        }
-
-        /* Banner 聚焦左側主體（城堡與人物），裁切掉右側空白 */
-        .banner-container {
+        /* 橫幅容器：使用原圖比例 100% 寬度等比縮放，四角修圓，左右上下完全不裁切任何一人 */
+        .banner-wrapper {
             width: 100%;
-            height: 230px;
-            background-image: url('31263.png');
-            background-size: auto 100%; /* 高度填滿，寬度依比例向右延伸 */
-            background-position: left center; /* 緊靠最左側，只展示左邊主要畫面 */
-            background-repeat: no-repeat;
             background-color: #79A3D3;
-            border-bottom-left-radius: 32px;
-            border-bottom-right-radius: 32px;
+            border-bottom-left-radius: 26px;
+            border-bottom-right-radius: 26px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            position: relative;
+            line-height: 0;
+        }
+
+        .banner-img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* 導航分頁列：排列在 Banner 正下方，不遮擋插圖中任何人物 */
+        .nav-tabs-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px 8px;
+            background-color: #FFF9F5;
         }
 
         .tab-button {
-            width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 1.15rem; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); transition: all 0.2s ease;
+            width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; box-shadow: 0 4px 10px rgba(222, 123, 84, 0.15); transition: all 0.2s ease;
         }
-        .tab-button.active { background-color: #DE7B54; color: #ffffff; box-shadow: 0 6px 15px rgba(222, 123, 84, 0.4); transform: scale(1.05); }
-        .tab-button:not(.active) { background-color: rgba(255,255,255,0.95); backdrop-filter: blur(4px); color: #DE7B54; }
+        .tab-button.active { background-color: #DE7B54; color: #ffffff; box-shadow: 0 6px 16px rgba(222, 123, 84, 0.45); transform: scale(1.06); }
+        .tab-button:not(.active) { background-color: #FFFFFF; border: 1px solid #FCE4D6; color: #DE7B54; }
 
         .app-main { 
             position: relative; 
             z-index: 20; 
             background-color: #FFF9F5; 
             min-height: calc(100vh - 160px); 
+            padding-top: 10px;
         }
 
         .date-selector-sticky { background-color: #FFF9F5; border-bottom: 1px solid #FCE4D6; z-index: 20; top: 0; padding-top: 5px; padding-bottom: 10px; }
@@ -106,27 +114,28 @@
 
 <div id="app" class="app-container">
     
-    <div class="header-wrapper">
-        <div class="banner-container">
-        </div>
-        
-        <div class="absolute bottom-0 right-4 z-30 flex flex-row gap-1.5">
-            <button @click="currentTab = 'itinerary'" title="行程" :class="{'active': currentTab === 'itinerary'}" class="tab-button">
-                <i class="fa-solid fa-map-location-dot"></i>
-            </button>
-            <button @click="currentTab = 'info'" title="資訊" :class="{'active': currentTab === 'info'}" class="tab-button">
-                <i class="fa-solid fa-circle-info"></i>
-            </button>
-            <button @click="currentTab = 'transit'" title="交通" :class="{'active': currentTab === 'transit'}" class="tab-button">
-                <i class="fa-solid fa-train-subway"></i>
-            </button>
-            <button @click="currentTab = 'shopping'" title="購物" :class="{'active': currentTab === 'shopping'}" class="tab-button">
-                <i class="fa-solid fa-basket-shopping"></i>
-            </button>
-            <button @click="currentTab = 'expenses'" title="花費" :class="{'active': currentTab === 'expenses'}" class="tab-button">
-                <i class="fa-solid fa-coins"></i>
-            </button>
-        </div>
+    <!-- 100% 原寸完整橫幅（四人同框、城堡、電視塔完全無裁切） -->
+    <div class="banner-wrapper">
+        <img src="31263.png" alt="Japan Trip 2026" class="banner-img">
+    </div>
+    
+    <!-- 導航選單：獨立置中，不壓在插圖上 -->
+    <div class="nav-tabs-bar">
+        <button @click="currentTab = 'itinerary'" title="行程" :class="{'active': currentTab === 'itinerary'}" class="tab-button">
+            <i class="fa-solid fa-map-location-dot"></i>
+        </button>
+        <button @click="currentTab = 'info'" title="資訊" :class="{'active': currentTab === 'info'}" class="tab-button">
+            <i class="fa-solid fa-circle-info"></i>
+        </button>
+        <button @click="currentTab = 'transit'" title="交通" :class="{'active': currentTab === 'transit'}" class="tab-button">
+            <i class="fa-solid fa-train-subway"></i>
+        </button>
+        <button @click="currentTab = 'shopping'" title="購物" :class="{'active': currentTab === 'shopping'}" class="tab-button">
+            <i class="fa-solid fa-basket-shopping"></i>
+        </button>
+        <button @click="currentTab = 'expenses'" title="花費" :class="{'active': currentTab === 'expenses'}" class="tab-button">
+            <i class="fa-solid fa-coins"></i>
+        </button>
     </div>
     
     <div v-if="syncStatus === 'syncing'" class="bg-blue-50 text-blue-500 text-[10px] font-bold text-center py-0.5 flex items-center justify-center gap-1 shadow-inner opacity-80 z-30 relative border-b border-blue-100">
@@ -136,7 +145,6 @@
         <i class="fa-solid fa-cloud-check"></i> 已連線雲端
     </div>
 
-    <!-- 主內容區 -->
     <main class="px-4 app-main">
         <!-- Tab 1: Itinerary -->
         <div v-show="currentTab === 'itinerary'" class="animate-fade-in">
@@ -205,7 +213,7 @@
                                     <i class="fa-solid fa-circle-info text-base mt-0.5"></i><span class="leading-relaxed whitespace-pre-line">{{ item.note }}</span>
                                 </div>
                                 
-                                <button @click.stop="editItineraryItem(item)" class="absolute bottom-3 right-3 w-9 h-9 bg-white text-blue-500 rounded-full flex items-center justify-center hover:bg-blue-500 hover:text-white shadow-sm transition-colors border border-blue-100 z-20">
+                                <button @click.stop="editItineraryItem(item)" class="absolute bottom-3 right-3 w-9 h-9 bg-white text-blue-600 rounded-full flex items-center justify-center hover:bg-blue-600 hover:text-white shadow-md transition-colors border border-blue-200 z-20">
                                     <i class="fa-solid fa-pen text-sm"></i>
                                 </button>
                             </div>
@@ -221,7 +229,7 @@
                                     </div>
                                     <div class="flex flex-col items-end gap-2"><i class="fa-solid fa-grip-lines drag-handle p-1 hover:text-maple-500 transition-colors bg-gray-50 rounded text-xl cursor-grab"></i></div>
                                 </div>
-                                <div class="relative z-10 pr-12">
+                                <div class="relative z-10 pr-4">
                                     <h3 class="text-lg font-bold text-gray-800 mb-2 leading-tight">{{ item.name }}</h3>
                                     <div class="text-xs text-gray-500 space-y-2 mb-3 bg-gray-50 p-3 rounded-xl border border-gray-100" v-if="item.hours || item.price || item.address">
                                         <p v-if="item.hours" class="flex items-center font-medium"><i class="fa-regular fa-clock w-5 text-center text-maple-500 text-sm"></i> 營業: {{ item.hours }}</p>
@@ -239,7 +247,7 @@
                                     <i class="fa-solid fa-location-arrow text-sm"></i>
                                 </a>
                                 
-                                <button @click.stop="editItineraryItem(item)" class="absolute bottom-4 right-4 w-9 h-9 bg-maple-50 text-maple-500 rounded-full flex items-center justify-center hover:bg-maple-500 hover:text-white shadow-sm transition-colors border border-maple-100 z-20">
+                                <button @click.stop="editItineraryItem(item)" class="absolute bottom-4 right-4 w-10 h-10 bg-white text-blue-600 rounded-full flex items-center justify-center hover:bg-blue-600 hover:text-white shadow-md transition-colors border border-blue-200 z-20">
                                     <i class="fa-solid fa-pen text-sm"></i>
                                 </button>
                             </div>
@@ -872,7 +880,7 @@
             onMounted(() => {
                 fetchRealTimeRate();
                 
-                db.collection('tripData').doc('v2026_nagoya_v3').onSnapshot((doc) => {
+                db.collection('tripData').doc('v2026_full_perfect_v1').onSnapshot((doc) => {
                     syncStatus.value = 'syncing';
                     if (doc.exists) {
                         const data = doc.data();
@@ -921,7 +929,7 @@
             const pushToFirebase = () => {
                 if (!initialLoadDone) return;
                 syncStatus.value = 'syncing';
-                db.collection('tripData').doc('v2026_nagoya_v3').set({
+                db.collection('tripData').doc('v2026_full_perfect_v1').set({
                     itinerary: JSON.stringify(itineraryData.value),
                     shopping: JSON.stringify(shoppingList.value),
                     expenses: JSON.stringify(expenses.value),
@@ -1117,4 +1125,3 @@
 </script>
 </body>
 </html>
-

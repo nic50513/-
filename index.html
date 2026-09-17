@@ -41,13 +41,13 @@
             box-shadow: 0 0 30px rgba(0, 0, 0, 0.05); position: relative; padding-bottom: 90px; overflow-x: hidden; 
         }
 
-        /* Banner 精準只取左半邊（左半部 50% 滿版），右半邊空白處完全切除 */
+        /* Banner 精確顯示原圖左側 50%，右側大片空白徹底切除在螢幕外 */
         .banner-wrapper {
             width: 100%;
             height: 220px;
             background-image: url('31263.png');
-            background-size: 200% 100%; /* 寬度放大到 200%，高度滿版，精準截取左側 50% */
-            background-position: left center; /* 靠齊最左側，徹底排除右半邊空白 */
+            background-size: 200% 100%; /* 寬度放大到 200%，高度滿版，精確截取左側 50% */
+            background-position: left center; /* 靠齊最左側，徹底切除右半邊空白 */
             background-repeat: no-repeat;
             background-color: #79A3D3;
             border-bottom-left-radius: 28px;
@@ -57,7 +57,7 @@
             position: relative;
         }
 
-        /* 導航分頁列：排列在 Banner 正下方，不遮擋插圖中任何人物 */
+        /* 導航選單：獨立置中排列，不遮擋插圖中任何人物 */
         .nav-tabs-bar {
             display: flex;
             justify-content: center;
@@ -113,12 +113,10 @@
 
 <div id="app" class="app-container">
     
-    <!-- 100% 原寸完整橫幅（四人同框、城堡、電視塔完全無裁切） -->
-    <div class="banner-wrapper">
-        
-    </div>
+    <!-- 橫幅只呈現左半部 50% 主體 -->
+    <div class="banner-wrapper"></div>
     
-    <!-- 導航選單：獨立置中，不壓在插圖上 -->
+    <!-- 導航選單：獨立置中，不遮擋人物 -->
     <div class="nav-tabs-bar">
         <button @click="currentTab = 'itinerary'" title="行程" :class="{'active': currentTab === 'itinerary'}" class="tab-button">
             <i class="fa-solid fa-map-location-dot"></i>
@@ -833,24 +831,14 @@
                     { id: 501, name: '飯店早餐', category: 'food', startTime: '', address: '飯店', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
                     { id: 502, name: '飯店-名古屋車站', category: 'transport', startTime: '08:30-09:00', address: '名古屋車站', note: '', transportType: 'public', travelTime: '30m', isNoteExpanded: false },
                     { id: 503, name: '名鐵名古屋站(名鐵犬山線)→犬山站', category: 'transport', startTime: '09:00-09:30', address: '犬山站', note: '車程約30分', transportType: 'public', travelTime: '30m', isNoteExpanded: false },
-                    { id: 504, name: '犬山城下町與天守閣', category: 'sightseeing', startTime: '09:30-15:00', address: '犬山城', note: '犬山站出發走城下町上山→犬山城天守閣→三光稲荷神社→下山在城下町吃小吃→傍晚前回名古屋。
-
-1.犬山牛太郎:A5飛驒牛握壽司
-2.本町茶寮:彩り田楽御膳
-3.壽俵屋犬山井上邸:醬油おこげ串
-4.Tonamaru串炸
-5.戀小町團子
-6.COCOTOMO FARM年輪蛋糕
-7.芳川屋草莓冰
-8.三光稲荷神社與「洗錢」體驗', transportType: 'walk', travelTime: '', isNoteExpanded: false },
+                    { id: 504, name: '犬山城下町與天守閣', category: 'sightseeing', startTime: '09:30-15:00', address: '犬山城', note: '犬山站出發走城下町上山→犬山城天守閣→三光稲荷神社→下山在城下町吃小吃→傍晚前回名古屋。\n\n1.犬山牛太郎:A5飛驒牛握壽司\n2.本町茶寮:彩り田楽御膳\n3.壽俵屋犬山井上邸:醬油おこげ串\n4.Tonamaru串炸\n5.戀小町團子\n6.COCOTOMO FARM年輪蛋糕\n7.芳川屋草莓冰\n8.三光稲荷神社與「洗錢」體驗', transportType: 'walk', travelTime: '', isNoteExpanded: false },
                     { id: 505, name: '晚餐: 獅子丸拉麵', category: 'food', startTime: '', address: '獅子丸拉麵', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
                     { id: 506, name: '住 henn na hotel', category: 'accommodation', startTime: '', address: 'henn na hotel', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false }
                 ],
                 // Day 6: 11/03
                 [
                     { id: 601, name: '飯店早餐', category: 'food', startTime: '', address: '飯店', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
-                    { id: 602, name: '名古屋榮商圈', category: 'shopping', startTime: '10:00', address: '榮', note: 'HAERA FUEGUIA 1833
-LOUANGE TOKYO Le Chateau', transportType: 'walk', travelTime: '', isNoteExpanded: false },
+                    { id: 602, name: '名古屋榮商圈', category: 'shopping', startTime: '10:00', address: '榮', note: 'HAERA FUEGUIA 1833\nLOUANGE TOKYO Le Chateau', transportType: 'walk', travelTime: '', isNoteExpanded: false },
                     { id: 603, name: '到機場', category: 'transport', startTime: '14:30', address: '名古屋機場 (NGO)', note: '', transportType: 'public', travelTime: '', isNoteExpanded: false },
                     { id: 604, name: '回台', category: 'flight', startTime: '16:40-19:10', address: 'NGO - TPE', note: '航班CX531', transportType: 'flight', travelTime: '2h30m', isNoteExpanded: false }
                 ]
@@ -889,7 +877,7 @@ LOUANGE TOKYO Le Chateau', transportType: 'walk', travelTime: '', isNoteExpanded
             onMounted(() => {
                 fetchRealTimeRate();
                 
-                db.collection('tripData').doc('v2026_half_banner_v1').onSnapshot((doc) => {
+                db.collection('tripData').doc('v2026_perfect_fix_final').onSnapshot((doc) => {
                     syncStatus.value = 'syncing';
                     if (doc.exists) {
                         const data = doc.data();
@@ -938,7 +926,7 @@ LOUANGE TOKYO Le Chateau', transportType: 'walk', travelTime: '', isNoteExpanded
             const pushToFirebase = () => {
                 if (!initialLoadDone) return;
                 syncStatus.value = 'syncing';
-                db.collection('tripData').doc('v2026_half_banner_v1').set({
+                db.collection('tripData').doc('v2026_perfect_fix_final').set({
                     itinerary: JSON.stringify(itineraryData.value),
                     shopping: JSON.stringify(shoppingList.value),
                     expenses: JSON.stringify(expenses.value),

@@ -41,7 +41,6 @@
             box-shadow: 0 0 30px rgba(0, 0, 0, 0.05); position: relative; padding-bottom: 90px; overflow-x: hidden; 
         }
 
-        /* Banner 精確顯示原圖左側 50% */
         .banner-wrapper {
             width: 100%;
             height: 220px;
@@ -57,7 +56,6 @@
             position: relative;
         }
 
-        /* 導航選單獨立置中 */
         .nav-tabs-bar {
             display: flex;
             justify-content: center;
@@ -140,7 +138,7 @@
     </div>
 
     <main class="px-4 app-main">
-        <!-- Tab 1: Itinerary (行程獨立分頁) -->
+        <!-- Tab 1: Itinerary -->
         <div v-if="currentTab === 'itinerary'" class="animate-fade-in">
             <div class="flex overflow-x-auto hide-scrollbar space-x-3 pb-2 snap-x sticky date-selector-sticky -mx-4 px-4">
                 <div v-for="(day, index) in dates" :key="index" 
@@ -975,7 +973,7 @@
             ],
             mustVisit: [
                 '📸 宮川中橋：紅色朱橋搭配沿岸楓紅，高山第一地標',
-                '🏛️ 高山陣屋 : 參觀百年前的審判所、糧倉與日式枯山水庭院',
+                '🏛️ 高山陣屋：參觀百年前的審判所、糧倉與日式枯山水庭院',
                 '🏮 上三之町：早晨 10 點前抵達最能避開人潮拍出靜謐江戶街道'
             ],
             tips: '老街多數店鋪在傍晚 17:00 前就會陸續打烊，建議將伴手禮與小吃集中在下午完成！'
@@ -1096,7 +1094,7 @@
             tips: '午間時段座位搶手，建議於預約時間前 5-10 分鐘抵達。'
         },
         '炭燒鰻魚藤榮 HAERA店': {
-            title: '名古屋極致鰻魚飯・炭燒鰻魚藤榮 (うなぎ藤栄)',
+            title: '名古屋極致鰻魚飯・炭燒鰻魚藤栄 (うなぎ藤栄)',
             tag: '備長炭現烤・外酥內嫩',
             intro: '名古屋最具代表性的「鰻魚三吃 (ひつまぶし)」！選用肥美青鰻在高溫備長炭上烤到表皮微脆焦香、肉質軟嫩多汁。',
             mustEat: [
@@ -1371,7 +1369,7 @@
                 {
                     title: '榮商圈精品甜點巡禮・滿載回台',
                     desc: '旅程最後一天悠閒享用早餐，上午在名古屋榮商圈朝聖阿根廷小眾香氛 FUEGUIA 1833 與六本木頂級法式甜點殿堂 LOUANGE TOKYO，午後前往中部國際機場採買免稅伴手禮，滿載美好回憶賦歸！',
-                    highlights: ['榮商圈精品巡禮', 'FUEGUIA 1833', 'LOUANGE TOKYO甜ent', '中部國際機場']
+                    highlights: ['榮商圈精品巡禮', 'FUEGUIA 1833', 'LOUANGE TOKYO甜點', '中部國際機場']
                 }
             ]);
 
@@ -1425,12 +1423,12 @@
                     { id: 309, name: '炭燒鰻魚藤榮 HAERA店', category: 'food', startTime: '20:00', address: '炭燒鰻魚藤榮', note: '預訂編號:99bc9420。必點炭烤鰻魚飯。', hours: '11:00-14:30, 17:00-21:00', transportType: 'walk', travelTime: '至飯店', isNoteExpanded: false },
                     { id: 310, name: '住 henn na hotel', category: 'accommodation', startTime: '20:00', address: 'henn na hotel', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false }
                 ],
-                // Day 4: 11/01
+                // Day 4: 11/01 (完全對應您的截圖順序與內容)
                 [
                     { id: 401, name: '飯店早餐/早午餐', category: 'food', startTime: '08:00', address: '飯店', note: '享用晨間朝食充飽電力', hours: '06:30-10:00', transportType: 'walk', travelTime: '至地鐵站', isNoteExpanded: false },
-                    { id: 402, name: '地下鐵東山線到藤が丘轉Linimo', category: 'transport', startTime: '08:30-09:30', address: '愛・地球博記念公園', note: '搭乘地下鐵「東山線」到藤が丘站。轉乘 Linimo (只有一條路線) 從藤が丘站到「愛・地球博記念公園」站下車。', transportType: 'public', travelTime: '1h', isNoteExpanded: false },
-                    { id: 403, name: '吉卜力公園', category: 'sightseeing', startTime: '09:30-15:00', address: 'Ghibli Park', note: '大倉庫、魔女之谷、青春之丘沉浸漫遊', hours: '09:00-17:00 (平日10:00開，週二休)', transportType: 'walk', travelTime: '至Linimo站', isNoteExpanded: false },
-                    { id: 404, name: '返回名古屋', category: 'transport', startTime: '15:00-16:00', address: '名古屋市區', note: '搭乘 Linimo 轉地鐵東山線返回市區', transportType: 'public', travelTime: '1h', isNoteExpanded: false },
+                    { id: 402, name: '地下鐵東山線到藤が丘轉Linimo', category: 'transport', startTime: '08:30-09:30', address: '愛・地球博記念公園', note: '搭乘地下鐵「東山線」到藤が丘站。轉乘 Linimo (只有一條路線) 從藤が丘站到「愛・地球博記念公園」站下車。', transportType: 'public', travelTime: '至吉卜力', isNoteExpanded: false },
+                    { id: 403, name: '吉卜力公園', category: 'sightseeing', startTime: '09:30-15:00', address: 'Ghibli Park', note: '大倉庫、魔女之谷、青春之丘沉浸漫遊', hours: '09:00-17:00 (平日10:00開，週二休)', transportType: 'public', travelTime: '至名古屋', isNoteExpanded: false },
+                    { id: 404, name: '返回名古屋', category: 'transport', startTime: '15:00-16:00', address: '名古屋市區', note: '搭乘 Linimo 轉地鐵東山線返回市區', transportType: 'public', travelTime: '至名古屋', isNoteExpanded: false },
                     { id: 405, name: '名古屋市區逛街', category: 'shopping', startTime: '16:00-20:00', address: '名古屋市區', note: 'PARCO HAERA、松坂屋、各大百貨旗艦店', hours: '10:00-20:00 (部分專櫃至21:00)', transportType: 'walk', travelTime: '至居酒屋', isNoteExpanded: false },
                     { id: 406, name: '燒鳥:炭火燒鳥 しげ榮本店', category: 'food', startTime: '20:00', address: 'しげ榮本店', note: '預約號碼:99bc9420。名古屋交趾地雞炭烤名店', hours: '17:00-24:00 (L.O. 23:00)', transportType: 'walk', travelTime: '至飯店', isNoteExpanded: false },
                     { id: 407, name: '住 henn na hotel', category: 'accommodation', startTime: '22:00', address: 'henn na hotel', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false }

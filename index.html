@@ -111,6 +111,7 @@
 <div id="app" class="app-container">
     <div class="banner-wrapper"></div>
     
+    <!-- 導航選單獨立置中 -->
     <div class="nav-tabs-bar">
         <button @click="currentTab = 'itinerary'" title="行程" :class="{'active': currentTab === 'itinerary'}" class="tab-button">
             <i class="fa-solid fa-map-location-dot"></i>
@@ -1093,12 +1094,12 @@
             tips: '午間時段座位搶手，建議於預約時間前 5-10 分鐘抵達。'
         },
         '炭燒鰻魚藤榮 HAERA店': {
-            title: '名古屋極致鰻魚飯・炭燒鰻魚藤栄 (うなぎ藤栄)',
+            title: '名古屋極致鰻魚飯・炭燒鰻魚藤榮 (うなぎ藤栄)',
             tag: '備長炭現烤・外酥內嫩',
             intro: '名古屋最具代表性的「鰻魚三吃 (ひつまぶし)」！選用肥美青鰻在高溫備長炭上烤到表皮微脆焦香、肉質軟嫩多汁。',
             mustEat: [
                 '🍱 經典鰻魚三吃（第一碗品原味、第二碗加蔥芥末海苔、第三碗淋清雅高湯作茶泡飯）',
-                '🍢 炭烤鰻魚肝串（数量限定，香 resten 脆帶微苦甘甜）'
+                '🍢 炭烤鰻魚肝串（数量限定，香脆帶微苦甘甜）'
             ],
             mustBuy: ['🍵 鰻魚飯特調高湯粉包、香菇鰻魚山椒佃煮'],
             mustVisit: ['👀 開放式炭火燒烤台，能近距離欣賞師傅熟練扇火翻烤的極致手藝'],
@@ -1145,7 +1146,7 @@
         '名古屋榮商圈': {
             title: '時尚潮流旗艦・名古屋榮商圈',
             tag: '百貨地標・精品香氛・頂級甜點',
-            intro: '名古屋最繁華的購物精華心臟！各大國際精品、PARCO、地下街以及前衛香氛與甜點店雲集。',
+            intro: '名古屋最繁華的購物精華心臟！各大國際精品、PARCO、地下街以及前wei香氛與甜點店雲集。',
             mustEat: [
                 '🍰 LOUANGE TOKYO Le Chateau：東京六本木頂級法式甜點殿堂，招牌精緻小熊巧克力蛋糕與奢華法式千層派',
                 '☕ HARBS 榮本店：發源於名古屋的千層蛋糕始祖，招牌水果千層必吃！',
@@ -1416,7 +1417,7 @@
                     { id: 301, name: '起床', category: 'other', startTime: '05:30', address: '', note: '', transportType: 'walk', travelTime: '至餐廳', isNoteExpanded: false },
                     { id: 302, name: '早餐: かじ橋食堂', category: 'food', startTime: '06:00-07:00', address: 'かじ橋食堂', note: '06:00開門營業', hours: '06:00-14:00', transportType: 'walk', travelTime: '至車站', isNoteExpanded: false },
                     { id: 304, name: '巴士前往白川鄉合掌村', category: 'transport', startTime: '07:20-08:20', address: '白川鄉', note: '9月底預約巴士', transportType: 'walk', travelTime: '合掌村', isNoteExpanded: false },
-                    { id: 305, name: '白川鄉合掌村 / 城山展望台', category: 'sightseeing', startTime: '08:20-14:30', address: '白川鄉', note: '「城山展望台」俯瞰被秋意包圍的茅草屋薑餅聚落。', hours: '村落全天開放 / 店家展館約 09:00-17:00', transportType: 'walk', travelTime: '巴士站', isNoteExpanded: false },
+                    { id: 305, name: '白川鄉合掌村 / 城山展望台', category: 'sightseeing', startTime: '08:20-14:30', address: '白川鄉', note: '「城山展望台」俯瞰被秋意包圍的茅草屋聚落。', hours: '村落全天開放 / 店家展館約 09:00-17:00', transportType: 'walk', travelTime: '巴士站', isNoteExpanded: false },
                     { id: 306, name: '高速巴士前往名古屋市區', category: 'transport', startTime: '14:30-17:16', address: '名古屋', note: '從白川鄉搭乘高速巴士(車程約2.5至3小時)', transportType: 'public', travelTime: '飯店', isNoteExpanded: false },
                     { id: 307, name: '飯店放行李', category: 'other', startTime: '17:30-18:30', address: 'henn na hotel', note: '', transportType: 'public', travelTime: '依現場車次', isNoteExpanded: false },
                     { id: 308, name: '榮區逛街', category: 'shopping', startTime: '18:30-20:00', address: '榮', note: '', hours: '百貨店鋪約 10:00-20:00', transportType: 'walk', travelTime: '依現場車次', isNoteExpanded: false },
@@ -1433,7 +1434,7 @@
                     { id: 406, name: '燒鳥:炭火燒鳥 しげ榮本店', category: 'food', startTime: '20:00', address: 'しげ榮本店', note: '預約號碼:99bc9420。名古屋交趾地雞炭烤名店', hours: '17:00-24:00 (L.O. 23:00)', transportType: 'walk', travelTime: '至飯店', isNoteExpanded: false },
                     { id: 407, name: '住 henn na hotel', category: 'accommodation', startTime: '22:00', address: 'henn na hotel', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false }
                 ],
-                // Day 5: 11/02 (已修正：早餐 07:00、交通轉乘與小圓標籤正確)
+                // Day 5: 11/02 (完全對應您的截圖：早餐 07:00、交通轉乘與小圓標籤正確)
                 [
                     { id: 501, name: '飯店早餐', category: 'food', startTime: '07:00', address: '飯店', note: '飯店晨間朝食', hours: '06:30-10:00', transportType: 'walk', travelTime: '名鐵', isNoteExpanded: false },
                     { id: 502, name: '飯店-名古屋車站', category: 'transport', startTime: '08:30-09:00', address: '名古屋車站', note: '', transportType: 'public', travelTime: '30m', isNoteExpanded: false },
@@ -1462,37 +1463,60 @@
                 { name: '飛驒牛 SUKIYAKI', amount: 6500, category: 'food', date: '2026-10-29', payment: 'cash', payer: '王', currency: 'JPY' },
             ];
 
-            const itineraryData = ref(JSON.parse(JSON.stringify(defaultItineraryData)));
-            const shoppingList = ref(JSON.parse(JSON.stringify(defaultShoppingList)));
-            const expenses = ref(JSON.parse(JSON.stringify(defaultExpenses)));
+            const itineraryData = ref([]);
+            const shoppingList = ref([]);
+            const expenses = ref([]);
 
+            // 啟用 Firebase 雲端即時雙向同步！
             onMounted(() => {
-                const savedItin = localStorage.getItem('v2026_itinerary_v8');
-                const savedShop = localStorage.getItem('v2026_shopping_v8');
-                const savedExp = localStorage.getItem('v2026_expenses_v8');
+                db.collection('tripData').doc('v2026_sync_v1').onSnapshot((doc) => {
+                    syncStatus.value = 'syncing';
+                    if (doc.exists) {
+                        const data = doc.data();
+                        const remoteItin = data.itinerary ? JSON.parse(data.itinerary) : [];
+                        
+                        let isTotallyEmpty = true;
+                        if (Array.isArray(remoteItin)) {
+                            for (let day of remoteItin) {
+                                if (day && day.length > 0) { isTotallyEmpty = false; break; }
+                            }
+                        }
 
-                if (savedItin) {
-                    try { itineraryData.value = JSON.parse(savedItin); } catch(e) {}
-                }
-                if (savedShop) {
-                    try { shoppingList.value = JSON.parse(savedShop); } catch(e) {}
-                }
-                if (savedExp) {
-                    try { expenses.value = JSON.parse(savedExp); } catch(e) {}
-                }
+                        if (isTotallyEmpty && !initialLoadDone) {
+                            itineraryData.value = JSON.parse(JSON.stringify(defaultItineraryData));
+                            shoppingList.value = JSON.parse(JSON.stringify(defaultShoppingList));
+                            expenses.value = JSON.parse(JSON.stringify(defaultExpenses));
+                            pushToFirebase();
+                        } else {
+                            itineraryData.value = remoteItin;
+                            shoppingList.value = data.shopping ? JSON.parse(data.shopping) : JSON.parse(JSON.stringify(defaultShoppingList));
+                            expenses.value = data.expenses ? JSON.parse(data.expenses) : JSON.parse(JSON.stringify(defaultExpenses));
+                        }
+                    } else {
+                        itineraryData.value = JSON.parse(JSON.stringify(defaultItineraryData));
+                        shoppingList.value = JSON.parse(JSON.stringify(defaultShoppingList));
+                        expenses.value = JSON.parse(JSON.stringify(defaultExpenses));
+                        pushToFirebase();
+                    }
+                    initialLoadDone = true;
+                    setTimeout(() => { syncStatus.value = 'online'; }, 500);
+                });
             });
 
-            watch(itineraryData, (newVal) => {
-                localStorage.setItem('v2026_itinerary_v8', JSON.stringify(newVal));
-            }, { deep: true });
+            const pushToFirebase = () => {
+                if (!initialLoadDone) return;
+                syncStatus.value = 'syncing';
+                db.collection('tripData').doc('v2026_sync_v1').set({
+                    itinerary: JSON.stringify(itineraryData.value),
+                    shopping: JSON.stringify(shoppingList.value),
+                    expenses: JSON.stringify(expenses.value),
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true }).then(() => { syncStatus.value = 'online'; });
+            };
 
-            watch(shoppingList, (newVal) => {
-                localStorage.setItem('v2026_shopping_v8', JSON.stringify(newVal));
-            }, { deep: true });
-
-            watch(expenses, (newVal) => {
-                localStorage.setItem('v2026_expenses_v8', JSON.stringify(newVal));
-            }, { deep: true });
+            watch(itineraryData, pushToFirebase, { deep: true });
+            watch(shoppingList, pushToFirebase, { deep: true });
+            watch(expenses, pushToFirebase, { deep: true });
 
             const currentItinerary = computed({
                 get: () => itineraryData.value[selectedDateIndex.value] || [],
@@ -1644,7 +1668,7 @@
                 if (isEditExpenseMode.value && editingExpenseIndex.value > -1) {
                     expenses.value[editingExpenseIndex.value] = { ...newExpense.value };
                 } else {
-                    expenses.value.push({ ...newExpense.value });
+                    expenses.value.push({ ...newExpense.path || ...newExpense.value });
                 }
                 expenses.value.sort((a, b) => new Date(b.date) - new Date(a.date));
                 showExpenseModal.value = false;

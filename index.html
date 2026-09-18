@@ -140,7 +140,7 @@
     </div>
 
     <main class="px-4 app-main">
-        <!-- Tab 1: Itinerary -->
+        <!-- Tab 1: Itinerary (行程獨立分頁) -->
         <div v-if="currentTab === 'itinerary'" class="animate-fade-in">
             <div class="flex overflow-x-auto hide-scrollbar space-x-3 pb-2 snap-x sticky date-selector-sticky -mx-4 px-4">
                 <div v-for="(day, index) in dates" :key="index" 
@@ -975,7 +975,7 @@
             ],
             mustVisit: [
                 '📸 宮川中橋：紅色朱橋搭配沿岸楓紅，高山第一地標',
-                '🏛️ 高山陣屋：參觀百年前的審判所、糧倉與日式枯山水庭院',
+                '🏛️ 高山陣屋 : 參觀百年前的審判所、糧倉與日式枯山水庭院',
                 '🏮 上三之町：早晨 10 點前抵達最能避開人潮拍出靜謐江戶街道'
             ],
             tips: '老街多數店鋪在傍晚 17:00 前就會陸續打烊，建議將伴手禮與小吃集中在下午完成！'
@@ -1161,7 +1161,7 @@
             ],
             mustVisit: [
                 '🗼 中部電力 MIRAI TOWER（名古屋電視塔）：夜間點燈與水鏡公園倒影',
-                '🛸 Oasis 21（綠洲21水之宇宙船）：宛如漂浮空中的水幕玻璃巨船，頂層空中走廊夜景超美',
+                '🛸 Oasis 21（Oasis 21水之宇宙船）：宛如漂浮空中的水幕玻璃巨船，頂層空中走廊夜景超美',
                 '🛍️ 久屋大通公園 RAYARD MIYASHITA 風格露天綠意商場街'
             ],
             tips: '百貨專櫃退稅通常於當日 19:30～20:00 截止，購物結帳時請隨身攜帶護照！'
@@ -1182,7 +1182,7 @@
             ],
             mustVisit: [
                 '🗼 中部電力 MIRAI TOWER（名古屋電視塔）：夜間點燈與水鏡公園倒影',
-                '🛸 Oasis 21（綠洲21水之宇宙船）：宛如漂浮空中的水幕玻璃巨船，頂層空中走廊夜景超美',
+                '🛸 Oasis 21（Oasis 21水之宇宙船）：宛如漂浮空中的水幕玻璃巨船，頂層空中走廊夜景超美',
                 '🛍️ 久屋大通公園 RAYARD MIYASHITA 風格露天綠意商場街'
             ],
             tips: '百貨專櫃退稅通常於當日 19:30～20:00 截止，購物結帳時請隨身攜帶護照！'
@@ -1254,7 +1254,6 @@
             const selectedDateIndex = ref(0);
             const selectedRegionIndex = ref(0);
             const syncStatus = ref('online'); 
-            let initialLoadDone = false;
 
             const showGuideModal = ref(false);
             const activeGuide = ref(null);
@@ -1372,7 +1371,7 @@
                 {
                     title: '榮商圈精品甜點巡禮・滿載回台',
                     desc: '旅程最後一天悠閒享用早餐，上午在名古屋榮商圈朝聖阿根廷小眾香氛 FUEGUIA 1833 與六本木頂級法式甜點殿堂 LOUANGE TOKYO，午後前往中部國際機場採買免稅伴手禮，滿載美好回憶賦歸！',
-                    highlights: ['榮商圈精品巡禮', 'FUEGUIA 1833', 'LOUANGE TOKYO甜點', '中部國際機場']
+                    highlights: ['榮商圈精品巡禮', 'FUEGUIA 1833', 'LOUANGE TOKYO甜ent', '中部國際機場']
                 }
             ]);
 
@@ -1464,18 +1463,9 @@
                 { name: '飛驒牛 SUKIYAKI', amount: 6500, category: 'food', date: '2026-10-29', payment: 'cash', payer: '王', currency: 'JPY' },
             ];
 
-            const itineraryData = ref([]);
-            const shoppingList = ref([]);
-            const expenses = ref([]);
-
-            onMounted(() => {
-                // 強制直接載入預設的完整行程與購物、記帳資料，絕不讀取空白雲端
-                itineraryData.value = JSON.parse(JSON.stringify(defaultItineraryData));
-                shoppingList.value = JSON.parse(JSON.stringify(defaultShoppingList));
-                expenses.value = JSON.parse(JSON.stringify(defaultExpenses));
-                initialLoadDone = true;
-                syncStatus.value = 'online';
-            });
+            const itineraryData = ref(JSON.parse(JSON.stringify(defaultItineraryData)));
+            const shoppingList = ref(JSON.parse(JSON.stringify(defaultShoppingList)));
+            const expenses = ref(JSON.parse(JSON.stringify(defaultExpenses)));
 
             const currentItinerary = computed({
                 get: () => itineraryData.value[selectedDateIndex.value] || [],
@@ -1571,7 +1561,7 @@
                 }
             };
 
-            onDragEnd = () => { itineraryData.value[selectedDateIndex.value] = [...currentItinerary.value]; };
+            const onDragEnd = () => { itineraryData.value[selectedDateIndex.value] = [...currentItinerary.value]; };
 
             const handleImageUpload = (e) => {
                 const file = e.target.files[0];

@@ -41,6 +41,7 @@
             box-shadow: 0 0 30px rgba(0, 0, 0, 0.05); position: relative; padding-bottom: 90px; overflow-x: hidden; 
         }
 
+        /* Banner 精確顯示原圖左側 50% */
         .banner-wrapper {
             width: 100%;
             height: 220px;
@@ -56,6 +57,7 @@
             position: relative;
         }
 
+        /* 導航選單獨立置中 */
         .nav-tabs-bar {
             display: flex;
             justify-content: center;
@@ -93,6 +95,7 @@
         }
         .fab-btn:active { transform: scale(0.95); box-shadow: 0 4px 15px rgba(222, 123, 84, 0.4); }
 
+        /* 備註欄徹底解除限制 */
         .note-content { height: auto !important; max-height: none !important; overflow: visible !important; }
         
         .expenses-banner { background: linear-gradient(135deg, #DE7B54 0%, #B85530 100%); }
@@ -138,7 +141,7 @@
 
     <main class="px-4 app-main">
         <!-- Tab 1: Itinerary -->
-        <div v-if="currentTab === 'itinerary'" class="animate-fade-in">
+        <div v-show="currentTab === 'itinerary'" class="animate-fade-in">
             <div class="flex overflow-x-auto hide-scrollbar space-x-3 pb-2 snap-x sticky date-selector-sticky -mx-4 px-4">
                 <div v-for="(day, index) in dates" :key="index" 
                      @click="selectedDateIndex = index"
@@ -323,7 +326,7 @@
             </div>
         </div>
 
-        <!-- Tab 2: Info -->
+        <!-- Tab 2: Info (雙向匯率換算) -->
         <div v-if="currentTab === 'info'" class="space-y-5 animate-fade-in">
             <div class="bg-gradient-to-r from-maple-500 to-maple-700 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
                 <i class="fa-solid fa-yen-sign absolute -right-4 -bottom-4 text-[100px] opacity-10"></i>
@@ -490,7 +493,7 @@
                 <div v-if="shoppingList.length % 2 !== 0" class="h-0 invisible"></div>
                 
                 <div v-if="shoppingList.length === 0" class="col-span-2 text-center py-16 bg-white rounded-3xl border border-dashed border-gray-300 card-shadow">
-                    <div class="w-16 h-16 bg-maple-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3">
                         <i class="fa-solid fa-basket-shopping text-3xl text-gray-300"></i>
                     </div>
                     <p class="text-sm font-bold text-gray-600">購物清單空白</p>
@@ -582,68 +585,6 @@
         <i class="fa-solid fa-plus font-bold"></i>
     </button>
 
-    <!-- Modal: Hotel Guide -->
-    <Transition name="modal">
-        <div v-if="showHotelGuideModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
-            <div class="absolute inset-0" @click="showHotelGuideModal = false"></div>
-            <Transition name="modal-slide" appear>
-                <div v-if="showHotelGuideModal && activeHotelGuide" class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-3xl p-6 shadow-2xl max-h-[88vh] overflow-y-auto relative z-10 border-t border-white/20">
-                    <div class="flex justify-between items-start mb-4 border-b border-gray-100 pb-3">
-                        <div>
-                            <span class="text-[10px] font-black tracking-wider text-indigo-700 bg-indigo-100 px-2.5 py-0.5 rounded-full inline-flex items-center gap-1 mb-1.5">
-                                <i class="fa-solid fa-hotel"></i> 住宿指南・{{ activeHotelGuide.tag }}
-                            </span>
-                            <h3 class="text-xl font-black text-gray-800 leading-tight">{{ activeHotelGuide.title }}</h3>
-                        </div>
-                        <button @click="showHotelGuideModal = false" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-500 transition-colors flex items-center justify-center shrink-0"><i class="fa-solid fa-xmark"></i></button>
-                    </div>
-
-                    <p class="text-xs font-medium text-gray-600 bg-indigo-50/70 p-3 rounded-2xl border border-indigo-100 leading-relaxed mb-4">
-                        {{ activeHotelGuide.intro }}
-                    </p>
-
-                    <div class="space-y-3.5">
-                        <div v-if="activeHotelGuide.facilities && activeHotelGuide.facilities.length" class="bg-indigo-50/40 rounded-2xl p-3.5 border border-indigo-100/70">
-                            <h4 class="text-xs font-black text-indigo-700 mb-2 flex items-center gap-1.5"><i class="fa-solid fa-bed"></i> 飯店內部設施</h4>
-                            <ul class="space-y-1.5">
-                                <li v-for="fac in activeHotelGuide.facilities" :key="fac" class="text-xs text-gray-700 font-medium leading-relaxed flex items-start gap-1">
-                                    <span class="text-indigo-400 font-bold">•</span><span>{{ fac }}</span>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div v-if="activeHotelGuide.convenience && activeHotelGuide.convenience.length" class="bg-emerald-50/50 rounded-2xl p-3.5 border border-emerald-100/70">
-                            <h4 class="text-xs font-black text-emerald-700 mb-2 flex items-center gap-1.5"><i class="fa-solid fa-store"></i> 周邊超商與藥妝</h4>
-                            <ul class="space-y-1.5">
-                                <li v-for="store in activeHotelGuide.convenience" :key="store" class="text-xs text-gray-700 font-medium leading-relaxed flex items-start gap-1">
-                                    <span class="text-emerald-500 font-bold">•</span><span>{{ store }}</span>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div v-if="activeHotelGuide.nightNearby && activeHotelGuide.nightNearby.length" class="bg-amber-50/50 rounded-2xl p-3.5 border border-amber-100/70">
-                            <h4 class="text-xs font-black text-amber-700 mb-2 flex items-center gap-1.5"><i class="fa-solid fa-moon"></i> 夜晚散策與附近逛街</h4>
-                            <ul class="space-y-1.5">
-                                <li v-for="night in activeHotelGuide.nightNearby" :key="night" class="text-xs text-gray-700 font-medium leading-relaxed flex items-start gap-1">
-                                    <span class="text-amber-500 font-bold">•</span><span>{{ night }}</span>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div v-if="activeHotelGuide.tips" class="bg-gray-50 rounded-xl p-3 border border-gray-200/70 text-[11px] text-gray-500 font-medium flex items-start gap-2">
-                            <i class="fa-solid fa-circle-exclamation text-indigo-500 text-sm mt-0.5 shrink-0"></i>
-                            <span class="leading-relaxed">{{ activeHotelGuide.tips }}</span>
-                        </div>
-                    </div>
-
-                    <button @click="showHotelGuideModal = false" class="w-full mt-5 py-3.5 rounded-xl font-black text-sm text-white bg-indigo-600 hover:bg-indigo-700 shadow-md transition-colors">
-                        了解！關閉指南
-                    </button>
-                </div>
-            </Transition>
-        </div>
-    </Transition>
-
     <!-- Modal: Spot Guide -->
     <Transition name="modal">
         <div v-if="showGuideModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
@@ -710,7 +651,6 @@
     <Transition name="modal">
         <div v-if="showItineraryModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
             <div class="absolute inset-0" @click="showItineraryModal = false"></div>
-            
             <Transition name="modal-slide" appear>
                 <div v-if="showItineraryModal" class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-3xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto relative z-10 border-t border-white/20">
                     <div class="flex justify-between items-center mb-6">
@@ -1093,7 +1033,7 @@
             tips: '午間時段座位搶手，建議於預約時間前 5-10 分鐘抵達。'
         },
         '炭燒鰻魚藤榮 HAERA店': {
-            title: '名古屋極致鰻魚飯・炭燒鰻魚藤栄 (うなぎ藤栄)',
+            title: '名古屋極致鰻魚飯・炭燒鰻魚藤榮 (うなぎ藤栄)',
             tag: '備長炭現烤・外酥內嫩',
             intro: '名古屋最具代表性的「鰻魚三吃 (ひつまぶし)」！選用肥美青鰻在高溫備長炭上烤到表皮微脆焦香、肉質軟嫩多汁。',
             mustEat: [
@@ -1158,7 +1098,7 @@
             ],
             mustVisit: [
                 '🗼 中部電力 MIRAI TOWER（名古屋電視塔）：夜間點燈與水鏡公園倒影',
-                '🛸 Oasis 21 (綠洲21水之宇宙船)：宛如漂浮空中的水幕玻璃巨船，頂層空中走廊夜景超美',
+                '🛸 Oasis 21（綠洲21水之宇宙船）：宛如漂浮空中的水幕玻璃巨船，頂層空中走廊夜景超美',
                 '🛍️ 久屋大通公園 RAYARD MIYASHITA 風格露天綠意商場街'
             ],
             tips: '百貨專櫃退稅通常於當日 19:30～20:00 截止，購物結帳時請隨身攜帶護照！'
@@ -1179,13 +1119,39 @@
             ],
             mustVisit: [
                 '🗼 中部電力 MIRAI TOWER（名古屋電視塔）：夜間點燈與水鏡公園倒影',
-                '🛸 Oasis 21 (綠洲21水之宇宙船)：宛如漂浮空中的水幕玻璃巨船，頂層空中走廊夜景超美',
+                '🛸 Oasis 21（綠洲21水之宇宙船）：宛如漂浮空中的水幕玻璃巨船，頂層空中走廊夜景超美',
                 '🛍️ 久屋大通公園 RAYARD MIYASHITA 風格露天綠意商場街'
             ],
             tips: '百貨專櫃退稅通常於當日 19:30～20:00 截止，購物結帳時請隨身攜帶護照！'
         }
     };
 
+    const makeHourly = (minT, maxT, cond) => {
+        const curve = [0.2, 0.15, 0.1, 0.05, 0.0, 0.0, 0.05, 0.15, 0.35, 0.6, 0.8, 0.95, 1.0, 0.95, 0.85, 0.75, 0.6, 0.45, 0.35, 0.3, 0.28, 0.25, 0.22, 0.2];
+        return curve.map((pct, h) => {
+            const t = Math.round(minT + (maxT - minT) * pct);
+            const popVal = cond === 'rain' ? 80 : (cond === 'cloudy' ? 30 : 10);
+            return {
+                time: `${String(h).padStart(2, '0')}:00`,
+                temp: t,
+                condition: cond,
+                pop: popVal,
+                isNight: (h < 6 || h >= 18)
+            };
+        });
+    };
+
+    createApp({
+        components: { draggable },
+        setup() {
+            const currentTab = ref('itinerary');
+            const selectedDateIndex = ref(0);
+            const selectedRegionIndex = ref(0);
+            const syncStatus = ref('online'); 
+            let initialLoadDone = false;
+
+            
+    
     const hotelGuides = {
         'FAV LUX HIDATAKAYAMA': {
             title: 'FAV LUX Hida Takayama',
@@ -1229,29 +1195,15 @@
         }
     };
 
-    const makeHourly = (minT, maxT, cond) => {
-        const curve = [0.2, 0.15, 0.1, 0.05, 0.0, 0.0, 0.05, 0.15, 0.35, 0.6, 0.8, 0.95, 1.0, 0.95, 0.85, 0.75, 0.6, 0.45, 0.35, 0.3, 0.28, 0.25, 0.22, 0.2];
-        return curve.map((pct, h) => {
-            const t = Math.round(minT + (maxT - minT) * pct);
-            const popVal = cond === 'rain' ? 80 : (cond === 'cloudy' ? 30 : 10);
-            return {
-                time: `${String(h).padStart(2, '0')}:00`,
-                temp: t,
-                condition: cond,
-                pop: popVal,
-                isNight: (h < 6 || h >= 18)
-            };
-        });
-    };
 
-    createApp({
-        components: { draggable },
-        setup() {
-            const currentTab = ref('itinerary');
-            const selectedDateIndex = ref(0);
-            const selectedRegionIndex = ref(0);
-            const syncStatus = ref('online'); 
-            let initialLoadDone = false;
+    const showHotelGuideModal = ref(false);
+    const activeHotelGuide = ref(null);
+    const openHotelGuide = (name) => {
+        if (hotelGuides[name]) {
+            activeHotelGuide.value = hotelGuides[name];
+            showHotelGuideModal.value = true;
+        }
+    };
 
             const showGuideModal = ref(false);
             const activeGuide = ref(null);
@@ -1263,18 +1215,10 @@
             };
             const hasGuide = (name) => !!spotGuides[name];
 
-            const showHotelGuideModal = ref(false);
-            const activeHotelGuide = ref(null);
-            const openHotelGuide = (name) => {
-                if (hotelGuides[name]) {
-                    activeHotelGuide.value = hotelGuides[name];
-                    showHotelGuideModal.value = true;
-                }
-            };
-
             const exchangeRate = ref(0.215); 
             const rateLoading = ref(false);
             
+            // 雙向匯率換算變數
             const jpyInput = ref(10000);
             const twdInput = ref(Math.round(10000 * exchangeRate.value));
             
@@ -1426,27 +1370,36 @@
                 // Day 4: 11/01
                 [
                     { id: 401, name: '飯店早餐/早午餐', category: 'food', startTime: '08:00', address: '飯店', note: '享用晨間朝食充飽電力', hours: '06:30-10:00', transportType: 'walk', travelTime: '至地鐵站', isNoteExpanded: false },
-                    { id: 402, name: '地下鐵東山線到藤が丘轉Linimo', category: 'transport', startTime: '08:30-09:30', address: '愛・地球博記念公園', note: '搭乘地下鐵「東山線」到藤が丘站。轉乘 Linimo (只有一條路線) 從藤が丘站到「愛・地球博記念公園」站下車。', transportType: 'public', travelTime: '至吉卜力', isNoteExpanded: false },
-                    { id: 403, name: '吉卜力公園', category: 'sightseeing', startTime: '09:30-15:00', address: 'Ghibli Park', note: '大倉庫、魔女之谷、青春之丘沉浸漫遊', hours: '09:00-17:00 (平日10:00開，週二休)', transportType: 'public', travelTime: '至名古屋', isNoteExpanded: false },
-                    { id: 404, name: '返回名古屋', category: 'transport', startTime: '15:00-16:00', address: '名古屋市區', note: '搭乘 Linimo 轉地鐵東山線返回市區', transportType: 'public', travelTime: '至名古屋', isNoteExpanded: false },
+                    { id: 402, name: '地下鐵東山線到藤が丘轉Linimo', category: 'transport', startTime: '08:30-09:30', address: '愛・地球博記念公園', note: '搭乘地下鐵「東山線」到藤が丘站。轉乘 Linimo (只有一條路線) 從藤が丘站到「愛・地球博記念公園」站下車。', transportType: 'public', travelTime: '1h', isNoteExpanded: false },
+                    { id: 403, name: '吉卜力公園', category: 'sightseeing', startTime: '09:30-15:00', address: 'Ghibli Park', note: '大倉庫、魔女之谷、青春之丘沉浸漫遊', hours: '09:00-17:00 (平日10:00開，週二休)', transportType: 'walk', travelTime: '至Linimo站', isNoteExpanded: false },
+                    { id: 404, name: '返回名古屋', category: 'transport', startTime: '15:00-16:00', address: '名古屋市區', note: '搭乘 Linimo 轉地鐵東山線返回市區', transportType: 'public', travelTime: '1h', isNoteExpanded: false },
                     { id: 405, name: '名古屋市區逛街', category: 'shopping', startTime: '16:00-20:00', address: '名古屋市區', note: 'PARCO HAERA、松坂屋、各大百貨旗艦店', hours: '10:00-20:00 (部分專櫃至21:00)', transportType: 'walk', travelTime: '至居酒屋', isNoteExpanded: false },
                     { id: 406, name: '燒鳥:炭火燒鳥 しげ榮本店', category: 'food', startTime: '20:00', address: 'しげ榮本店', note: '預約號碼:99bc9420。名古屋交趾地雞炭烤名店', hours: '17:00-24:00 (L.O. 23:00)', transportType: 'walk', travelTime: '至飯店', isNoteExpanded: false },
                     { id: 407, name: '住 henn na hotel', category: 'accommodation', startTime: '22:00', address: 'henn na hotel', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false }
                 ],
-                // Day 5: 11/02 (已修正：早餐 07:00，交通標籤正確對應為名鐵與犬山)
+                // Day 5: 11/02
                 [
-                    { id: 501, name: '飯店早餐', category: 'food', startTime: '07:00', address: '飯店', note: '飯店晨間朝食', hours: '06:30-10:00', transportType: 'public', travelTime: '名鐵', isNoteExpanded: false },
+                    { id: 501, name: '飯店早餐', category: 'food', startTime: '07:00', address: '飯店', note: '飯店晨間朝食', hours: '06:30-10:00', transportType: 'walk', travelTime: '至名鐵站', isNoteExpanded: false },
                     { id: 502, name: '飯店-名古屋車站', category: 'transport', startTime: '08:30-09:00', address: '名古屋車站', note: '', transportType: 'public', travelTime: '30m', isNoteExpanded: false },
-                    { id: 503, name: '名鐵名古屋站(名鐵犬山線)→犬山站', category: 'transport', startTime: '09:00-09:30', address: '犬山站', note: '車程約30分', transportType: 'walk', travelTime: '犬山', isNoteExpanded: false },
-                    { id: 504, name: '犬山城下町與天守閣', category: 'sightseeing', startTime: '09:30-15:00', address: '犬山城', note: '犬山站出發走城下町上山→犬山城天守閣→三光稲荷神社→下山在城下町吃小吃→傍晚前回名古屋。\n\n1.犬山牛太郎:A5飛驒牛握壽司\n2.本町茶寮:彩り田楽御膳\n3.壽俵屋犬山井上邸:醬油おこげ串\n4.Tonamaru串炸\n5.戀小町團子\n6.COCOTOMO FARM年輪蛋糕\n7.芳川屋草莓冰\n8.三光稲荷神社與「洗錢」體驗', hours: '天守閣 09:00-17:00 (最後入場16:30) / 城下町約 10:00-17:00', transportType: 'walk', travelTime: '回車站', isNoteExpanded: false },
-                    { id: 505, name: '返名古屋', category: 'transport', startTime: '15:00-16:00', address: '名古屋市區', note: '', transportType: 'public', travelTime: '至餐廳', isNoteExpanded: false },
-                    { id: 506, name: '晚餐: 獅子丸拉麵', category: 'food', startTime: '18:00-19:30', address: '獅子丸拉麵', note: '泡沫系雞白湯、米其林推薦排隊名作', hours: '11:00-14:30, 17:30-22:00', transportType: 'walk', travelTime: '至飯店', isNoteExpanded: false },
-                    { id: 507, name: '住 henn na hotel', category: 'accommodation', startTime: '20:00', address: 'henn na hotel', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false }
+                    { id: 503, name: '名鐵名古屋站(名鐵犬山線)→犬山站', category: 'transport', startTime: '09:00-09:30', address: '犬山站', note: '車程約30分', transportType: 'public', travelTime: '30m', isNoteExpanded: false },
+                    { id: 504, name: '犬山城下町與天守閣', category: 'sightseeing', startTime: '09:30-15:00', address: '犬山城', note: '犬山站出發走城下町上山→犬山城天守閣→三光稲荷神社→下山在城下町吃小吃→傍晚前回名古屋。
+
+1.犬山牛太郎:A5飛驒牛握壽司
+2.本町茶寮:彩り田楽御膳
+3.壽俵屋犬山井上邸:醬油おこげ串
+4.Tonamaru串炸
+5.戀小町團子
+6.COCOTOMO FARM年輪蛋糕
+7.芳川屋草莓冰
+8.三光稲荷神社與「洗錢」體驗', hours: '天守閣 09:00-17:00 (最後入場16:30) / 城下町約 10:00-17:00', transportType: 'walk', travelTime: '回名鐵站', isNoteExpanded: false },
+                    { id: 505, name: '晚餐: 獅子丸拉麵', category: 'food', startTime: '18:00-19:30', address: '獅子丸拉麵', note: '泡沫系雞白湯、米其林推薦排隊名作', hours: '11:00-14:30, 17:30-22:00', transportType: 'walk', travelTime: '至飯店', isNoteExpanded: false },
+                    { id: 506, name: '住 henn na hotel', category: 'accommodation', startTime: '20:00', address: 'henn na hotel', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false }
                 ],
                 // Day 6: 11/03
                 [
                     { id: 601, name: '飯店早餐', category: 'food', startTime: '', address: '飯店', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
-                    { id: 602, name: '名古屋榮商圈', category: 'shopping', startTime: '10:00', address: '榮', note: 'HAERA FUEGUIA 1833\nLOUANGE TOKYO Le Chateau', transportType: 'walk', travelTime: '', isNoteExpanded: false },
+                    { id: 602, name: '名古屋榮商圈', category: 'shopping', startTime: '10:00', address: '榮', note: 'HAERA FUEGUIA 1833
+LOUANGE TOKYO Le Chateau', transportType: 'walk', travelTime: '', isNoteExpanded: false },
                     { id: 603, name: '到機場', category: 'transport', startTime: '14:30', address: '名古屋機場 (NGO)', note: '', transportType: 'public', travelTime: '', isNoteExpanded: false },
                     { id: 604, name: '回台', category: 'flight', startTime: '16:40-19:10', address: 'NGO - TPE', note: '航班CX531', transportType: 'flight', travelTime: '2h30m', isNoteExpanded: false }
                 ]
@@ -1462,38 +1415,50 @@
                 { name: '飛驒牛 SUKIYAKI', amount: 6500, category: 'food', date: '2026-10-29', payment: 'cash', payer: '王', currency: 'JPY' },
             ];
 
-            const itineraryData = ref(JSON.parse(JSON.stringify(defaultItineraryData)));
-            const shoppingList = ref(JSON.parse(JSON.stringify(defaultShoppingList)));
-            const expenses = ref(JSON.parse(JSON.stringify(defaultExpenses)));
+            const itineraryData = ref([]);
+            const shoppingList = ref([]);
+            const expenses = ref([]);
 
             onMounted(() => {
-                db.collection('tripData').doc('v2026_sync_v2').onSnapshot((doc) => {
+                db.collection('tripData').doc('v2026_fix_vue_render_v2').onSnapshot((doc) => {
                     syncStatus.value = 'syncing';
                     if (doc.exists) {
                         const data = doc.data();
-                        const remoteItin = data.itinerary ? JSON.parse(data.itinerary) : [];
-                        
+                        const remoteItin = data.itinerary || '[]';
+                        const remoteShop = data.shopping || '[]';
+                        const remoteExp = data.expenses || '[]';
+
+                        let parsedItin = JSON.parse(remoteItin);
                         let isTotallyEmpty = true;
-                        if (Array.isArray(remoteItin)) {
-                            for (let day of remoteItin) {
-                                if (day && day.length > 0) { isTotallyEmpty = false; break; }
+                        if (Array.isArray(parsedItin)) {
+                            for (let day of parsedItin) {
+                                if (day && day.length > 0) {
+                                    isTotallyEmpty = false; break;
+                                }
                             }
                         }
 
                         if (isTotallyEmpty && !initialLoadDone) {
-                            itineraryData.value = JSON.parse(JSON.stringify(defaultItineraryData));
-                            shoppingList.value = JSON.parse(JSON.stringify(defaultShoppingList));
-                            expenses.value = JSON.parse(JSON.stringify(defaultExpenses));
-                            pushToFirebase();
+                            itineraryData.value = [...defaultItineraryData];
+                            shoppingList.value = [...defaultShoppingList];
+                            expenses.value = [...defaultExpenses];
+                            pushToFirebase(); 
                         } else {
-                            itineraryData.value = remoteItin;
-                            shoppingList.value = data.shopping ? JSON.parse(data.shopping) : JSON.parse(JSON.stringify(defaultShoppingList));
-                            expenses.value = data.expenses ? JSON.parse(data.expenses) : JSON.parse(JSON.stringify(defaultExpenses));
+                            if (JSON.stringify(itineraryData.value) !== remoteItin) {
+                                itineraryData.value = parsedItin;
+                            }
+                            if (JSON.stringify(shoppingList.value) !== remoteShop) {
+                                shoppingList.value = JSON.parse(remoteShop);
+                            }
+                            if (JSON.stringify(expenses.value) !== remoteExp) {
+                                expenses.value = JSON.parse(remoteExp);
+                                expenses.value.sort((a, b) => new Date(b.date) - new Date(a.date));
+                            }
                         }
                     } else {
-                        itineraryData.value = JSON.parse(JSON.stringify(defaultItineraryData));
-                        shoppingList.value = JSON.parse(JSON.stringify(defaultShoppingList));
-                        expenses.value = JSON.parse(JSON.stringify(defaultExpenses));
+                        itineraryData.value = [...defaultItineraryData];
+                        shoppingList.value = [...defaultShoppingList];
+                        expenses.value = [...defaultExpenses];
                         pushToFirebase();
                     }
                     initialLoadDone = true;
@@ -1504,7 +1469,7 @@
             const pushToFirebase = () => {
                 if (!initialLoadDone) return;
                 syncStatus.value = 'syncing';
-                db.collection('tripData').doc('v2026_sync_v2').set({
+                db.collection('tripData').doc('v2026_fix_vue_render_v2').set({
                     itinerary: JSON.stringify(itineraryData.value),
                     shopping: JSON.stringify(shoppingList.value),
                     expenses: JSON.stringify(expenses.value),
@@ -1610,7 +1575,7 @@
                 }
             };
 
-            const onDragEnd = () => { itineraryData.value[selectedDateIndex.value] = [...currentItinerary.value]; };
+            onDragEnd = () => { itineraryData.value[selectedDateIndex.value] = [...currentItinerary.value]; };
 
             const handleImageUpload = (e) => {
                 const file = e.target.files[0];

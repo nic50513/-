@@ -376,7 +376,7 @@
                             <div class="text-center"><div class="text-2xl font-black text-gray-800">NGO</div><div class="text-xs font-bold text-gray-500 mt-1">16:40</div></div>
                             <div class="flex flex-col items-center w-full px-2">
                                 <span class="text-[10px] text-gray-400 font-bold bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100 mb-1 z-10">2h 30m</span>
-                                <div class="w-full border-t-2 border-dashed border-maple-200 relative -mt-2"><i class="fa-solid fa-plane absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-maple-400 transform -scale-x-100 bg-white px-1 text-lg"></i></div>
+                                <div class="w-full border-t-2 border-dashed border-blue-200 relative -mt-2"><i class="fa-solid fa-plane absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-maple-400 transform -scale-x-100 bg-white px-1 text-lg"></i></div>
                             </div>
                             <div class="text-center"><div class="text-2xl font-black text-gray-800">TPE</div><div class="text-xs font-bold text-gray-500 mt-1">19:10</div></div>
                         </div>
@@ -1183,7 +1183,7 @@
             mustVisit: [
                 '🗼 中部電力 MIRAI TOWER（名古屋電視塔）：夜間點燈與水鏡公園倒影',
                 '🛸 Oasis 21（Oasis 21水之宇宙船）：宛如漂浮空中的水幕玻璃巨船，頂層空中走廊夜景超美',
-                '🛍️ GISHO / 久屋大通公園 RAYARD MIYASHITA 風格露天綠意商場街'
+                '🛍️ 久屋大通公園 RAYARD MIYASHITA 風格露天綠意商場街'
             ],
             tips: '百貨專櫃退稅通常於當日 19:30～20:00 截止，購物結帳時請隨身攜帶護照！'
         }
@@ -1469,7 +1469,7 @@
             const expenses = ref([]);
 
             onMounted(() => {
-                // 恢復為您最初且最安全的雲端儲存庫 ID
+                // 鎖定回您原本最穩定的雲端索引鍵，讓您的資料完美找回！
                 db.collection('tripData').doc('v2026_all_perfect_v2').onSnapshot((doc) => {
                     syncStatus.value = 'syncing';
                     if (doc.exists) {

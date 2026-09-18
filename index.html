@@ -41,13 +41,13 @@
             box-shadow: 0 0 30px rgba(0, 0, 0, 0.05); position: relative; padding-bottom: 90px; overflow-x: hidden; 
         }
 
-        /* Banner 精確顯示原圖左側 50%，右側大片空白徹底切除在螢幕外 */
+        /* Banner 精確顯示原圖左側 50% */
         .banner-wrapper {
             width: 100%;
             height: 220px;
             background-image: url('31263.png');
-            background-size: 200% 100%; /* 寬度放大到 200%，高度滿版，精確截取左側 50% */
-            background-position: left center; /* 靠齊最左側，徹底切除右半邊空白 */
+            background-size: 200% 100%;
+            background-position: left center;
             background-repeat: no-repeat;
             background-color: #79A3D3;
             border-bottom-left-radius: 28px;
@@ -57,7 +57,7 @@
             position: relative;
         }
 
-        /* 導航選單：獨立置中排列，不遮擋插圖中任何人物 */
+        /* 導航選單獨立置中 */
         .nav-tabs-bar {
             display: flex;
             justify-content: center;
@@ -95,8 +95,9 @@
         }
         .fab-btn:active { transform: scale(0.95); box-shadow: 0 4px 15px rgba(222, 123, 84, 0.4); }
 
-        .note-content { max-height: 2.5rem; overflow: hidden; transition: max-height 0.3s ease-out; }
-        .note-content.expanded { max-height: 500px; }
+        /* 解決備註欄字多被截斷問題：展開時徹底放寬高度限制 */
+        .note-content { max-height: 3.5rem; overflow: hidden; transition: max-height 0.4s ease; }
+        .note-content.expanded { max-height: none !important; }
         
         .expenses-banner { background: linear-gradient(135deg, #DE7B54 0%, #B85530 100%); }
         .ghost-card { opacity: 0.5; background: #FCE4D6; border: 2px dashed #DE7B54; }
@@ -112,11 +113,8 @@
 <body>
 
 <div id="app" class="app-container">
-    
-    <!-- 橫幅只呈現左半部 50% 主體 -->
     <div class="banner-wrapper"></div>
     
-    <!-- 導航選單：獨立置中，不遮擋人物 -->
     <div class="nav-tabs-bar">
         <button @click="currentTab = 'itinerary'" title="行程" :class="{'active': currentTab === 'itinerary'}" class="tab-button">
             <i class="fa-solid fa-map-location-dot"></i>
@@ -156,25 +154,45 @@
                 </div>
             </div>
 
-            <div v-if="weatherData[selectedDateIndex]" class="mt-4 mb-5 bg-white border border-maple-100 rounded-2xl p-4 flex justify-between items-center card-shadow">
-                <div class="flex items-center text-maple-700 space-x-4">
-                    <div class="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
-                        <i :class="getWeatherIcon(weatherData[selectedDateIndex].condition)" class="text-2xl text-orange-400"></i>
-                    </div>
-                    <div>
-                        <div class="flex items-end gap-1 leading-none mb-1">
-                            <span class="text-3xl font-extrabold">{{ weatherData[selectedDateIndex].temp.split('/')[0] }}°</span>
-                            <span class="text-sm font-bold text-gray-400 mb-0.5">/ {{ weatherData[selectedDateIndex].temp.split('/')[1] }}°C</span>
+            <!-- 24小時天氣橫向滑動呈現 -->
+            <div v-if="weatherData[selectedDateIndex]" class="mt-4 mb-5 bg-white border border-maple-100 rounded-2xl p-4 card-shadow">
+                <div class="flex justify-between items-center pb-3 border-b border-gray-100">
+                    <div class="flex items-center text-maple-700 space-x-3.5">
+                        <div class="w-11 h-11 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
+                            <i :class="getWeatherIcon(weatherData[selectedDateIndex].condition)" class="text-2xl text-orange-400"></i>
                         </div>
-                        <span class="block text-xs font-bold text-gray-500 bg-gray-50 px-2 py-0.5 rounded inline-block mt-1">體感: {{ weatherData[selectedDateIndex].feel }}°C</span> 
+                        <div>
+                            <div class="flex items-end gap-1 leading-none mb-0.5">
+                                <span class="text-2xl font-black">{{ weatherData[selectedDateIndex].temp.split('/')[0] }}°</span>
+                                <span class="text-xs font-bold text-gray-400 mb-0.5">/ {{ weatherData[selectedDateIndex].temp.split('/')[1] }}°C</span>
+                            </div>
+                            <span class="text-[11px] font-bold text-gray-500 bg-gray-50 px-2 py-0.5 rounded-md inline-block">體感: {{ weatherData[selectedDateIndex].feel }}°C</span> 
+                        </div>
+                    </div>
+                    <div class="text-right text-xs text-gray-500">
+                        <span class="font-bold block text-gray-800 text-sm mb-1.5">{{ getWeatherDescription(weatherData[selectedDateIndex].condition) }}</span>
+                        <span v-if="dates[selectedDateIndex].hasCar" class="text-maple-500 font-bold bg-maple-50 px-2 py-1 rounded-md inline-flex items-center gap-1 text-[11px]">
+                            <i class="fa-solid fa-car-side text-xs"></i> 租車日
+                        </span>
+                        <span v-else class="text-gray-400 inline-flex items-center gap-1 font-medium text-[11px] bg-gray-50 px-2 py-1 rounded-md">
+                            <i class="fa-solid fa-train-subway text-xs"></i> 大眾運輸
+                        </span>
                     </div>
                 </div>
-                <div class="text-right text-xs text-gray-500 pr-2">
-                    <span class="font-bold block text-gray-800 text-sm mb-2">{{ getWeatherDescription(weatherData[selectedDateIndex].condition) }}</span>
-                    <span v-if="dates[selectedDateIndex].hasCar" class="text-maple-500 font-bold bg-maple-50 px-2 py-1 rounded-md flex items-center justify-end gap-1">
-                        <i class="fa-solid fa-car-side text-sm"></i> 租車日
-                    </span>
-                    <span v-else class="text-gray-400 flex items-center justify-end gap-1 font-medium"><i class="fa-solid fa-train-subway text-sm"></i> 大眾運輸</span>
+
+                <div class="pt-3">
+                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center justify-between">
+                        <span class="flex items-center gap-1"><i class="fa-regular fa-clock text-maple-500"></i> 24小時氣溫預報</span>
+                        <span class="text-[9px] text-gray-300">左右滑動查看 ➔</span>
+                    </div>
+                    <div class="flex overflow-x-auto no-scrollbar gap-2.5 py-1 -mx-1 px-1 snap-x">
+                        <div v-for="h in (weatherData[selectedDateIndex].hourly || [])" :key="h.time" 
+                             class="flex-shrink-0 flex flex-col items-center justify-center py-2 px-2.5 rounded-xl bg-gray-50/80 border border-gray-100 min-w-[50px] snap-start hover:bg-orange-50/50 transition-colors">
+                            <span class="text-[10px] font-medium text-gray-400 mb-1.5">{{ h.time }}</span>
+                            <i :class="[getHourlyWeatherIcon(h), h.isNight ? 'text-indigo-400' : 'text-orange-400']" class="text-base mb-1.5"></i>
+                            <span class="text-xs font-black text-gray-700">{{ h.temp }}°</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -236,7 +254,7 @@
                                     <div v-if="item.note" class="text-xs text-gray-700 bg-maple-50 p-3 rounded-xl border-l-4 border-maple-500 shadow-inner">
                                         <div class="note-content font-medium leading-relaxed whitespace-pre-line" :class="{'expanded': item.isNoteExpanded}">{{ item.note }}</div>
                                         <button v-if="item.note.length > 50" @click.stop="item.isNoteExpanded = !item.isNoteExpanded" class="text-maple-700 font-bold mt-1.5 text-[10px] uppercase tracking-wider flex items-center gap-0.5">
-                                            <i :class="item.isNoteExpanded ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'" class="text-[12px]"></i> {{ item.isNoteExpanded ? '收合' : '展開...' }}
+                                            <i :class="item.isNoteExpanded ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'" class="text-[12px]"></i> {{ item.isNoteExpanded ? '收合' : '展開更多...' }}
                                         </button>
                                     </div>
                                 </div>
@@ -674,7 +692,7 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1">代墊人 / 付款人</label>
+                            <label class="block text-xs font-bold text-gray-500 mb-1.5 ml-1 uppercase tracking-wider">代墊人 / 付款人</label>
                             <input v-model="newExpense.payer" type="text" placeholder="例如: 甯, 王, 艾" class="w-full bg-white border border-gray-200 rounded-xl p-3.5 text-sm font-bold outline-none focus:border-maple-500 shadow-sm">
                             <div class="flex gap-2 mt-2 ml-1">
                                 <button @click="newExpense.payer='甯'" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1 rounded-full font-bold transition-colors">甯</button>
@@ -708,7 +726,7 @@
 
 <script>
     const draggable = window.vuedraggable;
-    const { createApp, ref, computed, onMounted, watch } = Vue
+    const { createApp, ref, computed, onMounted, watch } = Vue;
 
     const firebaseConfig = {
       apiKey: "AIzaSyAtx2a_sQ3j3ry_GKD2oj9es9gxbQrGtIw",
@@ -725,6 +743,17 @@
     const db = firebase.firestore();
     
     db.enablePersistence().catch((err) => { console.warn("Firebase persistence error:", err.code); });
+
+    // 24小時溫度與氣候模擬生成器
+    const makeHourly = (minT, maxT, cond) => {
+        const curve = [0.2, 0.15, 0.1, 0.05, 0.0, 0.0, 0.05, 0.15, 0.35, 0.6, 0.8, 0.95, 1.0, 0.95, 0.85, 0.75, 0.6, 0.45, 0.35, 0.3, 0.28, 0.25, 0.22, 0.2];
+        return curve.map((pct, h) => ({
+            time: `${String(h).padStart(2, '0')}:00`,
+            temp: Math.round(minT + (maxT - minT) * pct),
+            condition: cond,
+            isNight: (h < 6 || h >= 18)
+        }));
+    };
 
     createApp({
         components: { draggable },
@@ -767,12 +796,12 @@
             ]);
 
             const weatherData = ref([
-                { condition: 'sunny', temp: '18/10', feel: '16' },
-                { condition: 'cloudy', temp: '14/6', feel: '12' },
-                { condition: 'sunny', temp: '16/8', feel: '15' },
-                { condition: 'sunny', temp: '19/11', feel: '18' },
-                { condition: 'cloudy', temp: '17/10', feel: '15' },
-                { condition: 'rain', temp: '15/9', feel: '13' },
+                { condition: 'sunny', temp: '18/10', feel: '16', hourly: makeHourly(10, 18, 'sunny') },
+                { condition: 'cloudy', temp: '14/6', feel: '12', hourly: makeHourly(6, 14, 'cloudy') },
+                { condition: 'sunny', temp: '16/8', feel: '15', hourly: makeHourly(8, 16, 'sunny') },
+                { condition: 'sunny', temp: '19/11', feel: '18', hourly: makeHourly(11, 19, 'sunny') },
+                { condition: 'cloudy', temp: '17/10', feel: '15', hourly: makeHourly(10, 17, 'cloudy') },
+                { condition: 'rain', temp: '15/9', feel: '13', hourly: makeHourly(9, 15, 'rain') },
             ]);
 
             const hotels = ref([
@@ -783,26 +812,25 @@
             const defaultItineraryData = [
                 // Day 1: 10/29
                 [
-                    { id: 101, name: '機場報到', category: 'flight', startTime: '24:00', address: '桃園國際機場', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
-                    { id: 102, name: '桃園機場-名古屋機場', category: 'flight', startTime: '02:55-06:25', address: 'TPE - NGO', note: '航班MM724', transportType: 'flight', travelTime: '3h30m', isNoteExpanded: false },
-                    { id: 103, name: '出關', category: 'other', startTime: '06:25-07:26', address: '名古屋機場', note: '可買早餐或到名古屋後再買', transportType: 'walk', travelTime: '1h', isNoteExpanded: false },
-                    { id: 104, name: '名古屋機場-名古屋車站', category: 'transport', startTime: '07:26-08:08', address: '名古屋車站', note: '預估最晚搭這班(+USKY) / 現場買票', transportType: 'public', travelTime: '42m', isNoteExpanded: false },
-                    { id: 105, name: '轉車等待', category: 'other', startTime: '08:08-08:43', address: '名古屋車站', note: '', transportType: 'walk', travelTime: '35m', isNoteExpanded: false },
-                    { id: 106, name: '名古屋車站-高山', category: 'transport', startTime: '08:43-10:58', address: '高山車站', note: '9/2買klook(共4780)', transportType: 'public', travelTime: '2h15m', isNoteExpanded: false },
-                    { id: 107, name: '至飯店放行李', category: 'accommodation', startTime: '10:58-12:00', address: 'FAV LUX HIDATAKAYAMA', note: '放行李', transportType: 'walk', travelTime: '10m', isNoteExpanded: false },
-                    { id: 108, name: '飛騨牛SUKIYAKI 中橋 WAKACHIYA', category: 'food', startTime: '12:30-14:00', address: '中橋 WAKACHIYA', note: '走路10-15分', hours: '11:00-14:00', transportType: 'walk', travelTime: '15m', isNoteExpanded: false },
-                    { id: 109, name: '飛騨高山老街+高山陣屋', category: 'sightseeing', startTime: '14:00-18:00', address: '高山老街', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
-                    { id: 110, name: '中華拉麵 つづみ', category: 'food', startTime: '18:00-19:00', address: '中華拉麵 つづみ', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
-                    { id: 111, name: '住 FAV LUX HIDATAKAYAMA', category: 'accommodation', startTime: '', address: 'FAV LUX HIDATAKAYAMA', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false }
+                    { id: 101, name: '機場報到', category: 'flight', startTime: '24:00', address: '桃園國際機場', note: '', transportType: 'walk', travelTime: '第一航廈', isNoteExpanded: false },
+                    { id: 102, name: '桃園機場-名古屋機場', category: 'flight', startTime: '02:55-06:25', address: 'TPE - NGO', note: '航班MM724', transportType: 'flight', travelTime: '3h30m至名古屋', isNoteExpanded: false },
+                    { id: 103, name: '出關', category: 'other', startTime: '06:25-07:26', address: '名古屋機場', note: '可買早餐或到名古屋後再買', transportType: 'walk', travelTime: '至車站', isNoteExpanded: false },
+                    { id: 104, name: '名古屋機場-名古屋車站', category: 'transport', startTime: '07:26-08:08', address: '名古屋車站', note: '預估最晚搭這班(+USKY) / 現場買票', transportType: 'public', travelTime: '等待轉乘', isNoteExpanded: false },
+                    { id: 105, name: '名古屋車站-高山', category: 'transport', startTime: '08:43-10:58', address: '高山車站', note: '9/2買klook(共4780)', transportType: 'walk', travelTime: '約15分', isNoteExpanded: false },
+                    { id: 106, name: '飯店放行李', category: 'accommodation', startTime: '10:58-12:00', address: 'FAV LUX HIDATAKAYAMA', note: '', transportType: 'walk', travelTime: '約15分', isNoteExpanded: false },
+                    { id: 107, name: '飛驒牛SUKIYAKI 中橋 WAKACHIYA', category: 'food', startTime: '12:30-14:00', address: '中橋 WAKACHIYA', note: '', hours: '11:00-14:00', transportType: 'walk', travelTime: '至老街', isNoteExpanded: false },
+                    { id: 108, name: '飛驒高山老街+高山陣屋', category: 'sightseeing', startTime: '14:00-18:00', address: '高山老街', note: '', transportType: 'walk', travelTime: '至餐廳', isNoteExpanded: false },
+                    { id: 109, name: '中華拉麵 つづみ', category: 'food', startTime: '18:00-19:00', address: '中華拉麵 つづみ', note: '', transportType: 'walk', travelTime: '至飯店', isNoteExpanded: false },
+                    { id: 110, name: '住 FAV LUX HIDATAKAYAMA', category: 'accommodation', startTime: '', address: 'FAV LUX HIDATAKAYAMA', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false }
                 ],
-                // Day 2: 10/30
+                // Day 2: 10/30 (完全對照截圖同步)
                 [
-                    { id: 201, name: '起床', category: 'other', startTime: '06:00', address: '', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false },
-                    { id: 202, name: '高山 - 平湯溫泉', category: 'transport', startTime: '07:00-08:00', address: '平湯溫泉', note: '高山(濃飛巴士總站)售票處(5號)->平湯溫泉站2號月台搭乘前往大正池站巴士', transportType: 'bus', travelTime: '1h', isNoteExpanded: false },
-                    { id: 203, name: '平湯溫泉 - 大正池', category: 'transport', startTime: '08:30-09:00', address: '大正池', note: '現場買來回票', transportType: 'bus', travelTime: '30m', isNoteExpanded: false },
-                    { id: 204, name: '大正池→河童橋→(梓川左岸)明神池', category: 'sightseeing', startTime: '09:00-15:00', address: '上高地', note: '健行。河童橋午餐;蘋果派;河童燒;五千尺飯店卡士達布丁', transportType: 'walk', travelTime: '', isNoteExpanded: false },
-                    { id: 205, name: '明神池返回(梓川右岸)', category: 'sightseeing', startTime: '15:00', address: '上高地巴士站', note: '河童橋休息後至上高地巴士站回程', transportType: 'walk', travelTime: '', isNoteExpanded: false },
-                    { id: 206, name: '味の与平', category: 'food', startTime: '18:30', address: '味の与平', note: '預約號碼:JZ44GD5SC5', transportType: 'walk', travelTime: '', isNoteExpanded: false },
+                    { id: 201, name: '起床', category: 'other', startTime: '06:00', address: '', note: '', transportType: 'walk', travelTime: '至高山車站', isNoteExpanded: false },
+                    { id: 202, name: '高山車站 - 平湯溫泉站', category: 'transport', startTime: '07:00-08:00', address: '平湯溫泉', note: '高山(濃飛巴士總站)售票處(5號)->平湯溫泉站2號月台搭乘前往大正池站巴士', transportType: 'public', travelTime: '轉乘等待', isNoteExpanded: false },
+                    { id: 203, name: '平湯溫泉 - 大正池', category: 'transport', startTime: '08:30-09:00', address: '大正池', note: '現場買來回票', transportType: 'walk', travelTime: '大正池', isNoteExpanded: false },
+                    { id: 204, name: '大正池→河童橋→(梓川左岸)→明神池→(梓川右岸)→河童橋', category: 'sightseeing', startTime: '09:00-15:00', address: '上高地', note: '健行。河童橋午餐;蘋果派;河童燒;五千尺飯店卡士達布丁 (河童橋休息後至上高地巴士站回程)', transportType: 'walk', travelTime: '依現場車次', isNoteExpanded: false },
+                    { id: 205, name: '上高地站→平湯溫泉→高山站', category: 'transport', startTime: '15:30-17:31', address: '高山站', note: '15:30-15:55至平湯溫泉\n轉乘16:30-17:31至高山', transportType: 'walk', travelTime: '至餐廳', isNoteExpanded: false },
+                    { id: 206, name: '味の与平', category: 'food', startTime: '18:30', address: '味の与平', note: '預約號碼:JZ44GD5SC5', transportType: 'walk', travelTime: '飯店', isNoteExpanded: false },
                     { id: 207, name: '住 FAV LUX HIDATAKAYAMA', category: 'accommodation', startTime: '', address: 'FAV LUX HIDATAKAYAMA', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false }
                 ],
                 // Day 3: 10/31
@@ -877,7 +905,7 @@
             onMounted(() => {
                 fetchRealTimeRate();
                 
-                db.collection('tripData').doc('v2026_perfect_fix_final').onSnapshot((doc) => {
+                db.collection('tripData').doc('v2026_user_sync_day2').onSnapshot((doc) => {
                     syncStatus.value = 'syncing';
                     if (doc.exists) {
                         const data = doc.data();
@@ -926,7 +954,7 @@
             const pushToFirebase = () => {
                 if (!initialLoadDone) return;
                 syncStatus.value = 'syncing';
-                db.collection('tripData').doc('v2026_perfect_fix_final').set({
+                db.collection('tripData').doc('v2026_user_sync_day2').set({
                     itinerary: JSON.stringify(itineraryData.value),
                     shopping: JSON.stringify(shoppingList.value),
                     expenses: JSON.stringify(expenses.value),
@@ -975,6 +1003,10 @@
             const getCategoryLabel = (cat) => ({ sightseeing: '景點', food: '飲食', shopping: '購物', accommodation: '住宿', flight: '航班', transport: '交通', other: '其他' }[cat] || '其他');
             
             const getWeatherIcon = (cond) => ({ sunny: 'fa-solid fa-sun', cloudy: 'fa-solid fa-cloud', rain: 'fa-solid fa-cloud-showers-heavy' }[cond] || 'fa-solid fa-cloud');
+            const getHourlyWeatherIcon = (h) => {
+                if (h.isNight && h.condition === 'sunny') return 'fa-solid fa-moon';
+                return getWeatherIcon(h.condition);
+            };
             const getWeatherDescription = (cond) => ({ sunny: '晴朗', cloudy: '多雲', rain: '降雨' }[cond] || '未知');
             const getTransportIcon = (type) => ({ walk: 'fa-solid fa-person-walking', car: 'fa-solid fa-car', bus: 'fa-solid fa-bus', public: 'fa-solid fa-train-subway', flight: 'fa-solid fa-plane' }[type] || 'fa-solid fa-arrow-right');
 
@@ -1030,7 +1062,7 @@
                 }
             };
 
-            onDragEnd = () => { itineraryData.value[selectedDateIndex.value] = [...currentItinerary.value]; };
+            const onDragEnd = () => { itineraryData.value[selectedDateIndex.value] = [...currentItinerary.value]; };
 
             const handleImageUpload = (e) => {
                 const file = e.target.files[0];
@@ -1103,7 +1135,7 @@
                 hotels, shoppingList, expenses, totalExpensesJPY, totalExpensesTWD, weatherData,
                 currencyInput, currencyResult, calculateCurrency, exchangeRate, rateLoading,
                 getCategoryColor, getCategoryIcon, getCategoryLabel,
-                getWeatherIcon, getWeatherDescription, getTransportIcon,
+                getWeatherIcon, getHourlyWeatherIcon, getWeatherDescription, getTransportIcon,
                 getExpenseIcon, getExpenseIconBg, getExpenseBorder,
                 
                 showShoppingModal, showExpenseModal, showItineraryModal, 

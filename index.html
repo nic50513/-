@@ -491,7 +491,7 @@
                 <div v-if="shoppingList.length % 2 !== 0" class="h-0 invisible"></div>
                 
                 <div v-if="shoppingList.length === 0" class="col-span-2 text-center py-16 bg-white rounded-3xl border border-dashed border-gray-300 card-shadow">
-                    <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <div class="w-16 h-16 bg-maple-50 rounded-full flex items-center justify-center mx-auto mb-3">
                         <i class="fa-solid fa-basket-shopping text-3xl text-gray-300"></i>
                     </div>
                     <p class="text-sm font-bold text-gray-600">購物清單空白</p>
@@ -1423,7 +1423,7 @@
                     { id: 309, name: '炭燒鰻魚藤榮 HAERA店', category: 'food', startTime: '20:00', address: '炭燒鰻魚藤榮', note: '預訂編號:99bc9420。必點炭烤鰻魚飯。', hours: '11:00-14:30, 17:00-21:00', transportType: 'walk', travelTime: '至飯店', isNoteExpanded: false },
                     { id: 310, name: '住 henn na hotel', category: 'accommodation', startTime: '20:00', address: 'henn na hotel', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false }
                 ],
-                // Day 4: 11/01 (完全對應您的截圖順序與內容)
+                // Day 4: 11/01
                 [
                     { id: 401, name: '飯店早餐/早午餐', category: 'food', startTime: '08:00', address: '飯店', note: '享用晨間朝食充飽電力', hours: '06:30-10:00', transportType: 'walk', travelTime: '至地鐵站', isNoteExpanded: false },
                     { id: 402, name: '地下鐵東山線到藤が丘轉Linimo', category: 'transport', startTime: '08:30-09:30', address: '愛・地球博記念公園', note: '搭乘地下鐵「東山線」到藤が丘站。轉乘 Linimo (只有一條路線) 從藤が丘站到「愛・地球博記念公園」站下車。', transportType: 'public', travelTime: '至吉卜力', isNoteExpanded: false },
@@ -1464,6 +1464,35 @@
             const itineraryData = ref(JSON.parse(JSON.stringify(defaultItineraryData)));
             const shoppingList = ref(JSON.parse(JSON.stringify(defaultShoppingList)));
             const expenses = ref(JSON.parse(JSON.stringify(defaultExpenses)));
+
+            // 確保本地編輯能直接寫入 localStorage，重新整理絕不消失！
+            onMounted(() => {
+                const savedItin = localStorage.getItem('v2026_itinerary');
+                const savedShop = localStorage.getItem('v2026_shopping');
+                const savedExp = localStorage.getItem('v2026_expenses');
+
+                if (savedItin) {
+                    try { itineraryData.value = JSON.parse(savedItin); } catch(e) {}
+                }
+                if (savedShop) {
+                    try { shoppingList.value = JSON.parse(savedShop); } catch(e) {}
+                }
+                if (savedExp) {
+                    try { expenses.value = JSON.parse(savedExp); } catch(e) {}
+                }
+            });
+
+            watch(itineraryData, (newVal) => {
+                localStorage.setItem('v2026_itinerary', JSON.stringify(newVal));
+            }, { deep: true });
+
+            watch(shoppingList, (newVal) => {
+                localStorage.setItem('v2026_shopping', JSON.stringify(newVal));
+            }, { deep: true });
+
+            watch(expenses, (newVal) => {
+                localStorage.setItem('v2026_expenses', JSON.stringify(newVal));
+            }, { deep: true });
 
             const currentItinerary = computed({
                 get: () => itineraryData.value[selectedDateIndex.value] || [],

@@ -1183,7 +1183,7 @@
             mustVisit: [
                 '🗼 中部電力 MIRAI TOWER（名古屋電視塔）：夜間點燈與水鏡公園倒影',
                 '🛸 Oasis 21（Oasis 21水之宇宙船）：宛如漂浮空中的水幕玻璃巨船，頂層空中走廊夜景超美',
-                '🛍️ 久屋大通公園 RAYARD MIYASHITA 風格露天綠意商場街'
+                '🛍️ GISHO / 久屋大通公園 RAYARD MIYASHITA 風格露天綠意商場街'
             ],
             tips: '百貨專櫃退稅通常於當日 19:30～20:00 截止，購物結帳時請隨身攜帶護照！'
         }
@@ -1469,7 +1469,8 @@
             const expenses = ref([]);
 
             onMounted(() => {
-                db.collection('tripData').doc('v2026_tab_independent_v1').onSnapshot((doc) => {
+                // 恢復為您最初且最安全的雲端儲存庫 ID
+                db.collection('tripData').doc('v2026_all_perfect_v2').onSnapshot((doc) => {
                     syncStatus.value = 'syncing';
                     if (doc.exists) {
                         const data = doc.data();
@@ -1518,7 +1519,7 @@
             const pushToFirebase = () => {
                 if (!initialLoadDone) return;
                 syncStatus.value = 'syncing';
-                db.collection('tripData').doc('v2026_tab_independent_v1').set({
+                db.collection('tripData').doc('v2026_all_perfect_v2').set({
                     itinerary: JSON.stringify(itineraryData.value),
                     shopping: JSON.stringify(shoppingList.value),
                     expenses: JSON.stringify(expenses.value),

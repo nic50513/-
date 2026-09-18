@@ -111,7 +111,6 @@
 <div id="app" class="app-container">
     <div class="banner-wrapper"></div>
     
-    <!-- 導航選單獨立置中 -->
     <div class="nav-tabs-bar">
         <button @click="currentTab = 'itinerary'" title="行程" :class="{'active': currentTab === 'itinerary'}" class="tab-button">
             <i class="fa-solid fa-map-location-dot"></i>
@@ -1094,7 +1093,7 @@
             tips: '午間時段座位搶手，建議於預約時間前 5-10 分鐘抵達。'
         },
         '炭燒鰻魚藤榮 HAERA店': {
-            title: '名古屋極致鰻魚飯・炭燒鰻魚藤榮 (うなぎ藤栄)',
+            title: '名古屋極致鰻魚飯・炭燒鰻魚藤栄 (うなぎ藤栄)',
             tag: '備長炭現烤・外酥內嫩',
             intro: '名古屋最具代表性的「鰻魚三吃 (ひつまぶし)」！選用肥美青鰻在高溫備長炭上烤到表皮微脆焦香、肉質軟嫩多汁。',
             mustEat: [
@@ -1146,7 +1145,7 @@
         '名古屋榮商圈': {
             title: '時尚潮流旗艦・名古屋榮商圈',
             tag: '百貨地標・精品香氛・頂級甜點',
-            intro: '名古屋最繁華的購物精華心臟！各大國際精品、PARCO、地下街以及前wei香氛與甜點店雲集。',
+            intro: '名古屋最繁華的購物精華心臟！各大國際精品、PARCO、地下街以及前衛香氛與甜點店雲集。',
             mustEat: [
                 '🍰 LOUANGE TOKYO Le Chateau：東京六本木頂級法式甜點殿堂，招牌精緻小熊巧克力蛋糕與奢華法式千層派',
                 '☕ HARBS 榮本店：發源於名古屋的千層蛋糕始祖，招牌水果千層必吃！',
@@ -1159,7 +1158,7 @@
             ],
             mustVisit: [
                 '🗼 中部電力 MIRAI TOWER（名古屋電視塔）：夜間點燈與水鏡公園倒影',
-                '🛸 Oasis 21（Oasis 21水之宇宙船）：宛如漂浮空中的水幕玻璃巨船，頂層空中走廊夜景超美',
+                '🛸 Oasis 21 (綠洲21水之宇宙船)：宛如漂浮空中的水幕玻璃巨船，頂層空中走廊夜景超美',
                 '🛍️ 久屋大通公園 RAYARD MIYASHITA 風格露天綠意商場街'
             ],
             tips: '百貨專櫃退稅通常於當日 19:30～20:00 截止，購物結帳時請隨身攜帶護照！'
@@ -1180,7 +1179,7 @@
             ],
             mustVisit: [
                 '🗼 中部電力 MIRAI TOWER（名古屋電視塔）：夜間點燈與水鏡公園倒影',
-                '🛸 Oasis 21（Oasis 21水之宇宙船）：宛如漂浮空中的水幕玻璃巨船，頂層空中走廊夜景超美',
+                '🛸 Oasis 21 (綠洲21水之宇宙船)：宛如漂浮空中的水幕玻璃巨船，頂層空中走廊夜景超美',
                 '🛍️ 久屋大通公園 RAYARD MIYASHITA 風格露天綠意商場街'
             ],
             tips: '百貨專櫃退稅通常於當日 19:30～20:00 截止，購物結帳時請隨身攜帶護照！'
@@ -1434,11 +1433,11 @@
                     { id: 406, name: '燒鳥:炭火燒鳥 しげ榮本店', category: 'food', startTime: '20:00', address: 'しげ榮本店', note: '預約號碼:99bc9420。名古屋交趾地雞炭烤名店', hours: '17:00-24:00 (L.O. 23:00)', transportType: 'walk', travelTime: '至飯店', isNoteExpanded: false },
                     { id: 407, name: '住 henn na hotel', category: 'accommodation', startTime: '22:00', address: 'henn na hotel', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false }
                 ],
-                // Day 5: 11/02 (完全對應您的截圖：早餐 07:00、交通轉乘與小圓標籤正確)
+                // Day 5: 11/02 (已修正：早餐 07:00，交通標籤正確對應為名鐵與犬山)
                 [
-                    { id: 501, name: '飯店早餐', category: 'food', startTime: '07:00', address: '飯店', note: '飯店晨間朝食', hours: '06:30-10:00', transportType: 'walk', travelTime: '名鐵', isNoteExpanded: false },
+                    { id: 501, name: '飯店早餐', category: 'food', startTime: '07:00', address: '飯店', note: '飯店晨間朝食', hours: '06:30-10:00', transportType: 'public', travelTime: '名鐵', isNoteExpanded: false },
                     { id: 502, name: '飯店-名古屋車站', category: 'transport', startTime: '08:30-09:00', address: '名古屋車站', note: '', transportType: 'public', travelTime: '30m', isNoteExpanded: false },
-                    { id: 503, name: '名鐵名古屋站(名鐵犬山線)→犬山站', category: 'transport', startTime: '09:00-09:30', address: '犬山站', note: '車程約30分', transportType: 'public', travelTime: '犬山', isNoteExpanded: false },
+                    { id: 503, name: '名鐵名古屋站(名鐵犬山線)→犬山站', category: 'transport', startTime: '09:00-09:30', address: '犬山站', note: '車程約30分', transportType: 'walk', travelTime: '犬山', isNoteExpanded: false },
                     { id: 504, name: '犬山城下町與天守閣', category: 'sightseeing', startTime: '09:30-15:00', address: '犬山城', note: '犬山站出發走城下町上山→犬山城天守閣→三光稲荷神社→下山在城下町吃小吃→傍晚前回名古屋。\n\n1.犬山牛太郎:A5飛驒牛握壽司\n2.本町茶寮:彩り田楽御膳\n3.壽俵屋犬山井上邸:醬油おこげ串\n4.Tonamaru串炸\n5.戀小町團子\n6.COCOTOMO FARM年輪蛋糕\n7.芳川屋草莓冰\n8.三光稲荷神社與「洗錢」體驗', hours: '天守閣 09:00-17:00 (最後入場16:30) / 城下町約 10:00-17:00', transportType: 'walk', travelTime: '回車站', isNoteExpanded: false },
                     { id: 505, name: '返名古屋', category: 'transport', startTime: '15:00-16:00', address: '名古屋市區', note: '', transportType: 'public', travelTime: '至餐廳', isNoteExpanded: false },
                     { id: 506, name: '晚餐: 獅子丸拉麵', category: 'food', startTime: '18:00-19:30', address: '獅子丸拉麵', note: '泡沫系雞白湯、米其林推薦排隊名作', hours: '11:00-14:30, 17:30-22:00', transportType: 'walk', travelTime: '至飯店', isNoteExpanded: false },
@@ -1463,13 +1462,12 @@
                 { name: '飛驒牛 SUKIYAKI', amount: 6500, category: 'food', date: '2026-10-29', payment: 'cash', payer: '王', currency: 'JPY' },
             ];
 
-            const itineraryData = ref([]);
-            const shoppingList = ref([]);
-            const expenses = ref([]);
+            const itineraryData = ref(JSON.parse(JSON.stringify(defaultItineraryData)));
+            const shoppingList = ref(JSON.parse(JSON.stringify(defaultShoppingList)));
+            const expenses = ref(JSON.parse(JSON.stringify(defaultExpenses)));
 
-            // 啟用 Firebase 雲端即時雙向同步！
             onMounted(() => {
-                db.collection('tripData').doc('v2026_sync_v1').onSnapshot((doc) => {
+                db.collection('tripData').doc('v2026_sync_v2').onSnapshot((doc) => {
                     syncStatus.value = 'syncing';
                     if (doc.exists) {
                         const data = doc.data();
@@ -1506,7 +1504,7 @@
             const pushToFirebase = () => {
                 if (!initialLoadDone) return;
                 syncStatus.value = 'syncing';
-                db.collection('tripData').doc('v2026_sync_v1').set({
+                db.collection('tripData').doc('v2026_sync_v2').set({
                     itinerary: JSON.stringify(itineraryData.value),
                     shopping: JSON.stringify(shoppingList.value),
                     expenses: JSON.stringify(expenses.value),
@@ -1668,7 +1666,7 @@
                 if (isEditExpenseMode.value && editingExpenseIndex.value > -1) {
                     expenses.value[editingExpenseIndex.value] = { ...newExpense.value };
                 } else {
-                    expenses.value.push({ ...newExpense.path || ...newExpense.value });
+                    expenses.value.push({ ...newExpense.value });
                 }
                 expenses.value.sort((a, b) => new Date(b.date) - new Date(a.date));
                 showExpenseModal.value = false;

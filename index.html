@@ -387,14 +387,19 @@
             <div class="bg-white rounded-3xl p-6 card-shadow">
                 <h3 class="font-bold text-gray-800 mb-4 flex items-center"><i class="fa-solid fa-bed text-indigo-500 mr-2 bg-indigo-50 p-2 rounded-lg"></i> 住宿資訊</h3>
                 <div class="space-y-4">
-                    <div v-for="hotel in hotels" :key="hotel.name" class="border border-gray-100 rounded-2xl p-4 hover:border-indigo-200 transition-colors group bg-gray-50/50">
+                    <div v-for="hotel in hotels" :key="hotel.name" @click="openHotelGuide(hotel.name)" class="border border-indigo-100 rounded-2xl p-4 hover:border-indigo-300 transition-all group bg-white card-shadow cursor-pointer relative overflow-hidden">
                         <div class="flex justify-between items-start mb-2">
-                            <span class="text-[10px] font-bold text-white bg-indigo-400 px-2 py-0.5 rounded">{{ hotel.date }}</span>
-                            <button @click="openMap(hotel.name)" class="w-9 h-9 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-all shadow-sm"><i class="fa-solid fa-location-arrow text-sm"></i></button>
+                            <span class="text-[10px] font-bold text-white bg-indigo-500 px-2.5 py-0.5 rounded-full shadow-sm">{{ hotel.date }}</span>
+                            <div class="flex items-center gap-1.5">
+                                <button @click.stop="openHotelGuide(hotel.name)" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-sm hover:bg-indigo-100 transition-all">
+                                    <i class="fa-solid fa-hotel text-indigo-500"></i> 飯店設施與周邊
+                                </button>
+                                <button @click.stop="openMap(hotel.name)" class="w-8 h-8 rounded-full bg-gray-50 text-gray-500 flex items-center justify-center hover:bg-indigo-500 hover:text-white transition-all shadow-sm"><i class="fa-solid fa-location-arrow text-xs"></i></button>
+                            </div>
                         </div>
-                        <h4 class="font-black text-gray-800 text-lg leading-tight mb-2">{{ hotel.name }}</h4>
-                        <div class="text-xs text-gray-500 space-y-1.5 bg-white p-3 rounded-xl border border-gray-100 shadow-inner">
-                            <p class="flex items-center font-medium"><i class="fa-solid fa-phone w-5 text-center mr-1 text-indigo-300 text-[15px]"></i> <a :href="'tel:' + hotel.phone" class="hover:text-indigo-600">{{ hotel.phone }}</a></p>
+                        <h4 class="font-black text-gray-800 text-lg leading-tight mb-2 group-hover:text-indigo-600 transition-colors">{{ hotel.name }}</h4>
+                        <div class="text-xs text-gray-500 space-y-1.5 bg-gray-50/80 p-3 rounded-xl border border-gray-100 shadow-inner">
+                            <p class="flex items-center font-medium"><i class="fa-solid fa-phone w-5 text-center mr-1 text-indigo-300 text-[15px]"></i> <a :href="'tel:' + hotel.phone" @click.stop class="hover:text-indigo-600">{{ hotel.phone }}</a></p>
                             <p class="flex items-start font-medium"><i class="fa-solid fa-location-dot w-5 text-center mr-1 mt-0.5 text-indigo-300 text-[15px]"></i> <span class="flex-1">{{ hotel.address }}</span></p>
                         </div>
                     </div>
@@ -579,6 +584,68 @@
     <button v-if="currentTab !== 'info' && currentTab !== 'transit'" @click="handleAddClick" class="fab-btn">
         <i class="fa-solid fa-plus font-bold"></i>
     </button>
+
+    <!-- Modal: Hotel Guide (飯店設施與周邊導覽) -->
+    <Transition name="modal">
+        <div v-if="showHotelGuideModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
+            <div class="absolute inset-0" @click="showHotelGuideModal = false"></div>
+            <Transition name="modal-slide" appear>
+                <div v-if="showHotelGuideModal && activeHotelGuide" class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-3xl p-6 shadow-2xl max-h-[88vh] overflow-y-auto relative z-10 border-t border-white/20">
+                    <div class="flex justify-between items-start mb-4 border-b border-gray-100 pb-3">
+                        <div>
+                            <span class="text-[10px] font-black tracking-wider text-indigo-700 bg-indigo-100 px-2.5 py-0.5 rounded-full inline-flex items-center gap-1 mb-1.5">
+                                <i class="fa-solid fa-hotel"></i> 住宿指南・{{ activeHotelGuide.tag }}
+                            </span>
+                            <h3 class="text-xl font-black text-gray-800 leading-tight">{{ activeHotelGuide.title }}</h3>
+                        </div>
+                        <button @click="showHotelGuideModal = false" class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-500 transition-colors flex items-center justify-center shrink-0"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+
+                    <p class="text-xs font-medium text-gray-600 bg-indigo-50/70 p-3 rounded-2xl border border-indigo-100 leading-relaxed mb-4">
+                        {{ activeHotelGuide.intro }}
+                    </p>
+
+                    <div class="space-y-3.5">
+                        <div v-if="activeHotelGuide.facilities && activeHotelGuide.facilities.length" class="bg-indigo-50/40 rounded-2xl p-3.5 border border-indigo-100/70">
+                            <h4 class="text-xs font-black text-indigo-700 mb-2 flex items-center gap-1.5"><i class="fa-solid fa-bed"></i> 飯店內部設施</h4>
+                            <ul class="space-y-1.5">
+                                <li v-for="fac in activeHotelGuide.facilities" :key="fac" class="text-xs text-gray-700 font-medium leading-relaxed flex items-start gap-1">
+                                    <span class="text-indigo-400 font-bold">•</span><span>{{ fac }}</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div v-if="activeHotelGuide.convenience && activeHotelGuide.convenience.length" class="bg-emerald-50/50 rounded-2xl p-3.5 border border-emerald-100/70">
+                            <h4 class="text-xs font-black text-emerald-700 mb-2 flex items-center gap-1.5"><i class="fa-solid fa-store"></i> 周邊超商與藥妝</h4>
+                            <ul class="space-y-1.5">
+                                <li v-for="store in activeHotelGuide.convenience" :key="store" class="text-xs text-gray-700 font-medium leading-relaxed flex items-start gap-1">
+                                    <span class="text-emerald-500 font-bold">•</span><span>{{ store }}</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div v-if="activeHotelGuide.nightNearby && activeHotelGuide.nightNearby.length" class="bg-amber-50/50 rounded-2xl p-3.5 border border-amber-100/70">
+                            <h4 class="text-xs font-black text-amber-700 mb-2 flex items-center gap-1.5"><i class="fa-solid fa-moon"></i> 夜晚散策與附近逛街</h4>
+                            <ul class="space-y-1.5">
+                                <li v-for="night in activeHotelGuide.nightNearby" :key="night" class="text-xs text-gray-700 font-medium leading-relaxed flex items-start gap-1">
+                                    <span class="text-amber-500 font-bold">•</span><span>{{ night }}</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div v-if="activeHotelGuide.tips" class="bg-gray-50 rounded-xl p-3 border border-gray-200/70 text-[11px] text-gray-500 font-medium flex items-start gap-2">
+                            <i class="fa-solid fa-circle-exclamation text-indigo-500 text-sm mt-0.5 shrink-0"></i>
+                            <span class="leading-relaxed">{{ activeHotelGuide.tips }}</span>
+                        </div>
+                    </div>
+
+                    <button @click="showHotelGuideModal = false" class="w-full mt-5 py-3.5 rounded-xl font-black text-sm text-white bg-indigo-600 hover:bg-indigo-700 shadow-md transition-colors">
+                        了解！關閉指南
+                    </button>
+                </div>
+            </Transition>
+        </div>
+    </Transition>
 
     <!-- Modal: Spot Guide -->
     <Transition name="modal">
@@ -854,9 +921,6 @@
 </div>
 
 <script>
-    const draggable = window.vuedraggable;
-    const { createApp, ref, computed, onMounted, watch } = Vue;
-
     const spotGuides = {
         '中華拉麵 つづみ': {
             title: '高山經典老字號・中華拉麵 つづみ (つづみそば)',
@@ -1034,7 +1098,7 @@
             intro: '名古屋最具代表性的「鰻魚三吃 (ひつまぶし)」！選用肥美青鰻在高溫備長炭上烤到表皮微脆焦香、肉質軟嫩多汁。',
             mustEat: [
                 '🍱 經典鰻魚三吃（第一碗品原味、第二碗加蔥芥末海苔、第三碗淋清雅高湯作茶泡飯）',
-                '🍢 炭烤鰻魚肝串（数量限定，香脆帶微苦甘甜）'
+                '🍢 炭烤鰻魚肝串（数量限定，香 scented 微苦甘甜）'
             ],
             mustBuy: ['🍵 鰻魚飯特調高湯粉包、香菇鰻魚山椒佃煮'],
             mustVisit: ['👀 開放式炭火燒烤台，能近距離欣賞師傅熟練扇火翻烤的極致手藝'],
@@ -1084,7 +1148,7 @@
             intro: '名古屋最繁華的購物精華心臟！各大國際精品、PARCO、地下街以及前衛香氛與甜點店雲集。',
             mustEat: [
                 '🍰 LOUANGE TOKYO Le Chateau：東京六本木頂級法式甜點殿堂，招牌精緻小熊巧克力蛋糕與奢華法式千層派',
-                '☕ HARBS 榮本店：發源於名古屋的千層蛋糕始祖，招牌水果千層必吃！',
+                '☕ HARBS 榮本店：發源於名古屋的千層蛋糕始祖，招牌水果千層必須！',
                 '🍗 風來坊 / 山將：名古屋名物手羽先（香脆胡椒炸雞翅）'
             ],
             mustBuy: [
@@ -1105,7 +1169,7 @@
             intro: '名古屋最繁華的購物精華心臟！各大國際精品、PARCO、地下街以及前衛香氛與甜點店雲集。',
             mustEat: [
                 '🍰 LOUANGE TOKYO Le Chateau：東京六本木頂級法式甜點殿堂，招牌精緻小熊巧克力蛋糕與奢華法式千層派',
-                '☕ HARBS 榮本店：發源於名古屋的千層蛋糕始祖，招牌水果千層必吃！',
+                '☕ HARBS 榮本店：發源於名古屋的千層蛋糕始祖，招牌水果千層必須！',
                 '🍗 風來坊 / 山將：名古屋名物手羽先（香脆胡椒炸雞翅）'
             ],
             mustBuy: [
@@ -1122,6 +1186,49 @@
         }
     };
 
+    const hotelGuides = {
+        'FAV LUX HIDATAKAYAMA': {
+            title: 'FAV LUX Hida Takayama',
+            tag: '高山輕奢設計旅宿・步行至車站3分鐘',
+            intro: '2023年全新開幕的高質感設計旅宿，融合日式木造美學與現代極簡風。房間寬敞舒適、配備完善，步行即可輕鬆抵達高山濃飛巴士總站與三町通老街！',
+            facilities: [
+                '♨️ 館內設有舒適大浴場與半露天溫泉設施（逛完上高地或老街回來泡湯超療癒）',
+                '🛋️ 寬敞客房與獨立衛浴（部分房型配有客廳與微波爐、冰箱）',
+                '🛜 全館高速免費 Wi-Fi、自助洗衣設備與行李寄放區'
+            ],
+            convenience: [
+                '🏪 7-Eleven 高山花里町店（步行約 2 分鐘）',
+                '🏪 FamilyMart 全家高山站前店（步行約 3 分鐘）',
+                '🛒 藥妝店松本清 Matsumoto Kiyoshi（步行約 5 分鐘）'
+            ],
+            nightNearby: [
+                '🏮 高山車站周邊居酒屋街：夜晚步行 3-5 分鐘有許多在地高山拉麵與飛驒牛串燒小店',
+                '🌉 宮川沿岸夜景：夜晚散步至中橋欣賞點燈後的紅色朱橋與寧靜河畔'
+            ],
+            tips: '飯店距離高山車站與濃飛巴士總站僅約 250 公尺，隔天一早去上高地或白川鄉交通極度便利！'
+        },
+        'Henn na Hotel Nagoya': {
+            title: 'Henn na Hotel Nagoya (名古屋機器人飯店)',
+            tag: '科技互動・伏見站地鐵中心',
+            intro: '以「恐龍與機器人」櫃檯接待聞名的特色科技飯店！地點位在名古屋市中心的伏見站旁，交通四通八達，距離榮商圈與名古屋車站都非常近。',
+            facilities: [
+                '🤖 恐龍與全息投影櫃檯機器人接待（科技感十足的 Check-in 體驗）',
+                '👖 全客房配備 LG Styler 智慧衣物蒸氣電子衣櫥（可除臭殺菌、去除衣物火鍋或烤肉味）',
+                '🛜 高速 Wi-Fi、自助寄放行李箱置物櫃'
+            ],
+            convenience: [
+                '🏪 Lawson 伏見站南店（步行約 1 分鐘）',
+                '🏪 7-Eleven 名古屋伏見站東店（步行約 2 分鐘）',
+                '🛒 大型藥妝店與 Life 超市（步行約 4-6 分鐘）'
+            ],
+            nightNearby: [
+                '🛍️ 榮商圈 / Oasis 21：夜晚步行 10-12 分鐘即可抵達綠洲21與電視塔拍照、百貨夜景',
+                '🍜 伏見與榮地下街美食：周邊有許多知名味噌豬排、手羽先與深夜拉麵店，夜間覓食極為方便'
+            ],
+            tips: '飯店距離地下鐵「伏見站」步行僅約 3 分鐘，東山線與鶴舞線交會，要去吉卜力公園或榮商圈免轉車！'
+        }
+    };
+
     const showGuideModal = ref(false);
     const activeGuide = ref(null);
     const openGuideModal = (name) => {
@@ -1131,6 +1238,15 @@
         }
     };
     const hasGuide = (name) => !!spotGuides[name];
+
+    const showHotelGuideModal = ref(false);
+    const activeHotelGuide = ref(null);
+    const openHotelGuide = (name) => {
+        if (hotelGuides[name]) {
+            activeHotelGuide.value = hotelGuides[name];
+            showHotelGuideModal.value = true;
+        }
+    };
 
     const firebaseConfig = {
       apiKey: "AIzaSyAtx2a_sQ3j3ry_GKD2oj9es9gxbQrGtIw",
@@ -1365,25 +1481,7 @@
             const shoppingList = ref([]);
             const expenses = ref([]);
 
-            const fetchRealTimeRate = async () => {
-                rateLoading.value = true;
-                try {
-                    const res = await fetch('https://open.er-api.com/v6/latest/JPY');
-                    const data = await res.json();
-                    if (data && data.rates && data.rates.TWD) {
-                        exchangeRate.value = data.rates.TWD;
-                        updateFromJpy();
-                    }
-                } catch (e) {
-                    console.error('Failed to fetch exchange rate.', e);
-                } finally {
-                    rateLoading.value = false;
-                }
-            };
-
             onMounted(() => {
-                fetchRealTimeRate();
-                
                 db.collection('tripData').doc('v2026_clean_bilingual_v1').onSnapshot((doc) => {
                     syncStatus.value = 'syncing';
                     if (doc.exists) {
@@ -1609,6 +1707,7 @@
 
             return {
                 showGuideModal, activeGuide, openGuideModal, hasGuide,
+                showHotelGuideModal, activeHotelGuide, openHotelGuide,
                 dailyOverviews, currentOverview,
                 currentTab, dates, selectedDateIndex, itineraryData, currentItinerary,
                 hotels, shoppingList, expenses,

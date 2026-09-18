@@ -585,7 +585,7 @@
         <i class="fa-solid fa-plus font-bold"></i>
     </button>
 
-    <!-- Modal: Hotel Guide (飯店設施與周邊導覽) -->
+    <!-- Modal: Hotel Guide -->
     <Transition name="modal">
         <div v-if="showHotelGuideModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
             <div class="absolute inset-0" @click="showHotelGuideModal = false"></div>
@@ -921,6 +921,9 @@
 </div>
 
 <script>
+    const draggable = window.vuedraggable;
+    const { createApp, ref, computed, onMounted, watch } = Vue;
+
     const spotGuides = {
         '中華拉麵 つづみ': {
             title: '高山經典老字號・中華拉麵 つづみ (つづみそば)',
@@ -1098,7 +1101,7 @@
             intro: '名古屋最具代表性的「鰻魚三吃 (ひつまぶし)」！選用肥美青鰻在高溫備長炭上烤到表皮微脆焦香、肉質軟嫩多汁。',
             mustEat: [
                 '🍱 經典鰻魚三吃（第一碗品原味、第二碗加蔥芥末海苔、第三碗淋清雅高湯作茶泡飯）',
-                '🍢 炭烤鰻魚肝串（数量限定，香 scented 微苦甘甜）'
+                '🍢 炭烤鰻魚肝串（数量限定，香脆帶微苦甘甜）'
             ],
             mustBuy: ['🍵 鰻魚飯特調高湯粉包、香菇鰻魚山椒佃煮'],
             mustVisit: ['👀 開放式炭火燒烤台，能近距離欣賞師傅熟練扇火翻烤的極致手藝'],
@@ -1148,7 +1151,7 @@
             intro: '名古屋最繁華的購物精華心臟！各大國際精品、PARCO、地下街以及前衛香氛與甜點店雲集。',
             mustEat: [
                 '🍰 LOUANGE TOKYO Le Chateau：東京六本木頂級法式甜點殿堂，招牌精緻小熊巧克力蛋糕與奢華法式千層派',
-                '☕ HARBS 榮本店：發源於名古屋的千層蛋糕始祖，招牌水果千層必須！',
+                '☕ HARBS 榮本店：發源於名古屋的千層蛋糕始祖，招牌水果千層必吃！',
                 '🍗 風來坊 / 山將：名古屋名物手羽先（香脆胡椒炸雞翅）'
             ],
             mustBuy: [
@@ -1169,7 +1172,7 @@
             intro: '名古屋最繁華的購物精華心臟！各大國際精品、PARCO、地下街以及前衛香氛與甜點店雲集。',
             mustEat: [
                 '🍰 LOUANGE TOKYO Le Chateau：東京六本木頂級法式甜點殿堂，招牌精緻小熊巧克力蛋糕與奢華法式千層派',
-                '☕ HARBS 榮本店：發源於名古屋的千層蛋糕始祖，招牌水果千層必須！',
+                '☕ HARBS 榮本店：發源於名古屋的千層蛋糕始祖，招牌水果千層必吃！',
                 '🍗 風來坊 / 山將：名古屋名物手羽先（香脆胡椒炸雞翅）'
             ],
             mustBuy: [
@@ -1229,41 +1232,6 @@
         }
     };
 
-    const showGuideModal = ref(false);
-    const activeGuide = ref(null);
-    const openGuideModal = (name) => {
-        if (spotGuides[name]) {
-            activeGuide.value = spotGuides[name];
-            showGuideModal.value = true;
-        }
-    };
-    const hasGuide = (name) => !!spotGuides[name];
-
-    const showHotelGuideModal = ref(false);
-    const activeHotelGuide = ref(null);
-    const openHotelGuide = (name) => {
-        if (hotelGuides[name]) {
-            activeHotelGuide.value = hotelGuides[name];
-            showHotelGuideModal.value = true;
-        }
-    };
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAtx2a_sQ3j3ry_GKD2oj9es9gxbQrGtIw",
-      authDomain: "nagoya1029-c76fb.firebaseapp.com",
-      projectId: "nagoya1029-c76fb",
-      storageBucket: "nagoya1029-c76fb.firebasestorage.app",
-      messagingSenderId: "85921795852",
-      appId: "1:85921795852:web:38cadec5bdcba95b654329"
-    };
-    
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-    const db = firebase.firestore();
-    
-    db.enablePersistence().catch((err) => { console.warn("Firebase persistence error:", err.code); });
-
     const makeHourly = (minT, maxT, cond) => {
         const curve = [0.2, 0.15, 0.1, 0.05, 0.0, 0.0, 0.05, 0.15, 0.35, 0.6, 0.8, 0.95, 1.0, 0.95, 0.85, 0.75, 0.6, 0.45, 0.35, 0.3, 0.28, 0.25, 0.22, 0.2];
         return curve.map((pct, h) => {
@@ -1287,6 +1255,25 @@
             const selectedRegionIndex = ref(0);
             const syncStatus = ref('online'); 
             let initialLoadDone = false;
+
+            const showGuideModal = ref(false);
+            const activeGuide = ref(null);
+            const openGuideModal = (name) => {
+                if (spotGuides[name]) {
+                    activeGuide.value = spotGuides[name];
+                    showGuideModal.value = true;
+                }
+            };
+            const hasGuide = (name) => !!spotGuides[name];
+
+            const showHotelGuideModal = ref(false);
+            const activeHotelGuide = ref(null);
+            const openHotelGuide = (name) => {
+                if (hotelGuides[name]) {
+                    activeHotelGuide.value = hotelGuides[name];
+                    showHotelGuideModal.value = true;
+                }
+            };
 
             const exchangeRate = ref(0.215); 
             const rateLoading = ref(false);

@@ -95,7 +95,6 @@
         }
         .fab-btn:active { transform: scale(0.95); box-shadow: 0 4px 15px rgba(222, 123, 84, 0.4); }
 
-        /* 備註欄徹底解除限制 */
         .note-content { height: auto !important; max-height: none !important; overflow: visible !important; }
         
         .expenses-banner { background: linear-gradient(135deg, #DE7B54 0%, #B85530 100%); }
@@ -114,6 +113,7 @@
 <div id="app" class="app-container">
     <div class="banner-wrapper"></div>
     
+    <!-- 導航選單獨立置中 -->
     <div class="nav-tabs-bar">
         <button @click="currentTab = 'itinerary'" title="行程" :class="{'active': currentTab === 'itinerary'}" class="tab-button">
             <i class="fa-solid fa-map-location-dot"></i>
@@ -140,8 +140,8 @@
     </div>
 
     <main class="px-4 app-main">
-        <!-- Tab 1: Itinerary -->
-        <div v-show="currentTab === 'itinerary'" class="animate-fade-in">
+        <!-- Tab 1: Itinerary (行程獨立分頁) -->
+        <div v-if="currentTab === 'itinerary'" class="animate-fade-in">
             <div class="flex overflow-x-auto hide-scrollbar space-x-3 pb-2 snap-x sticky date-selector-sticky -mx-4 px-4">
                 <div v-for="(day, index) in dates" :key="index" 
                      @click="selectedDateIndex = index"
@@ -326,7 +326,7 @@
             </div>
         </div>
 
-        <!-- Tab 2: Info (雙向匯率換算) -->
+        <!-- Tab 2: Info (雙向匯率換算 & 住宿資訊) -->
         <div v-if="currentTab === 'info'" class="space-y-5 animate-fade-in">
             <div class="bg-gradient-to-r from-maple-500 to-maple-700 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
                 <i class="fa-solid fa-yen-sign absolute -right-4 -bottom-4 text-[100px] opacity-10"></i>
@@ -407,7 +407,7 @@
             </div>
         </div>
 
-        <!-- Tab 2.5: Transit -->
+        <!-- Tab 2.5: Transit (交通獨立分頁) -->
         <div v-if="currentTab === 'transit'" class="space-y-5 animate-fade-in">
             <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
                 <i class="fa-solid fa-train-subway absolute -right-4 -bottom-4 text-[100px] opacity-10"></i>
@@ -463,7 +463,7 @@
             </div>
         </div>
 
-        <!-- Tab 3: Shopping -->
+        <!-- Tab 3: Shopping (購物獨立分頁) -->
         <div v-if="currentTab === 'shopping'" class="animate-fade-in">
             <div class="grid grid-cols-2 gap-3">
                 <div v-for="(item, idx) in shoppingList" :key="idx" class="bg-white rounded-2xl p-2.5 card-shadow relative group cursor-pointer border border-gray-100" @click="item.checked = !item.checked">
@@ -502,7 +502,7 @@
             </div>
         </div>
 
-        <!-- Tab 4: Expenses -->
+        <!-- Tab 4: Expenses (記帳與花費獨立分頁) -->
         <div v-if="currentTab === 'expenses'" class="animate-fade-in">
             <div class="expenses-banner text-white rounded-3xl p-5 mb-5 relative overflow-hidden shadow-lg">
                 <i class="fa-solid fa-wallet absolute -right-6 -top-6 text-[120px] opacity-10"></i>
@@ -1469,7 +1469,7 @@
             const expenses = ref([]);
 
             onMounted(() => {
-                db.collection('tripData').doc('v2026_clean_bilingual_v1').onSnapshot((doc) => {
+                db.collection('tripData').doc('v2026_tab_independent_v1').onSnapshot((doc) => {
                     syncStatus.value = 'syncing';
                     if (doc.exists) {
                         const data = doc.data();
@@ -1518,7 +1518,7 @@
             const pushToFirebase = () => {
                 if (!initialLoadDone) return;
                 syncStatus.value = 'syncing';
-                db.collection('tripData').doc('v2026_clean_bilingual_v1').set({
+                db.collection('tripData').doc('v2026_tab_independent_v1').set({
                     itinerary: JSON.stringify(itineraryData.value),
                     shopping: JSON.stringify(shoppingList.value),
                     expenses: JSON.stringify(expenses.value),

@@ -1056,7 +1056,7 @@
                 '🧣 龍貓橡實小陶偶、魔女宅急便黑貓吉吉刺繡布章'
             ],
             mustVisit: [
-                '📸 吉卜力大倉庫 : 中央大階梯、假裝在電車上與無臉男並肩合照、機器人兵',
+                '📸 吉卜力大倉庫：中央大階梯、假裝在電車上與無臉男並肩合照、機器人兵',
                 '🌲 青春之丘：《心之谷》地球屋雜貨店、男爵貓公爵貓咪事務所',
                 '🧹 魔女之谷：《霍爾的移動城堡》真實等比城堡、《魔女宅急便》歐其諾宅邸'
             ],
@@ -1433,7 +1433,7 @@
                     { id: 406, name: '燒鳥:炭火燒鳥 しげ榮本店', category: 'food', startTime: '20:00', address: 'しげ榮本店', note: '預約號碼:99bc9420。名古屋交趾地雞炭烤名店', hours: '17:00-24:00 (L.O. 23:00)', transportType: 'walk', travelTime: '至飯店', isNoteExpanded: false },
                     { id: 407, name: '住 henn na hotel', category: 'accommodation', startTime: '22:00', address: 'henn na hotel', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false }
                 ],
-                // Day 5: 11/02 (已將早餐時間修正為 07:00)
+                // Day 5: 11/02 (完全對應您的截圖：早餐 07:00、飯店-名古屋車站 08:30-09:00、名鐵到犬山 09:00-09:30、犬山城下町 09:30-15:00、返名古屋 15:00-16:00、晚餐獅子丸拉麵 18:00-19:30、住 henn na hotel 20:00)
                 [
                     { id: 501, name: '飯店早餐', category: 'food', startTime: '07:00', address: '飯店', note: '飯店晨間朝食', hours: '06:30-10:00', transportType: 'walk', travelTime: '至名古屋名鐵站', isNoteExpanded: false },
                     { id: 502, name: '飯店-名古屋車站', category: 'transport', startTime: '08:30-09:00', address: '名古屋車站', note: '', transportType: 'public', travelTime: '30m', isNoteExpanded: false },
@@ -1466,10 +1466,11 @@
             const shoppingList = ref(JSON.parse(JSON.stringify(defaultShoppingList)));
             const expenses = ref(JSON.parse(JSON.stringify(defaultExpenses)));
 
+            // 確保本地編輯能直接寫入 localStorage，重新整理絕不消失！
             onMounted(() => {
-                const savedItin = localStorage.getItem('v2026_itinerary');
-                const savedShop = localStorage.getItem('v2026_shopping');
-                const savedExp = localStorage.getItem('v2026_expenses');
+                const savedItin = localStorage.getItem('v2026_itinerary_v5');
+                const savedShop = localStorage.getItem('v2026_shopping_v5');
+                const savedExp = localStorage.getItem('v2026_expenses_v5');
 
                 if (savedItin) {
                     try { itineraryData.value = JSON.parse(savedItin); } catch(e) {}
@@ -1483,15 +1484,15 @@
             });
 
             watch(itineraryData, (newVal) => {
-                localStorage.setItem('v2026_itinerary', JSON.stringify(newVal));
+                localStorage.setItem('v2026_itinerary_v5', JSON.stringify(newVal));
             }, { deep: true });
 
             watch(shoppingList, (newVal) => {
-                localStorage.setItem('v2026_shopping', JSON.stringify(newVal));
+                localStorage.setItem('v2026_shopping_v5', JSON.stringify(newVal));
             }, { deep: true });
 
             watch(expenses, (newVal) => {
-                localStorage.setItem('v2026_expenses', JSON.stringify(newVal));
+                localStorage.setItem('v2026_expenses_v5', JSON.stringify(newVal));
             }, { deep: true });
 
             const currentItinerary = computed({

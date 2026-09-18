@@ -324,7 +324,7 @@
             </div>
         </div>
 
-        <!-- Tab 2: Info (雙向匯率換算) -->
+        <!-- Tab 2: Info -->
         <div v-show="currentTab === 'info'" class="space-y-5 animate-fade-in">
             <div class="bg-gradient-to-r from-maple-500 to-maple-700 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
                 <i class="fa-solid fa-yen-sign absolute -right-4 -bottom-4 text-[100px] opacity-10"></i>
@@ -1159,7 +1159,7 @@
             ],
             mustVisit: [
                 '🗼 中部電力 MIRAI TOWER（名古屋電視塔）：夜間點燈與水鏡公園倒影',
-                '🛸 Oasis 21（綠洲21水之宇宙船）：宛如漂浮空中的水幕玻璃巨船，頂層空中走廊夜景超美',
+                '🛸 Oasis 21（Oasis 21水之宇宙船）：宛如漂浮空中的水幕玻璃巨船，頂層空中走廊夜景超美',
                 '🛍️ 久屋大通公園 RAYARD MIYASHITA 風格露天綠意商場街'
             ],
             tips: '百貨專櫃退稅通常於當日 19:30～20:00 截止，購物結帳時請隨身攜帶護照！'
@@ -1180,7 +1180,7 @@
             ],
             mustVisit: [
                 '🗼 中部電力 MIRAI TOWER（名古屋電視塔）：夜間點燈與水鏡公園倒影',
-                '🛸 Oasis 21（綠洲21水之宇宙船）：宛如漂浮空中的水幕玻璃巨船，頂層空中走廊夜景超美',
+                '🛸 Oasis 21（Oasis 21水之宇宙船）：宛如漂浮空中的水幕玻璃巨船，頂層空中走廊夜景超美',
                 '🛍️ 久屋大通公園 RAYARD MIYASHITA 風格露天綠意商場街'
             ],
             tips: '百貨專櫃退稅通常於當日 19:30～20:00 截止，購物結帳時請隨身攜帶護照！'
@@ -1417,7 +1417,7 @@
                     { id: 301, name: '起床', category: 'other', startTime: '05:30', address: '', note: '', transportType: 'walk', travelTime: '至餐廳', isNoteExpanded: false },
                     { id: 302, name: '早餐: かじ橋食堂', category: 'food', startTime: '06:00-07:00', address: 'かじ橋食堂', note: '06:00開門營業', hours: '06:00-14:00', transportType: 'walk', travelTime: '至車站', isNoteExpanded: false },
                     { id: 304, name: '巴士前往白川鄉合掌村', category: 'transport', startTime: '07:20-08:20', address: '白川鄉', note: '9月底預約巴士', transportType: 'walk', travelTime: '合掌村', isNoteExpanded: false },
-                    { id: 305, name: '白川鄉合掌村 / 城山展望台', category: 'sightseeing', startTime: '08:20-14:30', address: '白川鄉', note: '「城山展望台」俯瞰被秋意包圍的茅草屋聚落。', hours: '村落全天開放 / 店家展館約 09:00-17:00', transportType: 'walk', travelTime: '巴士站', isNoteExpanded: false },
+                    { id: 305, name: '白川鄉合掌村 / 城山展望台', category: 'sightseeing', startTime: '08:20-14:30', address: '白川鄉', note: '「城山展望台」俯瞰被秋意包圍的茅草屋薑餅聚落。', hours: '村落全天開放 / 店家展館約 09:00-17:00', transportType: 'walk', travelTime: '巴士站', isNoteExpanded: false },
                     { id: 306, name: '高速巴士前往名古屋市區', category: 'transport', startTime: '14:30-17:16', address: '名古屋', note: '從白川鄉搭乘高速巴士(車程約2.5至3小時)', transportType: 'public', travelTime: '飯店', isNoteExpanded: false },
                     { id: 307, name: '飯店放行李', category: 'other', startTime: '17:30-18:30', address: 'henn na hotel', note: '', transportType: 'public', travelTime: '依現場車次', isNoteExpanded: false },
                     { id: 308, name: '榮區逛街', category: 'shopping', startTime: '18:30-20:00', address: '榮', note: '', hours: '百貨店鋪約 10:00-20:00', transportType: 'walk', travelTime: '依現場車次', isNoteExpanded: false },
@@ -1467,7 +1467,7 @@
             const expenses = ref([]);
 
             onMounted(() => {
-                db.collection('tripData').doc('v2026_fixed_sync_v4').onSnapshot((doc) => {
+                db.collection('tripData').doc('v2026_final_stable_v1').onSnapshot((doc) => {
                     syncStatus.value = 'syncing';
                     if (doc.exists) {
                         const data = doc.data();
@@ -1516,7 +1516,7 @@
             const pushToFirebase = () => {
                 if (!initialLoadDone) return;
                 syncStatus.value = 'syncing';
-                db.collection('tripData').doc('v2026_fixed_sync_v4').set({
+                db.collection('tripData').doc('v2026_final_stable_v1').set({
                     itinerary: JSON.stringify(itineraryData.value),
                     shopping: JSON.stringify(shoppingList.value),
                     expenses: JSON.stringify(expenses.value),
@@ -1671,7 +1671,7 @@
                 newExpense.value = JSON.parse(JSON.stringify(item));
                 if (!newExpense.value.payer) newExpense.value.payer = '甯'; 
                 if (!newExpense.value.currency) newExpense.value.currency = 'JPY'; 
-                showExpenseModal.value = true;
+                showExpenseModal.value, (showExpenseModal.value = true);
             };
             const saveExpenseItem = () => {
                 if (!newExpense.value.name || !newExpense.value.amount) return alert('請輸入名稱與金額');

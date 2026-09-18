@@ -57,7 +57,7 @@
             position: relative;
         }
 
-        /* 導航選單獨立置中 */
+        /* 導航選單：獨立置中排列，不遮擋人物 */
         .nav-tabs-bar {
             display: flex;
             justify-content: center;
@@ -95,9 +95,8 @@
         }
         .fab-btn:active { transform: scale(0.95); box-shadow: 0 4px 15px rgba(222, 123, 84, 0.4); }
 
-        /* 解決備註欄字多被截斷問題：展開時徹底放寬高度限制 */
-        .note-content { max-height: 3.5rem; overflow: hidden; transition: max-height 0.4s ease; }
-        .note-content.expanded { max-height: none !important; }
+        /* 備註欄完全自動伸展 */
+        .note-content { height: auto !important; max-height: none !important; overflow: visible !important; }
         
         .expenses-banner { background: linear-gradient(135deg, #DE7B54 0%, #B85530 100%); }
         .ghost-card { opacity: 0.5; background: #FCE4D6; border: 2px dashed #DE7B54; }
@@ -154,7 +153,7 @@
                 </div>
             </div>
 
-            <!-- 24小時天氣橫向滑動呈現 -->
+            <!-- 24小時逐時天氣 -->
             <div v-if="weatherData[selectedDateIndex]" class="mt-4 mb-5 bg-white border border-maple-100 rounded-2xl p-4 card-shadow">
                 <div class="flex justify-between items-center pb-3 border-b border-gray-100">
                     <div class="flex items-center text-maple-700 space-x-3.5">
@@ -182,14 +181,14 @@
 
                 <div class="pt-3">
                     <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center justify-between">
-                        <span class="flex items-center gap-1"><i class="fa-regular fa-clock text-maple-500"></i> 24小時氣溫預報</span>
-                        <span class="text-[9px] text-gray-300">左右滑動查看 ➔</span>
+                        <span class="flex items-center gap-1"><i class="fa-regular fa-clock text-maple-500"></i> 24小時逐時氣溫</span>
+                        <span class="text-[9px] text-gray-400">左右滑動 ➔</span>
                     </div>
                     <div class="flex overflow-x-auto no-scrollbar gap-2.5 py-1 -mx-1 px-1 snap-x">
                         <div v-for="h in (weatherData[selectedDateIndex].hourly || [])" :key="h.time" 
-                             class="flex-shrink-0 flex flex-col items-center justify-center py-2 px-2.5 rounded-xl bg-gray-50/80 border border-gray-100 min-w-[50px] snap-start hover:bg-orange-50/50 transition-colors">
-                            <span class="text-[10px] font-medium text-gray-400 mb-1.5">{{ h.time }}</span>
-                            <i :class="[getHourlyWeatherIcon(h), h.isNight ? 'text-indigo-400' : 'text-orange-400']" class="text-base mb-1.5"></i>
+                             class="flex-shrink-0 flex flex-col items-center justify-center py-2 px-2.5 rounded-xl bg-gray-50/80 border border-gray-100 min-w-[52px] snap-start hover:bg-orange-50/50 transition-colors">
+                            <span class="text-[10px] font-medium text-gray-400 mb-1">{{ h.time }}</span>
+                            <i :class="[getHourlyWeatherIcon(h), h.isNight ? 'text-indigo-400' : 'text-orange-400']" class="text-base mb-1"></i>
                             <span class="text-xs font-black text-gray-700">{{ h.temp }}°</span>
                         </div>
                     </div>
@@ -225,7 +224,7 @@
                                     <div class="text-center"><div class="text-2xl font-black text-gray-800 tracking-tight">{{ item.name.split(' ')[0] || 'NGO' }}</div></div>
                                 </div>
                                 <div v-if="item.note" class="mt-4 text-xs font-bold text-blue-800 bg-white/70 backdrop-blur p-2.5 rounded-xl border border-blue-200/50 relative z-10 shadow-inner flex items-start gap-2">
-                                    <i class="fa-solid fa-circle-info text-base mt-0.5"></i><span class="leading-relaxed whitespace-pre-line">{{ item.note }}</span>
+                                    <i class="fa-solid fa-circle-info text-base mt-0.5"></i><span class="leading-relaxed whitespace-pre-line break-words">{{ item.note }}</span>
                                 </div>
                                 
                                 <button @click.stop="editItineraryItem(item)" class="absolute bottom-3 right-3 w-9 h-9 bg-white text-blue-600 rounded-full flex items-center justify-center hover:bg-blue-600 hover:text-white shadow-md transition-colors border border-blue-200 z-20">
@@ -252,10 +251,7 @@
                                         <p v-if="item.address" class="flex items-start font-medium"><i class="fa-solid fa-location-dot w-5 text-center mt-0.5 text-maple-500 text-sm"></i> <span class="flex-1">{{ item.address }}</span></p>
                                     </div>
                                     <div v-if="item.note" class="text-xs text-gray-700 bg-maple-50 p-3 rounded-xl border-l-4 border-maple-500 shadow-inner">
-                                        <div class="note-content font-medium leading-relaxed whitespace-pre-line" :class="{'expanded': item.isNoteExpanded}">{{ item.note }}</div>
-                                        <button v-if="item.note.length > 50" @click.stop="item.isNoteExpanded = !item.isNoteExpanded" class="text-maple-700 font-bold mt-1.5 text-[10px] uppercase tracking-wider flex items-center gap-0.5">
-                                            <i :class="item.isNoteExpanded ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'" class="text-[12px]"></i> {{ item.isNoteExpanded ? '收合' : '展開更多...' }}
-                                        </button>
+                                        <div class="note-content font-medium leading-relaxed whitespace-pre-line break-words">{{ item.note }}</div>
                                     </div>
                                 </div>
                                 <a v-if="item.address || item.name" :href="`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.address || item.name)}`" target="_blank" @click.stop class="absolute right-4 top-[80px] w-9 h-9 rounded-full bg-maple-100 text-maple-600 flex items-center justify-center hover:bg-maple-500 hover:text-white transition-all shadow-sm z-20">
@@ -446,24 +442,40 @@
             </div>
         </div>
 
-        <!-- Tab 4: Expenses -->
+        <!-- Tab 4: Expenses (雙幣分別加總 + 篩選代墊人即時連動) -->
         <div v-if="currentTab === 'expenses'" class="animate-fade-in">
-            <div class="expenses-banner text-white rounded-3xl p-6 mb-6 relative overflow-hidden shadow-lg">
+            <div class="expenses-banner text-white rounded-3xl p-5 mb-5 relative overflow-hidden shadow-lg">
                 <i class="fa-solid fa-wallet absolute -right-6 -top-6 text-[120px] opacity-10"></i>
-                <p class="text-xs font-bold text-maple-200 mb-1 uppercase tracking-wider relative z-10 flex items-center gap-1"><i class="fa-solid fa-chart-pie text-sm"></i> 目前旅行總花費 (以日幣計算)</p>
-                <h2 class="text-4xl font-black relative z-10 tracking-tight flex items-start gap-1">
-                    <span class="text-xl mt-1.5 font-bold">¥</span>{{ formatNumber(totalExpensesJPY) }}
-                </h2>
-                <div class="mt-3 bg-black/20 backdrop-blur border border-white/10 rounded-full px-3 py-1.5 inline-block relative z-10 shadow-inner">
-                    <p class="text-xs opacity-90 font-medium">約 NT$ <span class="font-bold text-sm">{{ formatNumber(totalExpensesTWD) }}</span></p>
+                <div class="flex items-center justify-between mb-3 relative z-10">
+                    <span class="text-xs font-bold text-maple-200 uppercase tracking-wider flex items-center gap-1">
+                        <i class="fa-solid fa-chart-pie text-sm"></i> 
+                        {{ expenseFilterPayer === 'All' ? '全部花費加總' : (expenseFilterPayer + ' 的墊付花費') }}
+                    </span>
+                    <span class="text-[10px] bg-black/20 px-2 py-0.5 rounded-full backdrop-blur">共 {{ filteredExpenses.length }} 筆</span>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3 relative z-10">
+                    <div class="bg-black/15 backdrop-blur-sm rounded-2xl p-3 border border-white/10">
+                        <span class="text-[10px] text-maple-200 block font-bold mb-0.5">日幣總計 (JPY)</span>
+                        <div class="text-2xl font-black tracking-tight text-white flex items-baseline gap-1">
+                            <span class="text-sm font-bold">¥</span>{{ formatNumber(filteredExpensesJPY) }}
+                        </div>
+                    </div>
+                    <div class="bg-black/15 backdrop-blur-sm rounded-2xl p-3 border border-white/10">
+                        <span class="text-[10px] text-maple-200 block font-bold mb-0.5">台幣總計 (TWD)</span>
+                        <div class="text-2xl font-black tracking-tight text-white flex items-baseline gap-1">
+                            <span class="text-sm font-bold">NT$</span>{{ formatNumber(filteredExpensesTWD) }}
+                        </div>
+                    </div>
                 </div>
             </div>
 
+            <!-- 代墊人篩選列 -->
             <div class="flex overflow-x-auto hide-scrollbar gap-2 mb-4 px-1">
                 <button v-for="payer in uniquePayers" :key="payer" 
                         @click="expenseFilterPayer = payer"
-                        class="px-4 py-1.5 rounded-full text-xs font-bold border transition-colors whitespace-nowrap"
-                        :class="expenseFilterPayer === payer ? 'bg-maple-500 text-white border-maple-500 shadow-md' : 'bg-white text-gray-500 border-gray-200'">
+                        class="px-4 py-1.5 rounded-full text-xs font-bold border transition-all whitespace-nowrap"
+                        :class="expenseFilterPayer === payer ? 'bg-maple-500 text-white border-maple-500 shadow-md scale-105' : 'bg-white text-gray-500 border-gray-200 hover:border-maple-300'">
                     {{ payer === 'All' ? '全部' : (payer || '未指定') }}
                 </button>
             </div>
@@ -744,7 +756,7 @@
     
     db.enablePersistence().catch((err) => { console.warn("Firebase persistence error:", err.code); });
 
-    // 24小時溫度與氣候模擬生成器
+    // 24小時逐時氣溫與氣候模擬生成器
     const makeHourly = (minT, maxT, cond) => {
         const curve = [0.2, 0.15, 0.1, 0.05, 0.0, 0.0, 0.05, 0.15, 0.35, 0.6, 0.8, 0.95, 1.0, 0.95, 0.85, 0.75, 0.6, 0.45, 0.35, 0.3, 0.28, 0.25, 0.22, 0.2];
         return curve.map((pct, h) => ({
@@ -810,7 +822,7 @@
             ]);
 
             const defaultItineraryData = [
-                // Day 1: 10/29
+                // Day 1: 10/29 (依據 App 修改內容同步)
                 [
                     { id: 101, name: '機場報到', category: 'flight', startTime: '24:00', address: '桃園國際機場', note: '', transportType: 'walk', travelTime: '第一航廈', isNoteExpanded: false },
                     { id: 102, name: '桃園機場-名古屋機場', category: 'flight', startTime: '02:55-06:25', address: 'TPE - NGO', note: '航班MM724', transportType: 'flight', travelTime: '3h30m至名古屋', isNoteExpanded: false },
@@ -823,7 +835,7 @@
                     { id: 109, name: '中華拉麵 つづみ', category: 'food', startTime: '18:00-19:00', address: '中華拉麵 つづみ', note: '', transportType: 'walk', travelTime: '至飯店', isNoteExpanded: false },
                     { id: 110, name: '住 FAV LUX HIDATAKAYAMA', category: 'accommodation', startTime: '', address: 'FAV LUX HIDATAKAYAMA', note: '', transportType: 'walk', travelTime: '', isNoteExpanded: false }
                 ],
-                // Day 2: 10/30 (完全對照截圖同步)
+                // Day 2: 10/30 (完全依據截圖同步)
                 [
                     { id: 201, name: '起床', category: 'other', startTime: '06:00', address: '', note: '', transportType: 'walk', travelTime: '至高山車站', isNoteExpanded: false },
                     { id: 202, name: '高山車站 - 平湯溫泉站', category: 'transport', startTime: '07:00-08:00', address: '平湯溫泉', note: '高山(濃飛巴士總站)售票處(5號)->平湯溫泉站2號月台搭乘前往大正池站巴士', transportType: 'public', travelTime: '轉乘等待', isNoteExpanded: false },
@@ -905,7 +917,7 @@
             onMounted(() => {
                 fetchRealTimeRate();
                 
-                db.collection('tripData').doc('v2026_user_sync_day2').onSnapshot((doc) => {
+                db.collection('tripData').doc('v2026_finance_split_v3').onSnapshot((doc) => {
                     syncStatus.value = 'syncing';
                     if (doc.exists) {
                         const data = doc.data();
@@ -954,7 +966,7 @@
             const pushToFirebase = () => {
                 if (!initialLoadDone) return;
                 syncStatus.value = 'syncing';
-                db.collection('tripData').doc('v2026_user_sync_day2').set({
+                db.collection('tripData').doc('v2026_finance_split_v3').set({
                     itinerary: JSON.stringify(itineraryData.value),
                     shopping: JSON.stringify(shoppingList.value),
                     expenses: JSON.stringify(expenses.value),
@@ -980,16 +992,19 @@
                 return expenses.value.filter(e => e.payer === expenseFilterPayer.value);
             });
 
-            const totalExpensesJPY = computed(() => {
-                return expenses.value.reduce((sum, exp) => {
-                    let amt = Number(exp.amount) || 0; 
-                    if (exp.currency === 'TWD') {
-                        amt = amt / exchangeRate.value;
-                    }
-                    return sum + amt;
-                }, 0);
+            // 日幣獨立加總（隨代墊人篩選連動）
+            const filteredExpensesJPY = computed(() => {
+                return filteredExpenses.value
+                    .filter(exp => exp.currency === 'JPY' || !exp.currency)
+                    .reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
             });
-            const totalExpensesTWD = computed(() => Math.round(totalExpensesJPY.value * exchangeRate.value));
+
+            // 台幣獨立加總（隨代墊人篩選連動）
+            const filteredExpensesTWD = computed(() => {
+                return filteredExpenses.value
+                    .filter(exp => exp.currency === 'TWD')
+                    .reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
+            });
 
             const calculateCurrency = () => { currencyResult.value = Math.round(currencyInput.value * exchangeRate.value); };
             
@@ -1062,7 +1077,7 @@
                 }
             };
 
-            const onDragEnd = () => { itineraryData.value[selectedDateIndex.value] = [...currentItinerary.value]; };
+            onDragEnd = () => { itineraryData.value[selectedDateIndex.value] = [...currentItinerary.value]; };
 
             const handleImageUpload = (e) => {
                 const file = e.target.files[0];
@@ -1132,7 +1147,8 @@
 
             return {
                 currentTab, dates, selectedDateIndex, itineraryData, currentItinerary,
-                hotels, shoppingList, expenses, totalExpensesJPY, totalExpensesTWD, weatherData,
+                hotels, shoppingList, expenses, weatherData,
+                filteredExpensesJPY, filteredExpensesTWD,
                 currencyInput, currencyResult, calculateCurrency, exchangeRate, rateLoading,
                 getCategoryColor, getCategoryIcon, getCategoryLabel,
                 getWeatherIcon, getHourlyWeatherIcon, getWeatherDescription, getTransportIcon,

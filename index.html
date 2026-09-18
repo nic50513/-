@@ -41,6 +41,7 @@
             box-shadow: 0 0 30px rgba(0, 0, 0, 0.05); position: relative; padding-bottom: 90px; overflow-x: hidden; 
         }
 
+        /* Banner 精確顯示原圖左側 50% */
         .banner-wrapper {
             width: 100%;
             height: 220px;
@@ -56,6 +57,7 @@
             position: relative;
         }
 
+        /* 導航選單獨立置中 */
         .nav-tabs-bar {
             display: flex;
             justify-content: center;
@@ -111,6 +113,7 @@
 <div id="app" class="app-container">
     <div class="banner-wrapper"></div>
     
+    <!-- 導航選單獨立置中 -->
     <div class="nav-tabs-bar">
         <button @click="currentTab = 'itinerary'" title="行程" :class="{'active': currentTab === 'itinerary'}" class="tab-button">
             <i class="fa-solid fa-map-location-dot"></i>
@@ -684,7 +687,7 @@
                         </div>
 
                         <div v-if="activeGuide.mustVisit && activeGuide.mustVisit.length" class="bg-blue-50/50 rounded-2xl p-3.5 border border-blue-100/70">
-                            <h4 class="text-xs font-black text-blue-600 mb-2 flex items-center gap-1.5"><i class="fa-solid fa-camera"></i> 必逛拍照亮亮點</h4>
+                            <h4 class="text-xs font-black text-blue-600 mb-2 flex items-center gap-1.5"><i class="fa-solid fa-camera"></i> 必逛拍照亮點</h4>
                             <ul class="space-y-1.5">
                                 <li v-for="spot in activeGuide.mustVisit" :key="spot" class="text-xs text-gray-700 font-medium leading-relaxed flex items-start gap-1">
                                     <span class="text-blue-400 font-bold">•</span><span>{{ spot }}</span>
@@ -1111,7 +1114,7 @@
             mustEat: [
                 '🍗 名古屋交趾地雞腿肉串、炭烤蔥肉串',
                 '🥚 爆漿半熟鵪鶉蛋串、手作炭烤雞肉丸子配蛋黃（つくね）',
-                '🍺 在地精釀生啤酒/愛知地酒清酒搭配'
+                '🍺 在地精釀生啤酒或愛知地酒清酒搭配'
             ],
             mustBuy: ['🍗 秘製燒鳥醬汁小瓶裝、特調七味唐辛子'],
             mustVisit: ['🏮 熱鬧溫馨的吧台座位，炭火升騰香氣撲鼻，最有日劇居酒屋氛圍'],
@@ -1158,7 +1161,7 @@
             ],
             mustVisit: [
                 '🗼 中部電力 MIRAI TOWER（名古屋電視塔）：夜間點燈與水鏡公園倒影',
-                '🛸 Oasis 21（Oasis 21水之宇宙船）：宛如漂浮空中的水幕玻璃巨船，頂層空中走廊夜景超美',
+                '🛸 Oasis 21（綠洲21水之宇宙船）：宛如漂浮空中的水幕玻璃巨船，頂層空中走廊夜景超美',
                 '🛍️ 久屋大通公園 RAYARD MIYASHITA 風格露天綠意商場街'
             ],
             tips: '百貨專櫃退稅通常於當日 19:30～20:00 截止，購物結帳時請隨身攜帶護照！'
@@ -1179,7 +1182,7 @@
             ],
             mustVisit: [
                 '🗼 中部電力 MIRAI TOWER（名古屋電視塔）：夜間點燈與水鏡公園倒影',
-                '🛸 Oasis 21（Oasis 21水之宇宙船）：宛如漂浮空中的水幕玻璃巨船，頂層空中走廊夜景超美',
+                '🛸 Oasis 21（綠洲21水之宇宙船）：宛如漂浮空中的水幕玻璃巨船，頂層空中走廊夜景超美',
                 '🛍️ 久屋大通公園 RAYARD MIYASHITA 風格露天綠意商場街'
             ],
             tips: '百貨專櫃退稅通常於當日 19:30～20:00 截止，購物結帳時請隨身攜帶護照！'
@@ -1466,53 +1469,13 @@
             const expenses = ref([]);
 
             onMounted(() => {
-                // 不論雲端有沒有資料，直接以 defaultItineraryData 為主，確保絕對不空白！
-                db.collection('tripData').doc('v2026_all_perfect_v2').onSnapshot((doc) => {
-                    syncStatus.value = 'syncing';
-                    if (doc.exists) {
-                        const data = doc.data();
-                        const remoteItin = data.itinerary ? JSON.parse(data.itinerary) : [];
-                        
-                        let isTotallyEmpty = true;
-                        if (Array.isArray(remoteItin)) {
-                            for (let day of remoteItin) {
-                                if (day && day.length > 0) { isTotallyEmpty = false; break; }
-                            }
-                        }
-
-                        if (isTotallyEmpty) {
-                            itineraryData.value = JSON.parse(JSON.stringify(defaultItineraryData));
-                            shoppingList.value = JSON.parse(JSON.stringify(defaultShoppingList));
-                            expenses.value = JSON.parse(JSON.stringify(defaultExpenses));
-                        } else {
-                            itineraryData.value = remoteItin;
-                            shoppingList.value = data.shopping ? JSON.parse(data.shopping) : JSON.parse(JSON.stringify(defaultShoppingList));
-                            expenses.value = data.expenses ? JSON.parse(data.expenses) : JSON.parse(JSON.stringify(defaultExpenses));
-                        }
-                    } else {
-                        itineraryData.value = JSON.parse(JSON.stringify(defaultItineraryData));
-                        shoppingList.value = JSON.parse(JSON.stringify(defaultShoppingList));
-                        expenses.value = JSON.parse(JSON.stringify(defaultExpenses));
-                    }
-                    initialLoadDone = true;
-                    setTimeout(() => { syncStatus.value = 'online'; }, 500);
-                });
+                // 強制直接載入預設的完整行程與購物、記帳資料，絕不讀取空白雲端
+                itineraryData.value = JSON.parse(JSON.stringify(defaultItineraryData));
+                shoppingList.value = JSON.parse(JSON.stringify(defaultShoppingList));
+                expenses.value = JSON.parse(JSON.stringify(defaultExpenses));
+                initialLoadDone = true;
+                syncStatus.value = 'online';
             });
-
-            const pushToFirebase = () => {
-                if (!initialLoadDone) return;
-                syncStatus.value = 'syncing';
-                db.collection('tripData').doc('v2026_all_perfect_v2').set({
-                    itinerary: JSON.stringify(itineraryData.value),
-                    shopping: JSON.stringify(shoppingList.value),
-                    expenses: JSON.stringify(expenses.value),
-                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true }).then(() => { syncStatus.value = 'online'; });
-            };
-
-            watch(itineraryData, pushToFirebase, { deep: true });
-            watch(shoppingList, pushToFirebase, { deep: true });
-            watch(expenses, pushToFirebase, { deep: true });
 
             const currentItinerary = computed({
                 get: () => itineraryData.value[selectedDateIndex.value] || [],

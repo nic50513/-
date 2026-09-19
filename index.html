@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuedraggable@4.1.0/dist/vuedraggable.umd.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <script>
         tailwind.config = {
@@ -113,7 +115,7 @@
         <i class="fa-solid fa-sync animate-spin"></i> 雲端同步中...
     </div>
     <div v-else-if="syncStatus === 'online'" class="bg-green-50 text-green-500 text-[10px] font-bold text-center py-0.5 flex items-center justify-center gap-1 border-b border-green-100">
-        <i class="fa-solid fa-cloud-check"></i> 雲端已同步 (多機共用)
+        <i class="fa-solid fa-cloud-check"></i> 雲端已連線同步
     </div>
 
     <main class="px-4 app-main">
@@ -130,8 +132,24 @@
                 </div>
             </div>
 
+            <!-- 地區天氣與逐時預報卡片 -->
             <div v-if="currentWeather" class="mt-4 mb-5 bg-white border border-maple-100 rounded-2xl p-4 card-shadow">
-                <div class="flex justify-between items-center">
+                <div v-if="currentDayRegions.length > 1" class="flex items-center justify-between pb-2.5 mb-2.5 border-b border-gray-100">
+                    <span class="text-[11px] font-bold text-gray-400 flex items-center gap-1">
+                        <i class="fa-solid fa-location-dot text-maple-500"></i> 地區天氣：
+                    </span>
+                    <div class="flex gap-1.5 bg-gray-50 p-1 rounded-xl border border-gray-100">
+                        <button v-for="(r, rIdx) in currentDayRegions" :key="r.region"
+                                @click="selectedRegionIndex = rIdx"
+                                class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1"
+                                :class="selectedRegionIndex === rIdx ? 'bg-white text-maple-700 shadow-sm border border-maple-200/60' : 'text-gray-400 hover:text-gray-600'">
+                            <span class="w-1.5 h-1.5 rounded-full" :class="selectedRegionIndex === rIdx ? 'bg-maple-500' : 'bg-gray-300'"></span>
+                            {{ r.region }}
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center pb-3 border-b border-gray-100">
                     <div class="flex items-center text-maple-700 space-x-3.5">
                         <div class="w-11 h-11 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
                             <i :class="getWeatherIcon(currentWeather.condition)" class="text-2xl text-orange-400"></i>
@@ -150,10 +168,38 @@
                             </div>
                         </div>
                     </div>
+                    <div class="text-right text-xs text-gray-500">
+                        <span class="font-bold block text-gray-800 text-sm mb-1.5">{{ getWeatherDescription(currentWeather.condition) }}</span>
+                        <span class="text-gray-400 inline-flex items-center gap-1 font-medium text-[11px] bg-gray-50 px-2 py-1 rounded-md">
+                            <i class="fa-solid fa-train-subway text-xs"></i> 大眾運輸
+                        </span>
+                    </div>
+                </div>
+
+                <div class="pt-3">
+                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center justify-between">
+                        <span class="flex items-center gap-1">
+                            <i class="fa-regular fa-clock text-maple-500"></i> {{ currentWeather.region }} 24小時逐時氣溫與降雨率
+                        </span>
+                        <span class="text-[9px] text-gray-400">左右滑動 ➔</span>
+                    </div>
+                    <div class="flex overflow-x-auto no-scrollbar gap-2.5 py-1 -mx-1 px-1 snap-x">
+                        <div v-for="h in (currentWeather.hourly || [])" :key="h.time" 
+                             class="flex-shrink-0 flex flex-col items-center justify-center py-2 px-2 rounded-xl bg-gray-50/80 border border-gray-100 min-w-[54px] snap-start hover:bg-orange-50/50 transition-colors">
+                            <span class="text-[10px] font-medium text-gray-400 mb-1">{{ h.time }}</span>
+                            <i :class="[getHourlyWeatherIcon(h), h.isNight ? 'text-indigo-400' : 'text-orange-400']" class="text-base mb-1"></i>
+                            <span class="text-xs font-black text-gray-700 mb-0.5">{{ h.temp }}°</span>
+                            <span class="text-[9px] font-bold text-blue-500"><i class="fa-solid fa-droplet text-[8px]"></i> {{ h.pop }}%</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
+            <!-- 當日行程概述總覽卡 -->
             <div v-if="currentOverview" class="mb-4 bg-gradient-to-br from-white to-maple-50/40 rounded-2xl p-4 border border-maple-200/70 card-shadow relative overflow-hidden">
+                <div class="absolute -right-3 -bottom-3 text-maple-500 opacity-5 text-7xl font-black select-none pointer-events-none">
+                    DAY {{ selectedDateIndex + 1 }}
+                </div>
                 <div class="flex items-center gap-2 mb-2">
                     <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-maple-500 text-white shadow-sm flex items-center gap-1">
                         <i class="fa-solid fa-flag"></i> DAY {{ selectedDateIndex + 1 }} 焦點
@@ -162,7 +208,7 @@
                 </div>
                 <p class="text-xs text-gray-600 leading-relaxed mb-3">{{ currentOverview.desc }}</p>
                 <div class="flex flex-wrap gap-1.5">
-                    <span v-for="tag in currentOverview.highlights" :key="tag" class="text-[10px] font-bold text-maple-700 bg-white/90 border border-maple-200 px-2 py-0.5 rounded-lg"># {{ tag }}</span>
+                    <span v-for="tag in currentOverview.highlights" :key="tag" class="text-[10px] font-bold text-maple-700 bg-white/90 border border-maple-200 px-2 py-0.5 rounded-lg shadow-2xs"># {{ tag }}</span>
                 </div>
             </div>
 
@@ -179,29 +225,29 @@
                             </div>
 
                             <div v-if="item.category === 'flight'" class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-3xl p-5 border border-blue-200 shadow-sm relative group overflow-hidden">
-                                <div class="flex justify-between items-center mb-4">
-                                    <span class="text-[10px] font-bold bg-blue-500 text-white px-2 py-1 rounded shadow-sm"><i class="fa-solid fa-plane text-xs"></i> 航班資訊</span>
+                                <div class="flex justify-between items-center mb-4 relative z-10">
+                                    <span class="text-[10px] font-bold bg-blue-500 text-white px-2 py-1 rounded shadow-sm flex items-center gap-1"><i class="fa-solid fa-plane text-xs"></i> 航班資訊</span>
                                     <div class="flex items-center gap-3">
                                         <span class="text-sm font-bold text-blue-800 bg-white/60 px-2 py-0.5 rounded">{{ item.startTime }}</span>
                                         <i class="fa-solid fa-grip-lines drag-handle text-blue-300 p-1 text-xl cursor-grab"></i>
                                     </div>
                                 </div>
-                                <div class="flex justify-between items-center px-2">
+                                <div class="flex justify-between items-center px-2 relative z-10">
                                     <div class="text-center"><div class="text-2xl font-black text-gray-800">TPE</div></div>
                                     <div class="flex flex-col items-center text-blue-500 px-4 w-full">
-                                        <span class="bg-white px-2 py-0.5 rounded-full shadow-sm border border-blue-100 mb-1 text-[10px] font-bold">{{ item.travelTime || '依航班時刻' }}</span>
+                                        <span class="bg-white px-2 py-0.5 rounded-full shadow-sm border border-blue-100 mb-1 text-[10px] font-bold z-10">{{ item.travelTime || '依航班時刻' }}</span>
                                         <div class="w-full border-t-2 border-dashed border-blue-300 relative -mt-3"><i class="fa-solid fa-plane absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-50 px-1 text-base"></i></div>
                                     </div>
                                     <div class="text-center"><div class="text-2xl font-black text-gray-800">NGO</div></div>
                                 </div>
-                                <div v-if="item.note" class="mt-4 text-xs font-bold text-blue-800 bg-white/70 p-2.5 rounded-xl border border-blue-200/50 flex items-start gap-2">
-                                    <i class="fa-solid fa-circle-info text-base mt-0.5"></i><span>{{ item.note }}</span>
+                                <div v-if="item.note" class="mt-4 text-xs font-bold text-blue-800 bg-white/70 p-2.5 rounded-xl border border-blue-200/50 relative z-10 shadow-inner flex items-start gap-2">
+                                    <i class="fa-solid fa-circle-info text-base mt-0.5"></i><span class="leading-relaxed whitespace-pre-line break-words">{{ item.note }}</span>
                                 </div>
-                                <button @click.stop="editItineraryItem(item)" class="absolute bottom-3 right-3 w-9 h-9 bg-white text-blue-600 rounded-full flex items-center justify-center shadow-md border border-blue-200"><i class="fa-solid fa-pen text-sm"></i></button>
+                                <button @click.stop="editItineraryItem(item)" class="absolute bottom-3 right-3 w-9 h-9 bg-white text-blue-600 rounded-full flex items-center justify-center shadow-md border border-blue-200 z-20"><i class="fa-solid fa-pen text-sm"></i></button>
                             </div>
 
                             <div v-else class="bg-white rounded-3xl p-5 pb-12 card-shadow relative overflow-hidden group">
-                                <div class="flex justify-between items-start mb-3">
+                                <div class="flex justify-between items-start mb-3 relative z-10">
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 rounded-xl text-white shadow-sm flex items-center justify-center text-xl" :class="getCategoryColor(item.category)"><i :class="getCategoryIcon(item.category)"></i></div>
                                         <div>
@@ -212,19 +258,25 @@
                                     <div class="flex flex-col items-end gap-2"><i class="fa-solid fa-grip-lines drag-handle p-1 hover:text-maple-500 bg-gray-50 rounded text-xl cursor-grab"></i></div>
                                 </div>
                                 <div class="relative z-10 pr-4">
-                                    <h3 class="text-lg font-bold text-gray-800 leading-tight mb-2">{{ item.name }}</h3>
-                                    <div class="text-xs text-gray-500 space-y-2 mb-3 bg-gray-50 p-3 rounded-xl border border-gray-100" v-if="item.hours || item.address">
+                                    <div class="flex items-start justify-between gap-2 mb-2">
+                                        <h3 class="text-lg font-bold text-gray-800 leading-tight">{{ item.name }}</h3>
+                                        <button v-if="hasGuide(item.name)" @click.stop="openGuideModal(item.name)" class="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black bg-amber-50 text-amber-700 border border-amber-200 shadow-sm hover:bg-amber-100 transition-all">
+                                            <i class="fa-solid fa-compass text-amber-500 animate-pulse"></i> 導遊攻略
+                                        </button>
+                                    </div>
+                                    <div class="text-xs text-gray-500 space-y-2 mb-3 bg-gray-50 p-3 rounded-xl border border-gray-100" v-if="item.hours || item.price || item.address">
                                         <p v-if="item.hours" class="flex items-center font-medium"><i class="fa-regular fa-clock w-5 text-center text-maple-500 text-sm"></i> 營業: {{ item.hours }}</p>
+                                        <p v-if="item.price" class="flex items-center font-medium"><i class="fa-solid fa-ticket w-5 text-center text-maple-500 text-sm"></i> 門票: {{ item.price }}</p>
                                         <p v-if="item.address" class="flex items-start font-medium"><i class="fa-solid fa-location-dot w-5 text-center mt-0.5 text-maple-500 text-sm"></i> <span class="flex-1">{{ item.address }}</span></p>
                                     </div>
-                                    <div v-if="item.note" class="text-xs text-gray-700 bg-maple-50 p-3 rounded-xl border-l-4 border-maple-500">
+                                    <div v-if="item.note" class="text-xs text-gray-700 bg-maple-50 p-3 rounded-xl border-l-4 border-maple-500 shadow-inner">
                                         <div class="note-content font-medium leading-relaxed whitespace-pre-line break-words">{{ item.note }}</div>
                                     </div>
                                 </div>
-                                <a v-if="item.address || item.name" :href="`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.address || item.name)}`" target="_blank" @click.stop class="absolute right-4 top-[80px] w-9 h-9 rounded-full bg-maple-100 text-maple-600 flex items-center justify-center hover:bg-maple-500 hover:text-white transition-all shadow-sm">
+                                <a v-if="item.address || item.name" :href="`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.address || item.name)}`" target="_blank" @click.stop class="absolute right-4 top-[80px] w-9 h-9 rounded-full bg-maple-100 text-maple-600 flex items-center justify-center hover:bg-maple-500 hover:text-white transition-all shadow-sm z-20">
                                     <i class="fa-solid fa-location-arrow text-sm"></i>
                                 </a>
-                                <button @click.stop="editItineraryItem(item)" class="absolute bottom-4 right-4 w-10 h-10 bg-white text-blue-600 rounded-full flex items-center justify-center shadow-md border border-blue-200"><i class="fa-solid fa-pen text-sm"></i></button>
+                                <button @click.stop="editItineraryItem(item)" class="absolute bottom-4 right-4 w-10 h-10 bg-white text-blue-600 rounded-full flex items-center justify-center shadow-md border border-blue-200 z-20"><i class="fa-solid fa-pen text-sm"></i></button>
                             </div>
                         </div>
                     </template>
@@ -251,9 +303,14 @@
             <div class="bg-white rounded-3xl p-6 card-shadow">
                 <h3 class="font-bold text-gray-800 mb-4 flex items-center"><i class="fa-solid fa-bed text-indigo-500 mr-2 bg-indigo-50 p-2 rounded-lg"></i> 住宿資訊</h3>
                 <div class="space-y-4">
-                    <div v-for="hotel in hotels" :key="hotel.name" class="border border-indigo-100 rounded-2xl p-4 bg-white card-shadow">
-                        <span class="text-[10px] font-bold text-white bg-indigo-500 px-2.5 py-0.5 rounded-full">{{ hotel.date }}</span>
-                        <h4 class="font-black text-gray-800 text-lg mt-2 mb-1">{{ hotel.name }}</h4>
+                    <div v-for="hotel in hotels" :key="hotel.name" @click="openHotelGuide(hotel.name)" class="border border-indigo-100 rounded-2xl p-4 bg-white card-shadow cursor-pointer hover:border-indigo-300 transition-all">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[10px] font-bold text-white bg-indigo-500 px-2.5 py-0.5 rounded-full">{{ hotel.date }}</span>
+                            <button @click.stop="openHotelGuide(hotel.name)" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                <i class="fa-solid fa-hotel text-indigo-500"></i> 飯店設施與周邊
+                            </button>
+                        </div>
+                        <h4 class="font-black text-gray-800 text-lg mt-1 mb-1">{{ hotel.name }}</h4>
                         <p class="text-xs text-gray-500">{{ hotel.address }}</p>
                     </div>
                 </div>
@@ -265,6 +322,18 @@
             <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-6 text-white shadow-lg">
                 <h3 class="font-bold text-xl mb-1 flex items-center gap-2"><i class="fa-solid fa-map-location-dot"></i> 交通路線指南</h3>
                 <p class="text-blue-100 text-xs">名古屋鐵道 & 地鐵時刻表參考</p>
+            </div>
+            <div class="bg-white rounded-3xl p-5 card-shadow">
+                <div class="grid grid-cols-2 gap-3">
+                    <a href="https://www.kotsu.city.nagoya.jp/rp/subway/routemap.html" target="_blank" class="bg-gray-50 border p-4 rounded-2xl flex flex-col items-center justify-center text-center">
+                        <i class="fa-solid fa-train-subway text-3xl text-blue-400 mb-1"></i>
+                        <span class="text-xs font-bold text-gray-700">市營地下鐵路線圖</span>
+                    </a>
+                    <a href="https://www.meitetsu.co.jp/chs/train/route/map/index.html" target="_blank" class="bg-gray-50 border p-4 rounded-2xl flex flex-col items-center justify-center text-center">
+                        <i class="fa-solid fa-train text-3xl text-red-400 mb-1"></i>
+                        <span class="text-xs font-bold text-gray-700">名鐵線路線圖</span>
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -286,7 +355,7 @@
         <!-- Tab 4: Expenses -->
         <div v-show="currentTab === 'expenses'" class="animate-fade-in">
             <div class="expenses-banner text-white rounded-3xl p-5 mb-5 shadow-lg">
-                <div class="flex justify-between text-xs font-bold mb-2"><span>花費總覽</span></div>
+                <div class="text-xs font-bold text-maple-200 mb-1">花費總覽 (JPY)</div>
                 <div class="text-2xl font-black">¥ {{ formatNumber(filteredExpensesJPY) }}</div>
             </div>
             <div class="bg-white rounded-3xl p-5 card-shadow space-y-3">
@@ -305,56 +374,124 @@
         <i class="fa-solid fa-plus font-bold"></i>
     </button>
 
-    <!-- Modal: Itinerary -->
-    <Transition name="modal">
-        <div v-if="showItineraryModal" class="fixed inset-0 bg-black/60 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
-            <div class="absolute inset-0" @click="showItineraryModal = false"></div>
-            <div class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-3xl p-6 shadow-2xl relative z-10">
-                <h3 class="text-xl font-black mb-4">{{ isEditItineraryMode ? '編輯行程' : '新增行程' }}</h3>
-                <div class="space-y-3">
-                    <input v-model="newItinerary.name" placeholder="名稱" class="w-full border p-3 rounded-xl font-bold">
-                    <input v-model="newItinerary.startTime" placeholder="時間 (例: 09:00)" class="w-full border p-3 rounded-xl">
-                    <input v-model="newItinerary.travelTime" placeholder="交通標籤/時間 (例: 30m / 名鐵)" class="w-full border p-3 rounded-xl">
-                    <textarea v-model="newItinerary.note" placeholder="備註" class="w-full border p-3 rounded-xl h-20"></textarea>
+    <!-- Modal: Hotel Guide -->
+    <div v-if="showHotelGuideModal && activeHotelGuide" class="fixed inset-0 bg-black/60 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="absolute inset-0" @click="showHotelGuideModal = false"></div>
+        <div class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-3xl p-6 shadow-2xl relative z-10 max-h-[88vh] overflow-y-auto">
+            <div class="flex justify-between items-start mb-4 border-b pb-3">
+                <h3 class="text-xl font-black text-gray-800">{{ activeHotelGuide.title }}</h3>
+                <button @click="showHotelGuideModal = false" class="text-gray-400 p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <p class="text-xs text-gray-600 mb-4">{{ activeHotelGuide.intro }}</p>
+            <div class="space-y-3 text-xs">
+                <div v-if="activeHotelGuide.facilities" class="bg-indigo-50/50 p-3 rounded-xl">
+                    <h4 class="font-bold text-indigo-700 mb-1">飯店設施</h4>
+                    <p v-for="f in activeHotelGuide.facilities" :key="f">• {{ f }}</p>
                 </div>
-                <div class="flex gap-2 mt-4">
-                    <button v-if="isEditItineraryMode" @click="removeItineraryItem" class="flex-1 bg-red-50 text-red-500 font-bold p-3 rounded-xl">刪除</button>
-                    <button @click="saveItineraryItem" class="flex-1 bg-maple-500 text-white font-bold p-3 rounded-xl">儲存並同步</button>
+                <div v-if="activeHotelGuide.convenience" class="bg-emerald-50/50 p-3 rounded-xl">
+                    <h4 class="font-bold text-emerald-700 mb-1">周邊超商與藥妝</h4>
+                    <p v-for="c in activeHotelGuide.convenience" :key="c">• {{ c }}</p>
                 </div>
             </div>
         </div>
-    </Transition>
+    </div>
+
+    <!-- Modal: Spot Guide -->
+    <div v-if="showGuideModal && activeGuide" class="fixed inset-0 bg-black/60 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="absolute inset-0" @click="showGuideModal = false"></div>
+        <div class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-3xl p-6 shadow-2xl relative z-10 max-h-[88vh] overflow-y-auto">
+            <div class="flex justify-between items-start mb-4 border-b pb-3">
+                <h3 class="text-xl font-black text-gray-800">{{ activeGuide.title }}</h3>
+                <button @click="showGuideModal = false" class="text-gray-400 p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <p class="text-xs text-gray-600 mb-4">{{ activeGuide.intro }}</p>
+            <div class="space-y-3 text-xs">
+                <div v-if="activeGuide.mustEat" class="bg-red-50/50 p-3 rounded-xl">
+                    <h4 class="font-bold text-red-600 mb-1">必吃在地美食</h4>
+                    <p v-for="e in activeGuide.mustEat" :key="e">• {{ e }}</p>
+                </div>
+                <div v-if="activeGuide.mustBuy" class="bg-emerald-50/50 p-3 rounded-xl">
+                    <h4 class="font-bold text-emerald-700 mb-1">必買伴手禮</h4>
+                    <p v-for="b in activeGuide.mustBuy" :key="b">• {{ b }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Itinerary -->
+    <div v-if="showItineraryModal" class="fixed inset-0 bg-black/60 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="absolute inset-0" @click="showItineraryModal = false"></div>
+        <div class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-3xl p-6 shadow-2xl relative z-10">
+            <h3 class="text-xl font-black mb-4">{{ isEditItineraryMode ? '編輯行程' : '新增行程' }}</h3>
+            <div class="space-y-3 text-sm">
+                <input v-model="newItinerary.name" placeholder="名稱" class="w-full border p-3 rounded-xl font-bold">
+                <input v-model="newItinerary.startTime" placeholder="時間 (例: 09:00)" class="w-full border p-3 rounded-xl">
+                <input v-model="newItinerary.travelTime" placeholder="交通標籤/時間 (例: 30m / 名鐵)" class="w-full border p-3 rounded-xl">
+                <textarea v-model="newItinerary.note" placeholder="備註" class="w-full border p-3 rounded-xl h-20"></textarea>
+            </div>
+            <div class="flex gap-2 mt-4">
+                <button v-if="isEditItineraryMode" @click="removeItineraryItem" class="flex-1 bg-red-50 text-red-500 font-bold p-3 rounded-xl">刪除</button>
+                <button @click="saveItineraryItem" class="flex-1 bg-maple-500 text-white font-bold p-3 rounded-xl">儲存並同步</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal: Expense -->
-    <Transition name="modal">
-        <div v-if="showExpenseModal" class="fixed inset-0 bg-black/60 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
-            <div class="absolute inset-0" @click="showExpenseModal = false"></div>
-            <div class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-3xl p-6 shadow-2xl relative z-10">
-                <h3 class="text-xl font-black mb-4">{{ isEditExpenseMode ? '編輯花費' : '記一筆花費' }}</h3>
-                <div class="space-y-3">
-                    <div class="flex gap-2">
-                        <select v-model="newExpense.currency" class="border p-3 rounded-xl font-bold"><option value="JPY">JPY</option><option value="TWD">TWD</option></select>
-                        <input v-model.number="newExpense.amount" type="number" placeholder="金額" class="w-full border p-3 rounded-xl font-bold text-xl">
-                    </div>
-                    <input v-model="newExpense.name" placeholder="項目名稱" class="w-full border p-3 rounded-xl">
-                    <input v-model="newExpense.payer" placeholder="付款人 (例: 甯, 王, 艾)" class="w-full border p-3 rounded-xl">
+    <div v-if="showExpenseModal" class="fixed inset-0 bg-black/60 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="absolute inset-0" @click="showExpenseModal = false"></div>
+        <div class="bg-white w-full max-w-md rounded-t-[2.5rem] sm:rounded-3xl p-6 shadow-2xl relative z-10">
+            <h3 class="text-xl font-black mb-4">{{ isEditExpenseMode ? '編輯花費' : '記一筆花費' }}</h3>
+            <div class="space-y-3 text-sm">
+                <div class="flex gap-2">
+                    <select v-model="newExpense.currency" class="border p-3 rounded-xl font-bold"><option value="JPY">JPY</option><option value="TWD">TWD</option></select>
+                    <input v-model.number="newExpense.amount" type="number" placeholder="金額" class="w-full border p-3 rounded-xl font-bold text-xl">
                 </div>
-                <div class="flex gap-2 mt-4">
-                    <button v-if="isEditExpenseMode" @click="deleteExpense" class="flex-1 bg-red-50 text-red-500 font-bold p-3 rounded-xl">刪除</button>
-                    <button @click="saveExpenseItem" class="flex-1 bg-maple-500 text-white font-bold p-3 rounded-xl">儲存並同步</button>
-                </div>
+                <input v-model="newExpense.name" placeholder="項目名稱" class="w-full border p-3 rounded-xl">
+                <input v-model="newExpense.payer" placeholder="付款人 (例: 甯, 王, 艾)" class="w-full border p-3 rounded-xl">
+            </div>
+            <div class="flex gap-2 mt-4">
+                <button v-if="isEditExpenseMode" @click="deleteExpense" class="flex-1 bg-red-50 text-red-500 font-bold p-3 rounded-xl">刪除</button>
+                <button @click="saveExpenseItem" class="flex-1 bg-maple-500 text-white font-bold p-3 rounded-xl">儲存並同步</button>
             </div>
         </div>
-    </Transition>
+    </div>
 </div>
 
 <script>
     const draggable = window.vuedraggable;
     const { createApp, ref, computed, onMounted } = Vue;
 
-    // 跨裝置雲端資料庫端點 (已建立專屬頻道，任何手機皆可即時讀寫)
-    const SYNC_URL = 'https://api.jsonbin.io/v3/b/66eb8adfac3f335b991a7e28';
-    const MASTER_KEY = '$2a$10$tZc4x/fR79r4kG00f1B1ye2t2sC60k9hR3r8V6C67i0O4XzM2mOha';
+    const spotGuides = {
+        '中華拉麵 つづみ': { title: '高山經典老字號・中華拉麵 つづみ', intro: '創立於昭和年代的高山拉麵名鋪！', mustEat: ['中華拉麵', '慢燉叉燒'], mustBuy: ['盒裝生麵禮盒'] },
+        '早餐: かじ橋食堂': { title: '宮川河畔元氣朝食・かじ橋食堂', intro: '清晨06:00開門的溫馨日式食堂。', mustEat: ['日式朝食定食', '飛驒牛朴葉味噌定食'], mustBuy: ['越光米調理包'] },
+        '飛驒高山老街+高山陣屋': { title: '飛驒高山老街 & 高山陣屋', intro: '完整保留黑色木造江戶風格建築。', mustEat: ['炙燒飛驒牛握壽司', '五平餅'], mustBuy: ['猿寶寶保平安吉祥物'] },
+        '飛騨高山老街+高山陣屋': { title: '飛驒高山老街 & 高山陣屋', intro: '完整保留黑色木造江戶風格建築。', mustEat: ['炙燒飛驒牛握壽司', '五平餅'], mustBuy: ['猿寶寶保平安吉祥物'] },
+        '大正池→河童橋→(梓川左岸)→明神池→(梓川右岸)→河童橋': { title: '神降臨之地・上高地全覽健行', intro: '秋天落葉松金黃與穗高連峰白雪相襯。', mustEat: ['五千尺手作卡士達蘋果派'], mustBuy: ['焦糖杏仁脆餅'] },
+        '白川鄉合掌村 / 城山展望台': { title: '世界遺產・白川鄉合掌造聚落', intro: '童話般的合掌造建築聚落。', mustEat: ['現烤飛驒牛串燒', '炭燒紅豆湯'], mustBuy: ['白川鄉限定白濁酒'] },
+        '吉卜力公園': { title: '宮崎駿動畫實境・吉卜力公園', intro: '融入自然森林的沉浸式藝術莊園。', mustEat: ['貓咪城堡手作三明治'], mustBuy: ['吉卜力大倉庫紀念品'] },
+        '犬山城下町與天守閣': { title: '國寶五城・犬山城與城下町', intro: '日本現存最古老天守閣。', mustEat: ['犬山牛太郎A5和牛握壽司', '本町茶寮田樂豆腐'], mustBuy: ['三光稻荷神社繪馬'] },
+        '炭燒鰻魚藤榮 HAERA店': { title: '名古屋極致鰻魚飯・炭燒鰻魚藤栄', intro: '備長炭現烤外酥內嫩的鰻魚三吃。', mustEat: ['經典鰻魚三吃', '炭烤鰻魚肝串'], mustBuy: ['特調高湯包'] },
+        '燒鳥:炭火燒鳥 しげ榮本店': { title: '炭火燒鳥 しげ 榮本店', intro: '純炭火交趾地雞串燒居酒屋。', mustEat: ['交趾地雞腿肉串', '手作雞肉丸子配蛋黃'], mustBuy: ['特調七味粉'] },
+        '味の与平': { title: '老街百年酒造料亭・味の与平', intro: '船坂酒造直營的和食餐廳。', mustEat: ['飛驒牛朴葉味噌燒御膳'], mustBuy: ['深山菊吟釀清酒'] },
+        '晚餐: 獅子丸拉麵': { title: '名古屋拉麵名作・麵家 獅子丸', intro: '米其林推薦泡沫系雞白湯拉麵。', mustEat: ['伊勢海老雞白湯拉麵'], mustBuy: ['拉麵乾麵禮盒'] },
+        '名古屋榮商圈': { title: '時尚潮流旗艦・名古屋榮商圈', intro: '名古屋最繁華的購物商圈。', mustEat: ['LOUANGE TOKYO千層派', 'HARBS水果千層'], mustBuy: ['FUEGUIA 1833香水', '福壽園抹茶粉'] },
+        '榮區逛街': { title: '時尚潮流旗艦・名古屋榮商圈', intro: '名古屋最繁華的購物商圈。', mustEat: ['LOUANGE TOKYO千層派'], mustBuy: ['福壽園抹茶粉'] }
+    };
+
+    const hotelGuides = {
+        'FAV LUX HIDATAKAYAMA': { title: 'FAV LUX Hida Takayama', intro: '高山輕奢設計旅宿，步行至車站3分鐘。', facilities: ['舒適大浴場與溫泉設施', '寬敞客房配備微波爐冰箱'], convenience: ['7-Eleven 高山花里町店 (步行2分)', '全家高山站前店 (步行3分)'] },
+        'Henn na Hotel Nagoya': { title: 'Henn na Hotel Nagoya', intro: '名古屋恐龍與機器人接待特色科技飯店。', facilities: ['機器人櫃檯接待', '全客房配備 LG Styler 電子衣櫥'], convenience: ['Lawson 伏見站南店 (步行1分)', '大型藥妝店 (步行4分)'] }
+    };
+
+    const makeHourly = (minT, maxT, cond) => {
+        const curve = [0.2, 0.1, 0.0, 0.2, 0.6, 0.9, 1.0, 0.8, 0.5, 0.3, 0.2];
+        return curve.map((pct, i) => ({
+            time: `${String(i * 2).padStart(2, '0')}:00`,
+            temp: Math.round(minT + (maxT - minT) * pct),
+            condition: cond, pop: cond === 'rain' ? 80 : 10,
+            isNight: (i * 2 < 6 || i * 2 >= 18)
+        }));
+    };
 
     const defaultItineraryData = [
         [
@@ -396,11 +533,12 @@
             { id: 406, name: '燒鳥:炭火燒鳥 しげ榮本店', category: 'food', startTime: '20:00', address: 'しげ榮本店', note: '預約號碼:99bc9420', transportType: 'walk', travelTime: '飯店' }
         ],
         [
-            { id: 501, name: '飯店早餐', category: 'food', startTime: '07:00', address: '飯店', note: '', transportType: 'walk', travelTime: '名鐵' },
+            { id: 501, name: '飯店早餐', category: 'food', startTime: '07:00', address: '飯店', note: '飯店晨間朝食', hours: '06:30-10:00', transportType: 'walk', travelTime: '至名鐵站' },
             { id: 502, name: '飯店-名古屋車站', category: 'transport', startTime: '08:30-09:00', address: '名古屋車站', note: '', transportType: 'public', travelTime: '名鐵' },
             { id: 503, name: '名鐵名古屋站(名鐵犬山線)→犬山站', category: 'transport', startTime: '09:00-09:30', address: '犬山站', note: '車程約30分', transportType: 'public', travelTime: '犬山' },
             { id: 504, name: '犬山城下町與天守閣', category: 'sightseeing', startTime: '09:30-15:00', address: '犬山城', note: '牛太郎、本町茶寮、三光稻荷神社', transportType: 'walk', travelTime: '回車站' },
-            { id: 505, name: '晚餐: 獅子丸拉麵', category: 'food', startTime: '18:00-19:30', address: '獅子丸拉麵', note: '', transportType: 'walk', travelTime: '飯店' }
+            { id: 505, name: '晚餐: 獅子丸拉麵', category: 'food', startTime: '18:00-19:30', address: '獅子丸拉麵', note: '', transportType: 'walk', travelTime: '至飯店' },
+            { id: 506, name: '住 henn na hotel', category: 'accommodation', startTime: '20:00', address: 'henn na hotel', note: '', transportType: 'walk', travelTime: '' }
         ],
         [
             { id: 601, name: '飯店早餐', category: 'food', startTime: '08:00', address: '飯店', note: '', transportType: 'walk', travelTime: '榮' },
@@ -415,7 +553,21 @@
         setup() {
             const currentTab = ref('itinerary');
             const selectedDateIndex = ref(0);
+            const selectedRegionIndex = ref(0);
             const syncStatus = ref('online');
+
+            const showGuideModal = ref(false);
+            const activeGuide = ref(null);
+            const openGuideModal = (name) => {
+                if (spotGuides[name]) { activeGuide.value = spotGuides[name]; showGuideModal.value = true; }
+            };
+            const hasGuide = (name) => !!spotGuides[name];
+
+            const showHotelGuideModal = ref(false);
+            const activeHotelGuide = ref(null);
+            const openHotelGuide = (name) => {
+                if (hotelGuides[name]) { activeHotelGuide.value = hotelGuides[name]; showHotelGuideModal.value = true; }
+            };
 
             const exchangeRate = ref(0.215);
             const jpyInput = ref(10000);
@@ -430,12 +582,46 @@
                 { date: '11/02', weekday: 'Mon' }, { date: '11/03', weekday: 'Tue' }
             ]);
 
-            const currentWeather = ref({ region: '高山', condition: 'sunny', temp: '16/7', feel: '14', pop: 10 });
-            const currentOverview = computed(() => ({
-                title: '日本中部北陸自由行',
-                desc: '高山老街、世界遺產白川鄉、上高地絕景、宮崎駿吉卜力公園',
-                highlights: ['飛驒牛', '老街', '吉卜力', '合掌村']
-            }));
+            const weatherRegionsData = ref([
+                [
+                    { region: '高山', condition: 'sunny', temp: '16/7', feel: '14', pop: 10, hourly: makeHourly(7, 16, 'sunny') },
+                    { region: '名古屋', condition: 'sunny', temp: '19/11', feel: '18', pop: 10, hourly: makeHourly(11, 19, 'sunny') }
+                ],
+                [
+                    { region: '上高地', condition: 'cloudy', temp: '12/3', feel: '9', pop: 30, hourly: makeHourly(3, 12, 'cloudy') },
+                    { region: '高山', condition: 'sunny', temp: '15/6', feel: '13', pop: 10, hourly: makeHourly(6, 15, 'sunny') }
+                ],
+                [
+                    { region: '白川鄉', condition: 'sunny', temp: '14/5', feel: '12', pop: 10, hourly: makeHourly(5, 14, 'sunny') },
+                    { region: '名古屋', condition: 'sunny', temp: '19/10', feel: '18', pop: 10, hourly: makeHourly(10, 19, 'sunny') }
+                ],
+                [
+                    { region: '吉卜力公園', condition: 'sunny', temp: '18/10', feel: '17', pop: 10, hourly: makeHourly(10, 18, 'sunny') },
+                    { region: '名古屋', condition: 'sunny', temp: '19/11', feel: '18', pop: 10, hourly: makeHourly(11, 19, 'sunny') }
+                ],
+                [
+                    { region: '犬山', condition: 'cloudy', temp: '17/9', feel: '15', pop: 30, hourly: makeHourly(9, 17, 'cloudy') },
+                    { region: '名古屋', condition: 'cloudy', temp: '18/10', feel: '16', pop: 30, hourly: makeHourly(10, 18, 'cloudy') }
+                ],
+                [
+                    { region: '名古屋', condition: 'rain', temp: '16/10', feel: '14', pop: 80, hourly: makeHourly(10, 16, 'rain') }
+                ]
+            ]);
+
+            watch(selectedDateIndex, () => { selectedRegionIndex.value = 0; });
+
+            const currentDayRegions = computed(() => weatherRegionsData.value[selectedDateIndex.value] || []);
+            const currentWeather = computed(() => currentDayRegions.value[selectedRegionIndex.value] || currentDayRegions.value[0]);
+
+            const dailyOverviews = ref([
+                { title: '飛驒高山・江戶老街漫步與極致和牛', desc: '抵達日本後直奔飛驒小京都「高山」，享用飛驒牛壽喜燒與三町通老街。', highlights: ['飛驒牛', '老街', '高山陣屋'] },
+                { title: '神之故鄉・上高地金秋絕景大健行', desc: '全日沉浸在阿爾卑斯仙境「上高地」，欣賞梓川與明神池神聖美景。', highlights: ['上高地', '梓川', '河童橋'] },
+                { title: '童話合掌村與名古屋繁華購物夜', desc: '前往世界遺產「白川鄉合掌村」，午後返回名古屋大啖鰻魚三吃。', highlights: ['合掌村', '城山展望台', '鰻魚飯'] },
+                { title: '童心沉浸・宮崎駿吉卜力公園夢幻日', desc: '朝聖愛知「吉卜力公園」，傍晚在榮商圈品嚐純炭火居酒屋。', highlights: ['吉卜力大倉庫', '魔女之谷', '地雞燒鳥'] },
+                { title: '國寶犬山城・城下町洗錢結緣散策', desc: '登頂國寶犬山城360度迴廊，體驗三光稻荷洗錢儀式與城下町小吃。', highlights: ['國寶犬山城', '三光稻荷洗錢', '獅子丸拉麵'] },
+                { title: '榮商圈精品甜點巡禮・滿載回台', desc: '榮商圈朝聖精品小眾香氛與法式甜點，滿載戰利品賦歸。', highlights: ['榮商圈精品', '法式甜點', '中部國際機場'] }
+            ]);
+            const currentOverview = computed(() => dailyOverviews.value[selectedDateIndex.value]);
 
             const itineraryData = ref(JSON.parse(JSON.stringify(defaultItineraryData)));
             const shoppingList = ref([
@@ -444,6 +630,11 @@
             ]);
             const expenses = ref([
                 { name: 'Klook 高山車票', amount: 4780, category: 'transport', date: '2026-10-29', payment: 'card', payer: '甯', currency: 'TWD' }
+            ]);
+
+            const hotels = ref([
+                { name: 'FAV LUX HIDATAKAYAMA', date: '10/29 - 10/31', address: '高山市花里町' },
+                { name: 'Henn na Hotel Nagoya', date: '10/31 - 11/03', address: '名古屋市中區錦' }
             ]);
 
             const showItineraryModal = ref(false);
@@ -456,50 +647,39 @@
             const editingExpenseIndex = ref(-1);
             const newExpense = ref({ name: '', amount: null, payer: '甯', currency: 'JPY', date: '2026-10-29' });
 
-            // 讀取遠端雲端資料庫
+            // 雙向即時雲端同步 (JSONbin 穩定公開端點)
+            const SYNC_URL = 'https://api.jsonbin.io/v3/b/66eb8adfac3f335b991a7e28';
+            const MASTER_KEY = '$2a$10$tZc4x/fR79r4kG00f1B1ye2t2sC60k9hR3r8V6C67i0O4XzM2mOha';
+
             const fetchCloudData = async () => {
                 syncStatus.value = 'syncing';
                 try {
-                    const res = await fetch(`${SYNC_URL}/latest`, {
-                        headers: { 'X-Master-Key': MASTER_KEY }
-                    });
+                    const res = await fetch(`${SYNC_URL}/latest`, { headers: { 'X-Master-Key': MASTER_KEY } });
                     if (res.ok) {
                         const json = await res.json();
-                        if (json.record && json.record.itinerary && json.record.itinerary.length > 0) {
+                        if (json.record && json.record.itinerary && Array.isArray(json.record.itinerary) && json.record.itinerary.length > 0) {
                             itineraryData.value = json.record.itinerary;
                             if (json.record.shopping) shoppingList.value = json.record.shopping;
                             if (json.record.expenses) expenses.value = json.record.expenses;
                         }
                     }
-                } catch(e) {
-                    console.log('使用本機預設資料啟動');
-                }
+                } catch(e) {}
                 syncStatus.value = 'online';
             };
 
-            // 推送更新至雲端資料庫
             const triggerSync = async () => {
                 syncStatus.value = 'syncing';
                 try {
                     await fetch(SYNC_URL, {
                         method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Master-Key': MASTER_KEY
-                        },
-                        body: JSON.stringify({
-                            itinerary: itineraryData.value,
-                            shopping: shoppingList.value,
-                            expenses: expenses.value
-                        })
+                        headers: { 'Content-Type': 'application/json', 'X-Master-Key': MASTER_KEY },
+                        body: JSON.stringify({ itinerary: itineraryData.value, shopping: shoppingList.value, expenses: expenses.value })
                     });
                 } catch(e) {}
                 syncStatus.value = 'online';
             };
 
-            onMounted(() => {
-                fetchCloudData();
-            });
+            onMounted(() => { fetchCloudData(); });
 
             const currentItinerary = computed({
                 get: () => itineraryData.value[selectedDateIndex.value] || [],
@@ -509,11 +689,13 @@
             const filteredExpensesJPY = computed(() => expenses.value.filter(e => e.currency === 'JPY').reduce((sum, e) => sum + Number(e.amount), 0));
             const formatNumber = (n) => n ? Number(n).toLocaleString() : '0';
 
-            const getCategoryColor = () => 'bg-maple-500';
-            const getCategoryIcon = () => 'fa-solid fa-camera';
-            const getCategoryLabel = () => '景點';
-            const getWeatherIcon = () => 'fa-solid fa-sun';
-            const getTransportIcon = () => 'fa-solid fa-person-walking';
+            const getCategoryColor = (cat) => ({ sightseeing: 'bg-[#2E5C3A]', food: 'bg-[#B33A3A]', shopping: 'bg-[#6C8D74]', accommodation: 'bg-[#D98E6C]', flight: 'bg-[#3A5CB3]', transport: 'bg-[#8A3B31]' }[cat] || 'bg-gray-500');
+            const getCategoryIcon = (cat) => ({ sightseeing: 'fa-solid fa-camera', food: 'fa-solid fa-utensils', shopping: 'fa-solid fa-basket-shopping', accommodation: 'fa-solid fa-bed', flight: 'fa-solid fa-plane', transport: 'fa-solid fa-train-subway' }[cat] || 'fa-solid fa-tag');
+            const getCategoryLabel = (cat) => ({ sightseeing: '景點', food: '飲食', shopping: '購物', accommodation: '住宿', flight: '航班', transport: '交通' }[cat] || '其他');
+            const getWeatherIcon = (c) => ({ sunny: 'fa-solid fa-sun', cloudy: 'fa-solid fa-cloud', rain: 'fa-solid fa-cloud-showers-heavy' }[c] || 'fa-solid fa-sun');
+            const getHourlyWeatherIcon = (h) => h.isNight ? 'fa-solid fa-moon' : getWeatherIcon(h.condition);
+            const getWeatherDescription = (c) => ({ sunny: '晴朗', cloudy: '多雲', rain: '降雨' }[c] || '晴朗');
+            const getTransportIcon = (t) => ({ walk: 'fa-solid fa-person-walking', bus: 'fa-solid fa-bus', public: 'fa-solid fa-train-subway', flight: 'fa-solid fa-plane' }[t] || 'fa-solid fa-person-walking');
 
             const editItineraryItem = (item) => {
                 isEditItineraryMode.value = true;
@@ -523,7 +705,7 @@
             };
 
             const saveItineraryItem = () => {
-                if (!newItinerary.value.name) return;
+                if (!newItinerary.value.name) return alert('請輸入名稱');
                 const list = [...currentItinerary.value];
                 if (isEditItineraryMode.value && editingItineraryIndex.value > -1) {
                     list[editingItineraryIndex.value] = { ...newItinerary.value };
@@ -536,11 +718,13 @@
             };
 
             const removeItineraryItem = () => {
-                const list = [...currentItinerary.value];
-                list.splice(editingItineraryIndex.value, 1);
-                currentItinerary.value = list;
-                showItineraryModal.value = false;
-                triggerSync();
+                if (confirm('確定刪除此行程？')) {
+                    const list = [...currentItinerary.value];
+                    list.splice(editingItineraryIndex.value, 1);
+                    currentItinerary.value = list;
+                    showItineraryModal.value = false;
+                    triggerSync();
+                }
             };
 
             const handleAddClick = () => {
@@ -563,7 +747,7 @@
             };
 
             const saveExpenseItem = () => {
-                if (!newExpense.value.name || !newExpense.value.amount) return;
+                if (!newExpense.value.name || !newExpense.value.amount) return alert('請輸入名稱與金額');
                 if (isEditExpenseMode.value && editingExpenseIndex.value > -1) {
                     expenses.value[editingExpenseIndex.value] = { ...newExpense.value };
                 } else {
@@ -574,20 +758,24 @@
             };
 
             const deleteExpense = () => {
-                expenses.value.splice(editingExpenseIndex.value, 1);
-                showExpenseModal.value = false;
-                triggerSync();
+                if (confirm('確定刪除此花費？')) {
+                    expenses.value.splice(editingExpenseIndex.value, 1);
+                    showExpenseModal.value = false;
+                    triggerSync();
+                }
             };
 
             return {
-                currentTab, selectedDateIndex, syncStatus, dates, currentWeather, currentOverview,
-                currentItinerary, shoppingList, expenses, jpyInput, twdInput,
-                updateFromJpy, updateFromTwd, filteredExpensesJPY, formatNumber,
-                getCategoryColor, getCategoryIcon, getCategoryLabel, getWeatherIcon, getTransportIcon,
+                currentTab, selectedDateIndex, selectedRegionIndex, syncStatus,
+                dates, weatherRegionsData, currentDayRegions, currentWeather, currentOverview,
+                currentItinerary, shoppingList, expenses, hotels,
+                jpyInput, twdInput, updateFromJpy, updateFromTwd, filteredExpensesJPY, formatNumber,
+                getCategoryColor, getCategoryIcon, getCategoryLabel, getWeatherIcon, getHourlyWeatherIcon, getWeatherDescription, getTransportIcon,
                 showItineraryModal, isEditItineraryMode, newItinerary, editItineraryItem, saveItineraryItem, removeItineraryItem,
                 showExpenseModal, isEditExpenseMode, newExpense, editExpenseItem, saveExpenseItem, deleteExpense,
-                handleAddClick, triggerSync,
-                hotels: ref([{ name: 'FAV LUX HIDATAKAYAMA', date: '10/29 - 10/31', address: '高山' }, { name: 'Henn na Hotel Nagoya', date: '10/31 - 11/03', address: '名古屋' }])
+                showGuideModal, activeGuide, openGuideModal, hasGuide,
+                showHotelGuideModal, activeHotelGuide, openHotelGuide,
+                handleAddClick, triggerSync
             };
         }
     }).mount('#app');

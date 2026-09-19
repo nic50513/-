@@ -10,8 +10,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuedraggable@4.1.0/dist/vuedraggable.umd.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <script>
         tailwind.config = {
@@ -28,8 +26,6 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
         
-        [v-cloak] { display: none !important; }
-
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
@@ -81,16 +77,11 @@
         .ghost-card { opacity: 0.5; background: #FCE4D6; border: 2px dashed #DE7B54; }
         .drag-handle { cursor: grab; color: #cbd5e1; }
         .drag-handle:active { cursor: grabbing; color: #DE7B54; }
-        
-        .modal-enter-active, .modal-leave-active { transition: opacity 0.3s ease; }
-        .modal-enter-from, .modal-leave-to { opacity: 0; }
-        .modal-slide-enter-active, .modal-slide-leave-active { transition: transform 0.3s ease; }
-        .modal-slide-enter-from, .modal-slide-leave-to { transform: translateY(100%); }
     </style>
 </head>
 <body>
 
-<div id="app" class="app-container" v-cloak>
+<div id="app" class="app-container">
     <div class="banner-wrapper"></div>
     
     <div class="nav-tabs-bar">
@@ -112,10 +103,10 @@
     </div>
     
     <div v-if="syncStatus === 'syncing'" class="bg-blue-50 text-blue-500 text-[10px] font-bold text-center py-0.5 flex items-center justify-center gap-1 border-b border-blue-100">
-        <i class="fa-solid fa-sync animate-spin"></i> 雲端同步中...
+        <i class="fa-solid fa-sync animate-spin"></i> 雲端同步更新中...
     </div>
     <div v-else-if="syncStatus === 'online'" class="bg-green-50 text-green-500 text-[10px] font-bold text-center py-0.5 flex items-center justify-center gap-1 border-b border-green-100">
-        <i class="fa-solid fa-cloud-check"></i> 雲端已連線同步
+        <i class="fa-solid fa-cloud-check"></i> 雲端同步就緒 (跨裝置共用)
     </div>
 
     <main class="px-4 app-main">
@@ -235,12 +226,12 @@
                                 <div class="flex justify-between items-center px-2 relative z-10">
                                     <div class="text-center"><div class="text-2xl font-black text-gray-800">TPE</div></div>
                                     <div class="flex flex-col items-center text-blue-500 px-4 w-full">
-                                        <span class="bg-white px-2 py-0.5 rounded-full shadow-sm border border-blue-100 mb-1 text-[10px] font-bold z-10">{{ item.travelTime || '依航班時刻' }}</span>
+                                        <span class="bg-white px-2 py-0.5 rounded-full shadow-sm border border-blue-100 mb-1 text-[10px] font-bold">{{ item.travelTime || '依航班時刻' }}</span>
                                         <div class="w-full border-t-2 border-dashed border-blue-300 relative -mt-3"><i class="fa-solid fa-plane absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-50 px-1 text-base"></i></div>
                                     </div>
                                     <div class="text-center"><div class="text-2xl font-black text-gray-800">NGO</div></div>
                                 </div>
-                                <div v-if="item.note" class="mt-4 text-xs font-bold text-blue-800 bg-white/70 p-2.5 rounded-xl border border-blue-200/50 relative z-10 shadow-inner flex items-start gap-2">
+                                <div v-if="item.note" class="mt-4 text-xs font-bold text-blue-800 bg-white/70 backdrop-blur p-2.5 rounded-xl border border-blue-200/50 flex items-start gap-2">
                                     <i class="fa-solid fa-circle-info text-base mt-0.5"></i><span class="leading-relaxed whitespace-pre-line break-words">{{ item.note }}</span>
                                 </div>
                                 <button @click.stop="editItineraryItem(item)" class="absolute bottom-3 right-3 w-9 h-9 bg-white text-blue-600 rounded-full flex items-center justify-center shadow-md border border-blue-200 z-20"><i class="fa-solid fa-pen text-sm"></i></button>
@@ -266,7 +257,6 @@
                                     </div>
                                     <div class="text-xs text-gray-500 space-y-2 mb-3 bg-gray-50 p-3 rounded-xl border border-gray-100" v-if="item.hours || item.price || item.address">
                                         <p v-if="item.hours" class="flex items-center font-medium"><i class="fa-regular fa-clock w-5 text-center text-maple-500 text-sm"></i> 營業: {{ item.hours }}</p>
-                                        <p v-if="item.price" class="flex items-center font-medium"><i class="fa-solid fa-ticket w-5 text-center text-maple-500 text-sm"></i> 門票: {{ item.price }}</p>
                                         <p v-if="item.address" class="flex items-start font-medium"><i class="fa-solid fa-location-dot w-5 text-center mt-0.5 text-maple-500 text-sm"></i> <span class="flex-1">{{ item.address }}</span></p>
                                     </div>
                                     <div v-if="item.note" class="text-xs text-gray-700 bg-maple-50 p-3 rounded-xl border-l-4 border-maple-500 shadow-inner">
@@ -508,7 +498,7 @@
         ],
         [
             { id: 201, name: '起床', category: 'other', startTime: '06:00', address: '', note: '', transportType: 'walk', travelTime: '' },
-            { id: 202, name: '高山車站 - 平湯溫泉站', category: 'transport', startTime: '07:00-08:00', address: '平湯溫泉', note: '搭乘巴士', transportType: 'bus', travelTime: '轉乘' },
+            { id: 202, name: '高山車站 - 平湯溫泉站', category: 'transport', startTime: '07:00-08:08', address: '平湯溫泉', note: '搭乘巴士', transportType: 'bus', travelTime: '轉乘' },
             { id: 203, name: '平湯溫泉 - 大正池', category: 'transport', startTime: '08:30-09:00', address: '大正池', note: '', transportType: 'bus', travelTime: '健行' },
             { id: 204, name: '大正池→河童橋→(梓川左岸)→明神池→(梓川右岸)→河童橋', category: 'sightseeing', startTime: '09:00-15:00', address: '上高地', note: '全覽健行', transportType: 'walk', travelTime: '回程' },
             { id: 205, name: '上高地站→平湯溫泉→高山站', category: 'transport', startTime: '15:30-17:31', address: '高山站', note: '', transportType: 'bus', travelTime: '至餐廳' },
@@ -647,20 +637,19 @@
             const editingExpenseIndex = ref(-1);
             const newExpense = ref({ name: '', amount: null, payer: '甯', currency: 'JPY', date: '2026-10-29' });
 
-            // 雙向即時雲端同步 (JSONbin 穩定公開端點)
-            const SYNC_URL = 'https://api.jsonbin.io/v3/b/66eb8adfac3f335b991a7e28';
-            const MASTER_KEY = '$2a$10$tZc4x/fR79r4kG00f1B1ye2t2sC60k9hR3r8V6C67i0O4XzM2mOha';
+            // 零依賴、無跨域阻擋的雲端頻道同步
+            const SYNC_ENDPOINT = 'https://kvdb.io/AnV9H7mC5uL8iK2wPx4s1Q/japan2026_itinerary_sync';
 
             const fetchCloudData = async () => {
                 syncStatus.value = 'syncing';
                 try {
-                    const res = await fetch(`${SYNC_URL}/latest`, { headers: { 'X-Master-Key': MASTER_KEY } });
+                    const res = await fetch(SYNC_ENDPOINT, { cache: 'no-store' });
                     if (res.ok) {
-                        const json = await res.json();
-                        if (json.record && json.record.itinerary && Array.isArray(json.record.itinerary) && json.record.itinerary.length > 0) {
-                            itineraryData.value = json.record.itinerary;
-                            if (json.record.shopping) shoppingList.value = json.record.shopping;
-                            if (json.record.expenses) expenses.value = json.record.expenses;
+                        const data = await res.json();
+                        if (data && data.itinerary && Array.isArray(data.itinerary) && data.itinerary.length > 0) {
+                            itineraryData.value = data.itinerary;
+                            if (data.shopping) shoppingList.value = data.shopping;
+                            if (data.expenses) expenses.value = data.expenses;
                         }
                     }
                 } catch(e) {}
@@ -670,10 +659,13 @@
             const triggerSync = async () => {
                 syncStatus.value = 'syncing';
                 try {
-                    await fetch(SYNC_URL, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json', 'X-Master-Key': MASTER_KEY },
-                        body: JSON.stringify({ itinerary: itineraryData.value, shopping: shoppingList.value, expenses: expenses.value })
+                    await fetch(SYNC_ENDPOINT, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            itinerary: itineraryData.value,
+                            shopping: shoppingList.value,
+                            expenses: expenses.value
+                        })
                     });
                 } catch(e) {}
                 syncStatus.value = 'online';
